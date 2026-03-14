@@ -1,0 +1,24 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Dart/Flutter (covered by brainy-app/.gitignore, but added for root safety)
+.dart_tool/
+.packages
+build/
+*.lock
+!pubspec.lock
+
+# Miscellaneous
+*.log
+*.tmp
+*.bak

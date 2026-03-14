@@ -1,0 +1,2 @@
+PUB=flutter pub add purchases_flutter purchases_ui_flutter
+API_KEY=test_WtvrALanvuosOAfJiyHAvmrDCJW
