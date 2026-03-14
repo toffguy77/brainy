@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "appName": "Brainy",
+  "play": "Play",
+  "character": "Character",
+  "progress": "Progress",
+  "settings": "Settings",
+  "continue_": "Continue",
+  "skip": "Skip",
+  "back": "Back"
+}

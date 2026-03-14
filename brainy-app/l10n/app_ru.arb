@@ -1,0 +1,11 @@
+{
+  "@@locale": "ru",
+  "appName": "Brainy",
+  "play": "Играть",
+  "character": "Персонаж",
+  "progress": "Прогресс",
+  "settings": "Настройки",
+  "continue_": "Продолжить",
+  "skip": "Пропустить",
+  "back": "Назад"
+}
