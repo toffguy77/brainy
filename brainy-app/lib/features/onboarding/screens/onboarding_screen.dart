@@ -9,6 +9,8 @@ import '../pages/age_page.dart';
 import '../pages/goals_page.dart';
 import '../pages/frequency_page.dart';
 import '../pages/paywall_page.dart';
+import '../pages/schulte_info_page.dart';
+import '../pages/science_page.dart';
 
 class OnboardingScreen extends ConsumerStatefulWidget {
   const OnboardingScreen({super.key});
@@ -67,6 +69,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   children: const [
                     WelcomePage(),
+                    SchulteInfoPage(),
+                    SciencePage(),
                     AgePage(),
                     GoalsPage(),
                     FrequencyPage(),

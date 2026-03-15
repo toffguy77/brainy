@@ -404,6 +404,90 @@ abstract class AppLocalizations {
   /// **'Продолжить без подписки'**
   String get onboardingSkipPaywall;
 
+  /// No description provided for @onboardingSchulteTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таблицы Шульте — тренажёр для мозга'**
+  String get onboardingSchulteTitle;
+
+  /// No description provided for @onboardingSchulteSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Находи числа по порядку как можно быстрее. Чем больше таблица — тем сложнее!'**
+  String get onboardingSchulteSubtitle;
+
+  /// No description provided for @onboardingSchulteHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найди числа по порядку: 1, 2, 3...'**
+  String get onboardingSchulteHint;
+
+  /// No description provided for @onboardingSchulteBenefit1.
+  ///
+  /// In ru, this message translates to:
+  /// **'Развивает внимание и концентрацию'**
+  String get onboardingSchulteBenefit1;
+
+  /// No description provided for @onboardingSchulteBenefit2.
+  ///
+  /// In ru, this message translates to:
+  /// **'Расширяет периферическое зрение'**
+  String get onboardingSchulteBenefit2;
+
+  /// No description provided for @onboardingSchulteBenefit3.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ускоряет чтение в 1.5–2 раза'**
+  String get onboardingSchulteBenefit3;
+
+  /// No description provided for @onboardingScienceTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Проверено наукой'**
+  String get onboardingScienceTitle;
+
+  /// No description provided for @onboardingScienceSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Методика создана немецким психиатром Вальтером Шульте в 1960-х для тренировки внимания'**
+  String get onboardingScienceSubtitle;
+
+  /// No description provided for @onboardingScienceFact1Value.
+  ///
+  /// In ru, this message translates to:
+  /// **'60+ лет'**
+  String get onboardingScienceFact1Value;
+
+  /// No description provided for @onboardingScienceFact1Label.
+  ///
+  /// In ru, this message translates to:
+  /// **'используется в нейропсихологии и педагогике'**
+  String get onboardingScienceFact1Label;
+
+  /// No description provided for @onboardingScienceFact2Value.
+  ///
+  /// In ru, this message translates to:
+  /// **'2 недели'**
+  String get onboardingScienceFact2Value;
+
+  /// No description provided for @onboardingScienceFact2Label.
+  ///
+  /// In ru, this message translates to:
+  /// **'для заметного улучшения скорости чтения при ежедневных занятиях'**
+  String get onboardingScienceFact2Label;
+
+  /// No description provided for @onboardingScienceFact3Value.
+  ///
+  /// In ru, this message translates to:
+  /// **'5 мин/день'**
+  String get onboardingScienceFact3Value;
+
+  /// No description provided for @onboardingScienceFact3Label.
+  ///
+  /// In ru, this message translates to:
+  /// **'достаточно для результата — не перегружает ребёнка'**
+  String get onboardingScienceFact3Label;
+
   /// No description provided for @onboardingAlreadySubscribed.
   ///
   /// In ru, this message translates to:

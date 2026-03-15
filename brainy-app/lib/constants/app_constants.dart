@@ -90,7 +90,7 @@ class AppConstants {
   ];
   static const List<int> frequencyOptions = [5, 10, 15];
   static const int recommendedFrequencyMinutes = 10;
-  static const int onboardingPageCount = 5;
+  static const int onboardingPageCount = 7;
 
   // RevenueCat
   static const String revenueCatApiKey = String.fromEnvironment(

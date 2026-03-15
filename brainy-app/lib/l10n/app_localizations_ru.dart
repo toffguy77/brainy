@@ -167,6 +167,53 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingSkipPaywall => 'Продолжить без подписки';
 
   @override
+  String get onboardingSchulteTitle => 'Таблицы Шульте — тренажёр для мозга';
+
+  @override
+  String get onboardingSchulteSubtitle =>
+      'Находи числа по порядку как можно быстрее. Чем больше таблица — тем сложнее!';
+
+  @override
+  String get onboardingSchulteHint => 'Найди числа по порядку: 1, 2, 3...';
+
+  @override
+  String get onboardingSchulteBenefit1 => 'Развивает внимание и концентрацию';
+
+  @override
+  String get onboardingSchulteBenefit2 => 'Расширяет периферическое зрение';
+
+  @override
+  String get onboardingSchulteBenefit3 => 'Ускоряет чтение в 1.5–2 раза';
+
+  @override
+  String get onboardingScienceTitle => 'Проверено наукой';
+
+  @override
+  String get onboardingScienceSubtitle =>
+      'Методика создана немецким психиатром Вальтером Шульте в 1960-х для тренировки внимания';
+
+  @override
+  String get onboardingScienceFact1Value => '60+ лет';
+
+  @override
+  String get onboardingScienceFact1Label =>
+      'используется в нейропсихологии и педагогике';
+
+  @override
+  String get onboardingScienceFact2Value => '2 недели';
+
+  @override
+  String get onboardingScienceFact2Label =>
+      'для заметного улучшения скорости чтения при ежедневных занятиях';
+
+  @override
+  String get onboardingScienceFact3Value => '5 мин/день';
+
+  @override
+  String get onboardingScienceFact3Label =>
+      'достаточно для результата — не перегружает ребёнка';
+
+  @override
   String get onboardingAlreadySubscribed => 'Вы уже подписаны!';
 
   @override

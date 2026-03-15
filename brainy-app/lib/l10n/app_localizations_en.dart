@@ -166,6 +166,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingSkipPaywall => 'Continue without subscription';
 
   @override
+  String get onboardingSchulteTitle => 'Schulte Tables — Brain Trainer';
+
+  @override
+  String get onboardingSchulteSubtitle =>
+      'Find the numbers in order as fast as you can. Bigger grid — harder challenge!';
+
+  @override
+  String get onboardingSchulteHint => 'Find the numbers in order: 1, 2, 3...';
+
+  @override
+  String get onboardingSchulteBenefit1 => 'Builds attention and concentration';
+
+  @override
+  String get onboardingSchulteBenefit2 => 'Expands peripheral vision';
+
+  @override
+  String get onboardingSchulteBenefit3 => 'Boosts reading speed 1.5–2×';
+
+  @override
+  String get onboardingScienceTitle => 'Backed by Science';
+
+  @override
+  String get onboardingScienceSubtitle =>
+      'Developed by German psychiatrist Walter Schulte in the 1960s for attention training';
+
+  @override
+  String get onboardingScienceFact1Value => '60+ years';
+
+  @override
+  String get onboardingScienceFact1Label =>
+      'used in neuropsychology and education';
+
+  @override
+  String get onboardingScienceFact2Value => '2 weeks';
+
+  @override
+  String get onboardingScienceFact2Label =>
+      'to noticeably improve reading speed with daily practice';
+
+  @override
+  String get onboardingScienceFact3Value => '5 min/day';
+
+  @override
+  String get onboardingScienceFact3Label =>
+      'enough for results — won\'t overwhelm your child';
+
+  @override
   String get onboardingAlreadySubscribed => 'You\'re already subscribed!';
 
   @override
