@@ -49,6 +49,7 @@ class SoundService {
 enum SoundEffect {
   tapCorrect('tap_correct.wav'),
   tapWrong('tap_wrong.wav'),
+  gameStart('game_start.wav'),
   gameComplete('game_complete.wav'),
   recordBroken('record_broken.wav'),
   achievement('achievement.wav'),

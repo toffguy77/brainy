@@ -61,6 +61,7 @@ class GameNotifier extends Notifier<GameState> {
           status: GameStatus.playing,
           countdownValue: null,
         );
+        SoundService.play(SoundEffect.gameStart);
         _startTimer();
       } else {
         state = state.copyWith(countdownValue: current - 1);
