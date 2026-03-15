@@ -18,6 +18,9 @@ build/
 *.lock
 !pubspec.lock
 
+# Superpowers brainstorming sessions
+.superpowers/
+
 # Miscellaneous
 *.log
 *.tmp
