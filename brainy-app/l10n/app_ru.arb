@@ -7,5 +7,249 @@
   "settings": "Настройки",
   "continue_": "Продолжить",
   "skip": "Пропустить",
-  "back": "Назад"
+  "back": "Назад",
+  "result": "Результат",
+  "newRecord": "Новый рекорд!",
+  "greatResult": "Отличный результат!",
+  "goodResult": "Хороший результат!",
+  "keepPracticing": "Продолжай тренироваться!",
+  "timeSec": "{seconds} сек",
+  "@timeSec": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "timeMinSec": "{minutes}:{seconds}",
+  "@timeMinSec": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "String"}
+    }
+  },
+  "coinsEarned": "Монеты",
+  "mistakes": "Ошибки",
+  "personalRecord": "Рекорд",
+  "playAgain": "Сыграть ещё",
+  "home": "Домой",
+
+  "onboardingWelcomeTitle": "Тренируем мозг играючи",
+  "onboardingWelcomeSubtitle": "Таблицы Шульте для детей 6–14 лет",
+  "onboardingStart": "Начать",
+  "onboardingNext": "Далее",
+  "onboardingAgeTitle": "Сколько лет ребёнку?",
+  "onboardingAgeSubtitle": "Подберём подходящую сложность",
+  "onboardingAge69": "6 – 9 лет",
+  "onboardingAge1012": "10 – 12 лет",
+  "onboardingAge1314": "13 – 14 лет",
+  "onboardingGoalsTitle": "Какая главная цель?",
+  "onboardingGoalsSubtitle": "Выбери одно или несколько",
+  "onboardingGoalConcentration": "Концентрация",
+  "onboardingGoalReading": "Скорость чтения",
+  "onboardingGoalExams": "Подготовка к экзаменам",
+  "onboardingGoalFun": "Просто тренировка",
+  "onboardingFrequencyTitle": "Сколько времени в день?",
+  "onboardingFrequencySubtitle": "Даже 5 минут в день дают результат",
+  "onboardingFreq5min": "5 минут",
+  "onboardingFreq5minDesc": "Лёгкий старт",
+  "onboardingFreq10min": "10 минут",
+  "onboardingFreq10minDesc": "Рекомендуем",
+  "onboardingFreq15min": "15+ минут",
+  "onboardingFreq15minDesc": "Интенсив",
+  "onboardingRecommended": "Рекомендуем",
+  "onboardingPaywallTitle": "Попробуй Premium бесплатно",
+  "onboardingPaywallBenefit1": "Все размеры таблиц (6×6, 7×7, 9×9)",
+  "onboardingPaywallBenefit2": "Все 5 персонажей",
+  "onboardingPaywallBenefit3": "Полная статистика прогресса",
+  "onboardingPaywallBenefit4": "Без рекламы",
+  "onboardingTryFree": "Начать 7 дней бесплатно",
+  "onboardingSkipPaywall": "Продолжить без подписки",
+  "onboardingAlreadySubscribed": "Вы уже подписаны!",
+  "onboardingLetsGo": "Поехали!",
+
+  "playNow": "Играть",
+  "selectGridSize": "Размер таблицы",
+  "premiumGridLocked": "Доступно в Premium",
+  "lastResult": "Последний: {gridSize}×{gridSize} за {seconds}с",
+  "@lastResult": {
+    "placeholders": {
+      "gridSize": {"type": "int"},
+      "seconds": {"type": "int"}
+    }
+  },
+  "noSessionsYet": "Нет игр — начнём!",
+  "streakDays": "Серия {count} дней",
+  "@streakDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "levelLabel": "Уровень {level}",
+  "@levelLabel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+
+  "characterScreenTitle": "Мои персонажи",
+  "characterSelect": "Выбрать",
+  "characterSelected": "Выбран",
+  "characterUnlockPremium": "Открыть Premium",
+
+  "accessoriesTitle": "Кастомизация",
+  "accessoriesTabHats": "Шляпы",
+  "accessoriesTabGlasses": "Очки",
+  "accessoriesTabEffects": "Эффекты",
+  "accessoriesTabCapes": "Плащи",
+  "accessoriesBuy": "Купить",
+  "accessoriesEquip": "Надеть",
+  "accessoriesEquipped": "Надето",
+  "accessoriesRemove": "Снять",
+  "accessoriesPremiumOnly": "Premium",
+  "accessoriesNotEnoughCoins": "Не хватает монет",
+  "accessoriesNotEnoughCoinsMessage": "Нужно {price} монет, а у тебя {balance}",
+  "@accessoriesNotEnoughCoinsMessage": {
+    "placeholders": {
+      "price": {"type": "int"},
+      "balance": {"type": "int"}
+    }
+  },
+  "accessoriesCustomize": "Кастомизация",
+  "accessoriesPurchased": "Куплено!",
+
+  "parentTitle": "Прогресс ребёнка",
+  "parentSetPin": "Установить PIN",
+  "parentEnterPin": "Введите PIN",
+  "parentSetPinSubtitle": "Придумайте 4-значный PIN для защиты настроек",
+  "parentEnterPinSubtitle": "Введите 4-значный PIN",
+  "parentWrongPin": "Неверный PIN",
+  "parentLockedOut": "Слишком много попыток. Подождите {seconds}с",
+  "@parentLockedOut": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "parentThisWeek": "Эта неделя",
+  "parentStreak": "Стрик",
+  "parentAvgTime": "Среднее время",
+  "parentSessions": "Сессий",
+  "parentDays": "дней",
+  "parentSec": "сек",
+  "parentProgressChart": "Прогресс (14 дней)",
+  "parentNoChartData": "Пока недостаточно данных",
+  "parentBestResults": "Лучшие результаты",
+  "parentBestTime": "Лучший: {seconds}с",
+  "@parentBestTime": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "parentNoRecord": "—",
+  "parentPremiumOnly": "Premium",
+  "parentRecentSessions": "Последние сессии",
+  "parentNoSessions": "Нет сессий",
+  "parentShare": "Поделиться",
+  "parentSettings": "Настройки",
+  "parentSettingsTitle": "Настройки родителя",
+  "parentGridSizeMode": "Размер таблицы",
+  "parentGridSizeAuto": "Авто",
+  "parentGridSizeFixed": "Фиксированный",
+  "parentMaxSessionTime": "Макс. время сессии",
+  "parentNoLimit": "Без ограничений",
+  "parentMinutes": "{min} мин",
+  "@parentMinutes": {
+    "placeholders": {
+      "min": {"type": "int"}
+    }
+  },
+  "parentNotifications": "Уведомления",
+  "parentChangePin": "Сменить PIN",
+  "parentManageSubscription": "Управление подпиской",
+  "parentShareCardTitle": "тренируется уже {days} дней!",
+  "@parentShareCardTitle": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "parentShareBest5x5": "Лучший результат 5×5",
+  "parentShareDownload": "Скачай Brainy: brainyapp.io",
+  "parentStars": "Звёзды",
+
+  "paywallTitle": "Brainy Premium",
+  "paywallSubtitle": "Открой всё и тренируйся без ограничений",
+  "paywallBenefit1": "Все размеры таблиц — до 9×9",
+  "paywallBenefit2": "5 уникальных персонажей",
+  "paywallBenefit3": "Панель прогресса для родителей",
+  "paywallBenefit4": "Без рекламы",
+  "paywallBenefit5": "Режим Горбова-Шульте",
+  "paywallPlanYear": "Год",
+  "paywallPlanMonth": "Месяц",
+  "paywallPlanFamily": "Семья (3 детей)",
+  "paywallBestPrice": "Лучшая цена",
+  "paywallPerMonth": "~{price}/мес",
+  "@paywallPerMonth": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "paywallTryFree": "Начать 7 дней бесплатно",
+  "paywallSubscribe": "Подписаться",
+  "paywallDisclaimer": "Отмена в любое время. Управление подпиской в App Store.",
+  "paywallRestore": "Восстановить покупки",
+  "paywallTerms": "Условия",
+  "paywallPrivacy": "Конфиденциальность",
+  "paywallWelcome": "Добро пожаловать в Premium!",
+  "paywallErrorTitle": "Ошибка покупки",
+  "paywallErrorMessage": "Что-то пошло не так. Попробуйте ещё раз.",
+  "paywallLoading": "Загрузка планов...",
+  "premiumFeatureLocked": "Это Premium фича",
+  "premiumUnlock": "Открыть Premium",
+  "premiumTryFree": "Попробовать бесплатно 7 дней",
+
+  "settingsSounds": "Звуки",
+  "settingsHaptic": "Вибрация",
+  "settingsReminderTime": "Время напоминания",
+  "settingsDefaultTime": "по умолчанию",
+  "settingsResetTime": "Сбросить на 20:00",
+
+  "progressTitle": "Мой прогресс",
+  "progressTotalGames": "Игры",
+  "progressTotalXp": "Опыт",
+  "progressBestStreak": "Лучший стрик",
+  "progressXpToNextLevel": "{xp} XP до уровня {level}",
+  "@progressXpToNextLevel": {
+    "placeholders": {
+      "xp": {"type": "int"},
+      "level": {"type": "int"}
+    }
+  },
+  "progressMaxLevel": "Максимальный уровень!",
+  "progressNextGoals": "Следующие цели",
+  "progressGoalReachLevel": "Достигни уровня {level}",
+  "@progressGoalReachLevel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "progressGoalStreak": "Стрик {days} дней",
+  "@progressGoalStreak": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "progressGoalUnlock": "Открой {name}",
+  "@progressGoalUnlock": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "progressRecords": "Лучшее время",
+  "progressNoRecords": "Играй, чтобы установить рекорды!",
+  "progressStartPlaying": "Начни играть, чтобы видеть прогресс!",
+  "starHintNext": "Пройди за {seconds} сек для {stars}★",
+  "@starHintNext": {
+    "placeholders": {
+      "seconds": {"type": "int"},
+      "stars": {"type": "int"}
+    }
+  }
 }

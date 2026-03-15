@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_colors.dart';
+import '../l10n/app_localizations.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -8,6 +9,7 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       body: child,
       bottomNavigationBar: NavigationBar(
@@ -15,18 +17,18 @@ class MainShell extends StatelessWidget {
         indicatorColor: AppColors.primary.withValues(alpha: 0.2),
         selectedIndex: _selectedIndex(context),
         onDestinationSelected: (index) => _onTap(context, index),
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.grid_view_rounded),
-            label: 'Играть',
+            icon: const Icon(Icons.grid_view_rounded),
+            label: l10n.play,
           ),
           NavigationDestination(
-            icon: Icon(Icons.face_rounded),
-            label: 'Персонаж',
+            icon: const Icon(Icons.face_rounded),
+            label: l10n.character,
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_rounded),
-            label: 'Прогресс',
+            icon: const Icon(Icons.bar_chart_rounded),
+            label: l10n.progress,
           ),
         ],
       ),
@@ -35,16 +37,19 @@ class MainShell extends StatelessWidget {
 
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/character')) return 1;
+    if (location.startsWith('/character') || location.startsWith('/accessories')) return 1;
     if (location.startsWith('/progress')) return 2;
     return 0;
   }
 
   void _onTap(BuildContext context, int index) {
     switch (index) {
-      case 0: context.go('/game');
-      case 1: context.go('/character');
-      case 2: context.go('/progress');
+      case 0:
+        context.go('/home');
+      case 1:
+        context.go('/character');
+      case 2:
+        context.go('/progress');
     }
   }
 }

@@ -19,6 +19,7 @@ dependencies:
   go_router: ^14.8.1
 
   # Local storage
+  hive: ^2.2.3
   hive_flutter: ^1.1.0
 
   # Firebase
@@ -30,12 +31,30 @@ dependencies:
 
   # Subscriptions
   purchases_flutter: ^8.4.1
+  purchases_ui_flutter: ^8.4.1
 
   # Animations
   lottie: ^3.3.1
+  confetti: ^0.7.0
 
   # Ads
   google_mobile_ads: ^5.3.0
+
+  # Charts
+  fl_chart: ^0.66.0
+
+  # Screenshots & sharing
+  screenshot: ^2.1.0
+  share_plus: ^10.1.4
+  path_provider: ^2.1.5
+
+  # Audio
+  audioplayers: ^5.2.1
+
+  # Notifications
+  flutter_local_notifications: ^17.0.0
+  timezone: ^0.9.2
+  permission_handler: ^11.3.0
 
   # Utils
   intl: ^0.20.2
@@ -49,7 +68,25 @@ dev_dependencies:
   flutter_lints: ^5.0.0
   build_runner: ^2.4.15
   riverpod_generator: ^2.6.3
-  # hive_generator: added when Hive adapters are needed
+  # hive_generator incompatible with riverpod_generator (source_gen conflict)
+  # Hive adapters are written manually
+
+  # App icon & splash
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.10
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#6C5CE7"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+
+flutter_native_splash:
+  color: "#0D0D1A"
+  image: assets/splash/splash_logo.png
+  android: true
+  ios: true
 
 flutter:
   uses-material-design: true
@@ -59,6 +96,8 @@ flutter:
     - assets/characters/
     - assets/animations/
     - assets/sounds/
+    - assets/icon/
+    - assets/splash/
 
   fonts:
     - family: Nunito

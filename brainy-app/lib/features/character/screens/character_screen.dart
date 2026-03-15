@@ -1,21 +1,580 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../shared/services/subscription_service.dart';
+import '../../../models/character.dart';
+import '../../../models/user_progress.dart';
+import '../../game/providers/user_progress_provider.dart';
+import '../data/characters_data.dart';
+import '../providers/character_provider.dart';
 
-class CharacterScreen extends StatelessWidget {
+IconData characterIcon(String id) {
+  switch (id) {
+    case 'brainy':
+      return Icons.psychology_rounded;
+    case 'zap':
+      return Icons.bolt_rounded;
+    case 'vortex':
+      return Icons.cyclone_rounded;
+    case 'pixel':
+      return Icons.grid_view_rounded;
+    case 'glitch':
+      return Icons.bug_report_rounded;
+    default:
+      return Icons.face_rounded;
+  }
+}
+
+class CharacterScreen extends ConsumerStatefulWidget {
   const CharacterScreen({super.key});
 
   @override
+  ConsumerState<CharacterScreen> createState() => _CharacterScreenState();
+}
+
+class _CharacterScreenState extends ConsumerState<CharacterScreen>
+    with SingleTickerProviderStateMixin {
+  late final PageController _pageController;
+  late final AnimationController _bobController;
+  late final Animation<double> _bobAnimation;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final activeId = ref.read(userProgressProvider).activeCharacterId;
+    final activeIndex =
+        defaultCharacters.indexWhere((c) => c.id == activeId);
+    _currentPage = activeIndex >= 0 ? activeIndex : 0;
+
+    _pageController = PageController(
+      viewportFraction: 0.7,
+      initialPage: _currentPage,
+    );
+
+    _bobController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+    _bobAnimation = Tween<double>(begin: -8, end: 8).animate(
+      CurvedAnimation(parent: _bobController, curve: Curves.easeInOut),
+    );
+
+    // Auto-unlock premium characters for subscribers
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final hasPremium = await SubscriptionService.isPremium();
+      if (!hasPremium || !mounted) return;
+      for (final info in defaultCharacters) {
+        if (info.unlockType == UnlockType.premium) {
+          ref.read(characterProvider.notifier).unlockCharacter(info.id);
+        }
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _bobController.dispose();
+    super.dispose();
+  }
+
+  CharacterData _findCharacterData(
+      List<CharacterData> characters, String id) {
+    return characters.firstWhere(
+      (c) => c.id == id,
+      orElse: () => characters.first,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final progress = ref.watch(userProgressProvider);
+    final characters = ref.watch(characterProvider);
+    final activeInfo = defaultCharacters[_currentPage];
+    final activeData = _findCharacterData(characters, activeInfo.id);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: const Text('Персонаж'),
+        title: Text(
+          l10n.characterScreenTitle,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        centerTitle: true,
       ),
-      body: const Center(
-        child: Text(
-          'Character Screen',
-          style: TextStyle(color: AppColors.textPrimary),
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              children: [
+                const SizedBox(height: 16),
+                _buildCharacterPreview(activeInfo, activeData),
+                const SizedBox(height: 12),
+                Text(
+                  activeInfo.name(locale),
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 24,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  activeInfo.description(locale),
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  height: 200,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: defaultCharacters.length,
+                    onPageChanged: (index) =>
+                        setState(() => _currentPage = index),
+                    itemBuilder: (context, index) {
+                      final info = defaultCharacters[index];
+                      final data = _findCharacterData(characters, info.id);
+                      final isActive = progress.activeCharacterId == info.id;
+                      return _CharacterCard(
+                        info: info,
+                        isUnlocked: data.isUnlocked,
+                        isActive: isActive,
+                        locale: locale,
+                        onTap: () =>
+                            _onCharacterTap(info, data, progress, l10n, locale),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(height: 16),
+                _buildPageIndicator(),
+                const SizedBox(height: 24),
+                if (activeData.isUnlocked) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: Material(
+                        color: AppColors.surface,
+                        borderRadius: BorderRadius.circular(16),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => context.go('/accessories'),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.auto_awesome_rounded,
+                                  color: AppColors.secondary, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n.accessoriesCustomize,
+                                style: const TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.secondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                _buildActionButton(
+                    activeInfo, activeData, progress, l10n, locale),
+                const SizedBox(height: 24),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCharacterPreview(CharacterInfo info, CharacterData data) {
+    return AnimatedBuilder(
+      animation: _bobAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, _bobAnimation.value),
+          child: child,
+        );
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        width: 160,
+        height: 160,
+        decoration: BoxDecoration(
+          gradient: data.isUnlocked
+              ? LinearGradient(
+                  colors: [
+                    info.color.withValues(alpha: 0.8),
+                    info.color.withValues(alpha: 0.3),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: data.isUnlocked ? null : AppColors.surface,
+          borderRadius: BorderRadius.circular(80),
+          border: Border.all(
+            color: data.isUnlocked ? info.color : AppColors.surface,
+            width: 3,
+          ),
+        ),
+        child: Icon(
+          characterIcon(info.id),
+          size: 80,
+          color: data.isUnlocked
+              ? Colors.white
+              : AppColors.textSecondary.withValues(alpha: 0.5),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPageIndicator() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(
+        defaultCharacters.length,
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          width: index == _currentPage ? 24 : 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: index == _currentPage
+                ? defaultCharacters[index].color
+                : AppColors.surface,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    CharacterInfo info,
+    CharacterData data,
+    UserProgress progress,
+    AppLocalizations l10n,
+    String locale,
+  ) {
+    if (!data.isUnlocked) {
+      if (info.unlockType == UnlockType.premium) {
+        return _ActionButton(
+          label: l10n.characterUnlockPremium,
+          color: AppColors.accent,
+          onTap: () => context.go('/paywall'),
+        );
+      }
+      return _ActionButton(
+        label: info.unlockCondition(locale),
+        color: AppColors.surface,
+        onTap: null,
+      );
+    }
+
+    if (progress.activeCharacterId == info.id) {
+      return _ActionButton(
+        label: l10n.characterSelected,
+        color: AppColors.surface,
+        onTap: null,
+      );
+    }
+
+    return _ActionButton(
+      label: l10n.characterSelect,
+      color: AppColors.primary,
+      onTap: () =>
+          ref.read(characterProvider.notifier).selectCharacter(info.id),
+    );
+  }
+
+  void _onCharacterTap(
+    CharacterInfo info,
+    CharacterData data,
+    UserProgress progress,
+    AppLocalizations l10n,
+    String locale,
+  ) {
+    if (!data.isUnlocked) {
+      _showLockedBottomSheet(info, l10n, locale);
+      return;
+    }
+    if (progress.activeCharacterId != info.id) {
+      ref.read(characterProvider.notifier).selectCharacter(info.id);
+    }
+  }
+
+  void _showLockedBottomSheet(
+    CharacterInfo info,
+    AppLocalizations l10n,
+    String locale,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.textSecondary.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Icon(
+                Icons.lock_rounded,
+                size: 48,
+                color: info.color,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                info.name(locale),
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                info.description(locale),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 14,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: info.color.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  info.unlockCondition(locale),
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: info.color,
+                  ),
+                ),
+              ),
+              if (info.unlockType == UnlockType.premium) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: AppColors.primaryGradient,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.pop(context);
+                          this.context.go('/paywall');
+                        },
+                        child: Center(
+                          child: Text(
+                            l10n.characterUnlockPremium,
+                            style: const TextStyle(
+                              fontFamily: 'Nunito',
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _CharacterCard extends StatelessWidget {
+  final CharacterInfo info;
+  final bool isUnlocked;
+  final bool isActive;
+  final String locale;
+  final VoidCallback onTap;
+
+  const _CharacterCard({
+    required this.info,
+    required this.isUnlocked,
+    required this.isActive,
+    required this.locale,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+          color: isUnlocked
+              ? info.color.withValues(alpha: 0.15)
+              : AppColors.surface.withValues(alpha: 0.5),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isActive
+                ? info.color
+                : isUnlocked
+                    ? info.color.withValues(alpha: 0.3)
+                    : Colors.transparent,
+            width: isActive ? 2.5 : 1.5,
+          ),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              characterIcon(info.id),
+              size: 56,
+              color: isUnlocked
+                  ? info.color
+                  : AppColors.textSecondary.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              info.name(locale),
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: isUnlocked
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 4),
+            if (!isUnlocked)
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.lock_rounded,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    info.unlockCondition(locale),
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 11,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              )
+            else if (isActive)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                decoration: BoxDecoration(
+                  color: info.color.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.check_rounded,
+                  size: 18,
+                  color: info.color,
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  final String label;
+  final Color color;
+  final VoidCallback? onTap;
+
+  const _ActionButton({
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: Material(
+          color: color,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: onTap,
+            child: Center(
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -31,4 +31,491 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get result => 'Result';
+
+  @override
+  String get newRecord => 'New Record!';
+
+  @override
+  String get greatResult => 'Great Result!';
+
+  @override
+  String get goodResult => 'Good Result!';
+
+  @override
+  String get keepPracticing => 'Keep Practicing!';
+
+  @override
+  String timeSec(int seconds) {
+    return '$seconds sec';
+  }
+
+  @override
+  String timeMinSec(int minutes, String seconds) {
+    return '$minutes:$seconds';
+  }
+
+  @override
+  String get coinsEarned => 'Coins';
+
+  @override
+  String get mistakes => 'Mistakes';
+
+  @override
+  String get personalRecord => 'Record';
+
+  @override
+  String get playAgain => 'Play Again';
+
+  @override
+  String get home => 'Home';
+
+  @override
+  String get onboardingWelcomeTitle => 'Train your brain playfully';
+
+  @override
+  String get onboardingWelcomeSubtitle => 'Schulte tables for kids 6–14';
+
+  @override
+  String get onboardingStart => 'Start';
+
+  @override
+  String get onboardingNext => 'Next';
+
+  @override
+  String get onboardingAgeTitle => 'How old is your child?';
+
+  @override
+  String get onboardingAgeSubtitle => 'We\'ll adapt the difficulty';
+
+  @override
+  String get onboardingAge69 => '6 – 9 years';
+
+  @override
+  String get onboardingAge1012 => '10 – 12 years';
+
+  @override
+  String get onboardingAge1314 => '13 – 14 years';
+
+  @override
+  String get onboardingGoalsTitle => 'What\'s the main goal?';
+
+  @override
+  String get onboardingGoalsSubtitle => 'Select one or more';
+
+  @override
+  String get onboardingGoalConcentration => 'Concentration';
+
+  @override
+  String get onboardingGoalReading => 'Speed reading';
+
+  @override
+  String get onboardingGoalExams => 'Exam prep';
+
+  @override
+  String get onboardingGoalFun => 'Just for fun';
+
+  @override
+  String get onboardingFrequencyTitle => 'Daily practice time';
+
+  @override
+  String get onboardingFrequencySubtitle => 'Even 5 minutes a day helps';
+
+  @override
+  String get onboardingFreq5min => '5 minutes';
+
+  @override
+  String get onboardingFreq5minDesc => 'Easy start';
+
+  @override
+  String get onboardingFreq10min => '10 minutes';
+
+  @override
+  String get onboardingFreq10minDesc => 'Recommended';
+
+  @override
+  String get onboardingFreq15min => '15+ minutes';
+
+  @override
+  String get onboardingFreq15minDesc => 'Intensive';
+
+  @override
+  String get onboardingRecommended => 'Recommended';
+
+  @override
+  String get onboardingPaywallTitle => 'Try Premium for free';
+
+  @override
+  String get onboardingPaywallBenefit1 => 'All table sizes (6×6, 7×7, 9×9)';
+
+  @override
+  String get onboardingPaywallBenefit2 => 'All 5 characters';
+
+  @override
+  String get onboardingPaywallBenefit3 => 'Full progress statistics';
+
+  @override
+  String get onboardingPaywallBenefit4 => 'No ads';
+
+  @override
+  String get onboardingTryFree => 'Start 7-day free trial';
+
+  @override
+  String get onboardingSkipPaywall => 'Continue without subscription';
+
+  @override
+  String get onboardingAlreadySubscribed => 'You\'re already subscribed!';
+
+  @override
+  String get onboardingLetsGo => 'Let\'s go!';
+
+  @override
+  String get playNow => 'Play Now';
+
+  @override
+  String get selectGridSize => 'Select table size';
+
+  @override
+  String get premiumGridLocked => 'Unlock with Premium';
+
+  @override
+  String lastResult(int gridSize, int seconds) {
+    return 'Last: $gridSize×$gridSize in ${seconds}s';
+  }
+
+  @override
+  String get noSessionsYet => 'No games yet — let\'s start!';
+
+  @override
+  String streakDays(int count) {
+    return '$count day streak';
+  }
+
+  @override
+  String levelLabel(int level) {
+    return 'Level $level';
+  }
+
+  @override
+  String get characterScreenTitle => 'My Characters';
+
+  @override
+  String get characterSelect => 'Select';
+
+  @override
+  String get characterSelected => 'Selected';
+
+  @override
+  String get characterUnlockPremium => 'Unlock with Premium';
+
+  @override
+  String get accessoriesTitle => 'Customization';
+
+  @override
+  String get accessoriesTabHats => 'Hats';
+
+  @override
+  String get accessoriesTabGlasses => 'Glasses';
+
+  @override
+  String get accessoriesTabEffects => 'Effects';
+
+  @override
+  String get accessoriesTabCapes => 'Capes';
+
+  @override
+  String get accessoriesBuy => 'Buy';
+
+  @override
+  String get accessoriesEquip => 'Equip';
+
+  @override
+  String get accessoriesEquipped => 'Equipped';
+
+  @override
+  String get accessoriesRemove => 'Remove';
+
+  @override
+  String get accessoriesPremiumOnly => 'Premium';
+
+  @override
+  String get accessoriesNotEnoughCoins => 'Not enough coins';
+
+  @override
+  String accessoriesNotEnoughCoinsMessage(int price, int balance) {
+    return 'You need $price coins, but you have $balance';
+  }
+
+  @override
+  String get accessoriesCustomize => 'Customize';
+
+  @override
+  String get accessoriesPurchased => 'Purchased!';
+
+  @override
+  String get parentTitle => 'Child\'s Progress';
+
+  @override
+  String get parentSetPin => 'Set PIN';
+
+  @override
+  String get parentEnterPin => 'Enter PIN';
+
+  @override
+  String get parentSetPinSubtitle =>
+      'Create a 4-digit PIN to protect parent settings';
+
+  @override
+  String get parentEnterPinSubtitle => 'Enter your 4-digit PIN';
+
+  @override
+  String get parentWrongPin => 'Wrong PIN';
+
+  @override
+  String parentLockedOut(int seconds) {
+    return 'Too many attempts. Try again in ${seconds}s';
+  }
+
+  @override
+  String get parentThisWeek => 'This Week';
+
+  @override
+  String get parentStreak => 'Streak';
+
+  @override
+  String get parentAvgTime => 'Avg Time';
+
+  @override
+  String get parentSessions => 'Sessions';
+
+  @override
+  String get parentDays => 'days';
+
+  @override
+  String get parentSec => 'sec';
+
+  @override
+  String get parentProgressChart => 'Progress (last 14 days)';
+
+  @override
+  String get parentNoChartData => 'Not enough data yet';
+
+  @override
+  String get parentBestResults => 'Best Results';
+
+  @override
+  String parentBestTime(int seconds) {
+    return 'Best: ${seconds}s';
+  }
+
+  @override
+  String get parentNoRecord => '—';
+
+  @override
+  String get parentPremiumOnly => 'Premium';
+
+  @override
+  String get parentRecentSessions => 'Recent Sessions';
+
+  @override
+  String get parentNoSessions => 'No sessions yet';
+
+  @override
+  String get parentShare => 'Share';
+
+  @override
+  String get parentSettings => 'Settings';
+
+  @override
+  String get parentSettingsTitle => 'Parent Settings';
+
+  @override
+  String get parentGridSizeMode => 'Grid Size';
+
+  @override
+  String get parentGridSizeAuto => 'Auto';
+
+  @override
+  String get parentGridSizeFixed => 'Fixed';
+
+  @override
+  String get parentMaxSessionTime => 'Max Session Time';
+
+  @override
+  String get parentNoLimit => 'No limit';
+
+  @override
+  String parentMinutes(int min) {
+    return '$min min';
+  }
+
+  @override
+  String get parentNotifications => 'Notifications';
+
+  @override
+  String get parentChangePin => 'Change PIN';
+
+  @override
+  String get parentManageSubscription => 'Manage Subscription';
+
+  @override
+  String parentShareCardTitle(int days) {
+    return 'has been training for $days days!';
+  }
+
+  @override
+  String get parentShareBest5x5 => 'Best 5×5 result';
+
+  @override
+  String get parentShareDownload => 'Download Brainy: brainyapp.io';
+
+  @override
+  String get parentStars => 'Stars';
+
+  @override
+  String get paywallTitle => 'Brainy Premium';
+
+  @override
+  String get paywallSubtitle => 'Unlock everything and train without limits';
+
+  @override
+  String get paywallBenefit1 => 'All table sizes — up to 9×9';
+
+  @override
+  String get paywallBenefit2 => '5 unique characters';
+
+  @override
+  String get paywallBenefit3 => 'Parent progress panel';
+
+  @override
+  String get paywallBenefit4 => 'No ads';
+
+  @override
+  String get paywallBenefit5 => 'Gorbov-Schulte mode';
+
+  @override
+  String get paywallPlanYear => 'Year';
+
+  @override
+  String get paywallPlanMonth => 'Month';
+
+  @override
+  String get paywallPlanFamily => 'Family (3 kids)';
+
+  @override
+  String get paywallBestPrice => 'Best price';
+
+  @override
+  String paywallPerMonth(String price) {
+    return '~$price/mo';
+  }
+
+  @override
+  String get paywallTryFree => 'Start 7-day free trial';
+
+  @override
+  String get paywallSubscribe => 'Subscribe';
+
+  @override
+  String get paywallDisclaimer =>
+      'Cancel anytime. Manage subscription in App Store.';
+
+  @override
+  String get paywallRestore => 'Restore purchases';
+
+  @override
+  String get paywallTerms => 'Terms';
+
+  @override
+  String get paywallPrivacy => 'Privacy';
+
+  @override
+  String get paywallWelcome => 'Welcome to Premium!';
+
+  @override
+  String get paywallErrorTitle => 'Purchase failed';
+
+  @override
+  String get paywallErrorMessage => 'Something went wrong. Please try again.';
+
+  @override
+  String get paywallLoading => 'Loading plans...';
+
+  @override
+  String get premiumFeatureLocked => 'This is a Premium feature';
+
+  @override
+  String get premiumUnlock => 'Unlock Premium';
+
+  @override
+  String get premiumTryFree => 'Try free for 7 days';
+
+  @override
+  String get settingsSounds => 'Sounds';
+
+  @override
+  String get settingsHaptic => 'Vibration';
+
+  @override
+  String get settingsReminderTime => 'Reminder time';
+
+  @override
+  String get settingsDefaultTime => 'default';
+
+  @override
+  String get settingsResetTime => 'Reset to 20:00';
+
+  @override
+  String get progressTitle => 'My Progress';
+
+  @override
+  String get progressTotalGames => 'Games';
+
+  @override
+  String get progressTotalXp => 'XP';
+
+  @override
+  String get progressBestStreak => 'Best Streak';
+
+  @override
+  String progressXpToNextLevel(int xp, int level) {
+    return '$xp XP to level $level';
+  }
+
+  @override
+  String get progressMaxLevel => 'Max level reached!';
+
+  @override
+  String get progressNextGoals => 'Next Goals';
+
+  @override
+  String progressGoalReachLevel(int level) {
+    return 'Reach level $level';
+  }
+
+  @override
+  String progressGoalStreak(int days) {
+    return '$days-day streak';
+  }
+
+  @override
+  String progressGoalUnlock(String name) {
+    return 'Unlock $name';
+  }
+
+  @override
+  String get progressRecords => 'Best Times';
+
+  @override
+  String get progressNoRecords => 'Play to set records!';
+
+  @override
+  String get progressStartPlaying => 'Start playing to track progress!';
+
+  @override
+  String starHintNext(int seconds, int stars) {
+    return 'Finish in ${seconds}s for $stars★';
+  }
 }

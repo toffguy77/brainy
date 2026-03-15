@@ -7,5 +7,249 @@
   "settings": "Settings",
   "continue_": "Continue",
   "skip": "Skip",
-  "back": "Back"
+  "back": "Back",
+  "result": "Result",
+  "newRecord": "New Record!",
+  "greatResult": "Great Result!",
+  "goodResult": "Good Result!",
+  "keepPracticing": "Keep Practicing!",
+  "timeSec": "{seconds} sec",
+  "@timeSec": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "timeMinSec": "{minutes}:{seconds}",
+  "@timeMinSec": {
+    "placeholders": {
+      "minutes": {"type": "int"},
+      "seconds": {"type": "String"}
+    }
+  },
+  "coinsEarned": "Coins",
+  "mistakes": "Mistakes",
+  "personalRecord": "Record",
+  "playAgain": "Play Again",
+  "home": "Home",
+
+  "onboardingWelcomeTitle": "Train your brain playfully",
+  "onboardingWelcomeSubtitle": "Schulte tables for kids 6–14",
+  "onboardingStart": "Start",
+  "onboardingNext": "Next",
+  "onboardingAgeTitle": "How old is your child?",
+  "onboardingAgeSubtitle": "We'll adapt the difficulty",
+  "onboardingAge69": "6 – 9 years",
+  "onboardingAge1012": "10 – 12 years",
+  "onboardingAge1314": "13 – 14 years",
+  "onboardingGoalsTitle": "What's the main goal?",
+  "onboardingGoalsSubtitle": "Select one or more",
+  "onboardingGoalConcentration": "Concentration",
+  "onboardingGoalReading": "Speed reading",
+  "onboardingGoalExams": "Exam prep",
+  "onboardingGoalFun": "Just for fun",
+  "onboardingFrequencyTitle": "Daily practice time",
+  "onboardingFrequencySubtitle": "Even 5 minutes a day helps",
+  "onboardingFreq5min": "5 minutes",
+  "onboardingFreq5minDesc": "Easy start",
+  "onboardingFreq10min": "10 minutes",
+  "onboardingFreq10minDesc": "Recommended",
+  "onboardingFreq15min": "15+ minutes",
+  "onboardingFreq15minDesc": "Intensive",
+  "onboardingRecommended": "Recommended",
+  "onboardingPaywallTitle": "Try Premium for free",
+  "onboardingPaywallBenefit1": "All table sizes (6×6, 7×7, 9×9)",
+  "onboardingPaywallBenefit2": "All 5 characters",
+  "onboardingPaywallBenefit3": "Full progress statistics",
+  "onboardingPaywallBenefit4": "No ads",
+  "onboardingTryFree": "Start 7-day free trial",
+  "onboardingSkipPaywall": "Continue without subscription",
+  "onboardingAlreadySubscribed": "You're already subscribed!",
+  "onboardingLetsGo": "Let's go!",
+
+  "playNow": "Play Now",
+  "selectGridSize": "Select table size",
+  "premiumGridLocked": "Unlock with Premium",
+  "lastResult": "Last: {gridSize}×{gridSize} in {seconds}s",
+  "@lastResult": {
+    "placeholders": {
+      "gridSize": {"type": "int"},
+      "seconds": {"type": "int"}
+    }
+  },
+  "noSessionsYet": "No games yet — let's start!",
+  "streakDays": "{count} day streak",
+  "@streakDays": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "levelLabel": "Level {level}",
+  "@levelLabel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+
+  "characterScreenTitle": "My Characters",
+  "characterSelect": "Select",
+  "characterSelected": "Selected",
+  "characterUnlockPremium": "Unlock with Premium",
+
+  "accessoriesTitle": "Customization",
+  "accessoriesTabHats": "Hats",
+  "accessoriesTabGlasses": "Glasses",
+  "accessoriesTabEffects": "Effects",
+  "accessoriesTabCapes": "Capes",
+  "accessoriesBuy": "Buy",
+  "accessoriesEquip": "Equip",
+  "accessoriesEquipped": "Equipped",
+  "accessoriesRemove": "Remove",
+  "accessoriesPremiumOnly": "Premium",
+  "accessoriesNotEnoughCoins": "Not enough coins",
+  "accessoriesNotEnoughCoinsMessage": "You need {price} coins, but you have {balance}",
+  "@accessoriesNotEnoughCoinsMessage": {
+    "placeholders": {
+      "price": {"type": "int"},
+      "balance": {"type": "int"}
+    }
+  },
+  "accessoriesCustomize": "Customize",
+  "accessoriesPurchased": "Purchased!",
+
+  "parentTitle": "Child's Progress",
+  "parentSetPin": "Set PIN",
+  "parentEnterPin": "Enter PIN",
+  "parentSetPinSubtitle": "Create a 4-digit PIN to protect parent settings",
+  "parentEnterPinSubtitle": "Enter your 4-digit PIN",
+  "parentWrongPin": "Wrong PIN",
+  "parentLockedOut": "Too many attempts. Try again in {seconds}s",
+  "@parentLockedOut": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "parentThisWeek": "This Week",
+  "parentStreak": "Streak",
+  "parentAvgTime": "Avg Time",
+  "parentSessions": "Sessions",
+  "parentDays": "days",
+  "parentSec": "sec",
+  "parentProgressChart": "Progress (last 14 days)",
+  "parentNoChartData": "Not enough data yet",
+  "parentBestResults": "Best Results",
+  "parentBestTime": "Best: {seconds}s",
+  "@parentBestTime": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "parentNoRecord": "—",
+  "parentPremiumOnly": "Premium",
+  "parentRecentSessions": "Recent Sessions",
+  "parentNoSessions": "No sessions yet",
+  "parentShare": "Share",
+  "parentSettings": "Settings",
+  "parentSettingsTitle": "Parent Settings",
+  "parentGridSizeMode": "Grid Size",
+  "parentGridSizeAuto": "Auto",
+  "parentGridSizeFixed": "Fixed",
+  "parentMaxSessionTime": "Max Session Time",
+  "parentNoLimit": "No limit",
+  "parentMinutes": "{min} min",
+  "@parentMinutes": {
+    "placeholders": {
+      "min": {"type": "int"}
+    }
+  },
+  "parentNotifications": "Notifications",
+  "parentChangePin": "Change PIN",
+  "parentManageSubscription": "Manage Subscription",
+  "parentShareCardTitle": "has been training for {days} days!",
+  "@parentShareCardTitle": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "parentShareBest5x5": "Best 5×5 result",
+  "parentShareDownload": "Download Brainy: brainyapp.io",
+  "parentStars": "Stars",
+
+  "paywallTitle": "Brainy Premium",
+  "paywallSubtitle": "Unlock everything and train without limits",
+  "paywallBenefit1": "All table sizes — up to 9×9",
+  "paywallBenefit2": "5 unique characters",
+  "paywallBenefit3": "Parent progress panel",
+  "paywallBenefit4": "No ads",
+  "paywallBenefit5": "Gorbov-Schulte mode",
+  "paywallPlanYear": "Year",
+  "paywallPlanMonth": "Month",
+  "paywallPlanFamily": "Family (3 kids)",
+  "paywallBestPrice": "Best price",
+  "paywallPerMonth": "~{price}/mo",
+  "@paywallPerMonth": {
+    "placeholders": {
+      "price": {"type": "String"}
+    }
+  },
+  "paywallTryFree": "Start 7-day free trial",
+  "paywallSubscribe": "Subscribe",
+  "paywallDisclaimer": "Cancel anytime. Manage subscription in App Store.",
+  "paywallRestore": "Restore purchases",
+  "paywallTerms": "Terms",
+  "paywallPrivacy": "Privacy",
+  "paywallWelcome": "Welcome to Premium!",
+  "paywallErrorTitle": "Purchase failed",
+  "paywallErrorMessage": "Something went wrong. Please try again.",
+  "paywallLoading": "Loading plans...",
+  "premiumFeatureLocked": "This is a Premium feature",
+  "premiumUnlock": "Unlock Premium",
+  "premiumTryFree": "Try free for 7 days",
+
+  "settingsSounds": "Sounds",
+  "settingsHaptic": "Vibration",
+  "settingsReminderTime": "Reminder time",
+  "settingsDefaultTime": "default",
+  "settingsResetTime": "Reset to 20:00",
+
+  "progressTitle": "My Progress",
+  "progressTotalGames": "Games",
+  "progressTotalXp": "XP",
+  "progressBestStreak": "Best Streak",
+  "progressXpToNextLevel": "{xp} XP to level {level}",
+  "@progressXpToNextLevel": {
+    "placeholders": {
+      "xp": {"type": "int"},
+      "level": {"type": "int"}
+    }
+  },
+  "progressMaxLevel": "Max level reached!",
+  "progressNextGoals": "Next Goals",
+  "progressGoalReachLevel": "Reach level {level}",
+  "@progressGoalReachLevel": {
+    "placeholders": {
+      "level": {"type": "int"}
+    }
+  },
+  "progressGoalStreak": "{days}-day streak",
+  "@progressGoalStreak": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "progressGoalUnlock": "Unlock {name}",
+  "@progressGoalUnlock": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "progressRecords": "Best Times",
+  "progressNoRecords": "Play to set records!",
+  "progressStartPlaying": "Start playing to track progress!",
+  "starHintNext": "Finish in {seconds}s for {stars}★",
+  "@starHintNext": {
+    "placeholders": {
+      "seconds": {"type": "int"},
+      "stars": {"type": "int"}
+    }
+  }
 }

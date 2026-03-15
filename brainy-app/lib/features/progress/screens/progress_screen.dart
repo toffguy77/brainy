@@ -1,22 +1,571 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_constants.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../models/user_progress.dart';
+import '../../character/data/characters_data.dart';
+import '../../game/providers/records_provider.dart';
+import '../../game/providers/sessions_provider.dart';
+import '../../game/providers/user_progress_provider.dart';
 
-class ProgressScreen extends StatelessWidget {
+class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final progress = ref.watch(userProgressProvider);
+    final sessions = ref.watch(sessionsProvider);
+    final records = ref.watch(recordsProvider);
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.background,
-        title: const Text('Прогресс'),
-      ),
-      body: const Center(
-        child: Text(
-          'Progress Screen',
-          style: TextStyle(color: AppColors.textPrimary),
+        title: Text(
+          l10n.progressTitle,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            fontWeight: FontWeight.w800,
+          ),
         ),
+        centerTitle: true,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 8),
+            _LevelCard(progress: progress, l10n: l10n),
+            const SizedBox(height: 16),
+            _StatsRow(
+              progress: progress,
+              totalGames: sessions.length,
+              l10n: l10n,
+            ),
+            const SizedBox(height: 24),
+            _NextGoalsSection(
+              progress: progress,
+              l10n: l10n,
+              locale: locale,
+            ),
+            const SizedBox(height: 24),
+            _RecordsSection(records: records, l10n: l10n),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LevelCard extends StatelessWidget {
+  final UserProgress progress;
+  final AppLocalizations l10n;
+
+  const _LevelCard({required this.progress, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final thresholds = AppConstants.xpThresholds.entries.toList();
+    final currentLevel = progress.level;
+    final currentXp = progress.xp;
+
+    // Find current and next level thresholds
+    int currentThresholdXp = 0;
+    int? nextLevel;
+    int? nextThresholdXp;
+
+    for (int i = 0; i < thresholds.length; i++) {
+      if (thresholds[i].key <= currentLevel) {
+        currentThresholdXp = thresholds[i].value;
+      }
+      if (thresholds[i].key > currentLevel) {
+        nextLevel = thresholds[i].key;
+        nextThresholdXp = thresholds[i].value;
+        break;
+      }
+    }
+
+    final bool isMaxLevel = nextLevel == null;
+    final double progressFraction = isMaxLevel
+        ? 1.0
+        : ((currentXp - currentThresholdXp) /
+                (nextThresholdXp! - currentThresholdXp))
+            .clamp(0.0, 1.0);
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withValues(alpha: 0.3),
+            AppColors.secondary.withValues(alpha: 0.15),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppColors.primary.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Center(
+                  child: Text(
+                    '$currentLevel',
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 24,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.levelLabel(currentLevel),
+                      style: const TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      isMaxLevel
+                          ? l10n.progressMaxLevel
+                          : l10n.progressXpToNextLevel(
+                              nextThresholdXp! - currentXp, nextLevel),
+                      style: const TextStyle(
+                        fontFamily: 'Nunito',
+                        fontSize: 13,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // XP progress bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progressFraction,
+              minHeight: 10,
+              backgroundColor: AppColors.surface,
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(AppColors.primary),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '$currentXp XP',
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              if (!isMaxLevel)
+                Text(
+                  '$nextThresholdXp XP',
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatsRow extends StatelessWidget {
+  final UserProgress progress;
+  final int totalGames;
+  final AppLocalizations l10n;
+
+  const _StatsRow({
+    required this.progress,
+    required this.totalGames,
+    required this.l10n,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        _StatCard(
+          icon: Icons.sports_esports_rounded,
+          iconColor: AppColors.primary,
+          value: '$totalGames',
+          label: l10n.progressTotalGames,
+        ),
+        const SizedBox(width: 10),
+        _StatCard(
+          icon: Icons.star_rounded,
+          iconColor: AppColors.accent,
+          value: '${progress.xp}',
+          label: l10n.progressTotalXp,
+        ),
+        const SizedBox(width: 10),
+        _StatCard(
+          icon: Icons.local_fire_department_rounded,
+          iconColor: Colors.orange,
+          value: '${progress.longestStreak}',
+          label: l10n.progressBestStreak,
+        ),
+      ],
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String value;
+  final String label;
+
+  const _StatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: iconColor, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 11,
+                color: AppColors.textSecondary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NextGoalsSection extends StatelessWidget {
+  final UserProgress progress;
+  final AppLocalizations l10n;
+  final String locale;
+
+  const _NextGoalsSection({
+    required this.progress,
+    required this.l10n,
+    required this.locale,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final goals = _buildGoals();
+    if (goals.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.progressNextGoals,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...goals,
+      ],
+    );
+  }
+
+  List<Widget> _buildGoals() {
+    final goals = <Widget>[];
+
+    // Find next level goal
+    for (final entry in AppConstants.xpThresholds.entries) {
+      if (entry.key > progress.level) {
+        // Find characters unlocked at this level
+        final charAtLevel = defaultCharacters.where(
+          (c) =>
+              c.unlockType == UnlockType.level &&
+              c.requiredLevel == entry.key,
+        );
+
+        final double levelProgress =
+            (progress.xp / entry.value).clamp(0.0, 1.0);
+
+        String description = l10n.progressGoalReachLevel(entry.key);
+        if (charAtLevel.isNotEmpty) {
+          description +=
+              ' → ${l10n.progressGoalUnlock(charAtLevel.first.name(locale))}';
+        }
+
+        goals.add(_GoalTile(
+          icon: Icons.bolt_rounded,
+          iconColor: AppColors.accent,
+          title: description,
+          progress: levelProgress,
+          progressLabel: '${progress.xp} / ${entry.value} XP',
+        ));
+        break;
+      }
+    }
+
+    // Find next streak goals from characters
+    for (final char in defaultCharacters) {
+      if (char.unlockType == UnlockType.streak &&
+          char.requiredStreak != null &&
+          progress.longestStreak < char.requiredStreak!) {
+        final double streakProgress =
+            (progress.longestStreak / char.requiredStreak!).clamp(0.0, 1.0);
+
+        goals.add(_GoalTile(
+          icon: Icons.local_fire_department_rounded,
+          iconColor: Colors.orange,
+          title:
+              '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(locale))}',
+          progress: streakProgress,
+          progressLabel:
+              '${progress.longestStreak} / ${char.requiredStreak} ${l10n.parentDays}',
+        ));
+        break; // Only show the nearest streak goal
+      }
+    }
+
+    return goals;
+  }
+}
+
+class _GoalTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final double progress;
+  final String progressLabel;
+
+  const _GoalTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.progress,
+    required this.progressLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, color: iconColor, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: AppColors.background,
+              valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            progressLabel,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RecordsSection extends StatelessWidget {
+  final Map<int, int> records;
+  final AppLocalizations l10n;
+
+  const _RecordsSection({required this.records, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.progressRecords,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            fontSize: 18,
+            fontWeight: FontWeight.w800,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (records.isEmpty)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              l10n.progressNoRecords,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          )
+        else
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              for (final size in [3, 4, 5, 6, 7, 9])
+                _RecordChip(
+                  gridSize: size,
+                  seconds: records[size],
+                ),
+            ],
+          ),
+      ],
+    );
+  }
+}
+
+class _RecordChip extends StatelessWidget {
+  final int gridSize;
+  final int? seconds;
+
+  const _RecordChip({required this.gridSize, required this.seconds});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasRecord = seconds != null;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: hasRecord
+            ? AppColors.primary.withValues(alpha: 0.15)
+            : AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: hasRecord
+            ? Border.all(
+                color: AppColors.primary.withValues(alpha: 0.3),
+                width: 1,
+              )
+            : null,
+      ),
+      child: Column(
+        children: [
+          Text(
+            '$gridSize×$gridSize',
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color:
+                  hasRecord ? AppColors.textPrimary : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            hasRecord ? '${seconds}s' : '—',
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: hasRecord ? AppColors.secondary : AppColors.textSecondary,
+            ),
+          ),
+        ],
       ),
     );
   }
