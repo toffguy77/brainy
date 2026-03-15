@@ -21,7 +21,7 @@ class SciencePage extends ConsumerWidget {
             width: 72,
             height: 72,
             decoration: BoxDecoration(
-              color: AppColors.primary.withAlpha(38),
+              color: AppColors.primary.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
             alignment: Alignment.center,

@@ -108,7 +108,7 @@ class _MiniCell extends StatelessWidget {
 
     if (isFound) {
       textColor = AppColors.success;
-      bgColor = AppColors.success.withAlpha(51);
+      bgColor = AppColors.success.withValues(alpha: 0.2);
       border = Border.all(color: AppColors.success, width: 2);
     } else if (isNext) {
       textColor = AppColors.primary;
@@ -148,7 +148,7 @@ class _BenefitRow extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: AppColors.primary.withAlpha(38),
+            color: AppColors.primary.withValues(alpha: 0.15),
             borderRadius: BorderRadius.circular(10),
           ),
           alignment: Alignment.center,
