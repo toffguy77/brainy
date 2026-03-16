@@ -18,6 +18,7 @@ import 'package:brainy/models/character.dart';
 import 'package:brainy/models/achievement.dart';
 import 'package:brainy/features/character/data/characters_data.dart';
 import 'package:brainy/features/parent/providers/parent_provider.dart';
+import 'package:brainy/shared/services/subscription_service.dart';
 import 'package:brainy/features/home/screens/home_screen.dart';
 import 'package:brainy/features/game/screens/game_screen.dart';
 import 'package:brainy/features/game/screens/result_screen.dart';
@@ -40,13 +41,23 @@ const _locale = String.fromEnvironment('LOCALE', defaultValue: 'ru');
 String _deviceName = 'unknown';
 
 /// Save a screenshot to screenshots/raw/{device}/{locale}/{name}.png
+/// Pump enough frames for the UI to render without waiting for all
+/// animations to finish (many screens have looping animations).
+Future<void> _pumpFrames(WidgetTester tester, {int frames = 10}) async {
+  for (int i = 0; i < frames; i++) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
+}
+
+/// Save a screenshot to screenshots/raw/{device}/{locale}/{name}.png
 Future<void> _takeScreenshot(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
-  String name, {
-  bool settle = true,
-}) async {
-  if (settle) await tester.pumpAndSettle();
+  String name,
+) async {
+  // Pump a few frames to let layout settle, but don't use pumpAndSettle
+  // because many screens have repeating animations (bobbing character, etc.)
+  await _pumpFrames(tester);
   final dir = Directory('screenshots/raw/$_deviceName/$_locale');
   if (!dir.existsSync()) dir.createSync(recursive: true);
 
@@ -256,6 +267,10 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
+        overrides: [
+          // Override isPremiumProvider to avoid RevenueCat crash in tests
+          isPremiumProvider.overrideWith((ref) async => false),
+        ],
         child: MaterialApp.router(
           title: 'Brainy',
           theme: AppTheme.darkTheme,
@@ -274,20 +289,20 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
 
     // --- Screen 1: Home ---
     await _takeScreenshot(binding, tester, 'home');
 
     // --- Screen 2: Game (mid-game) ---
     testRouter.go('/game?size=5');
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     // Wait for countdown (3 seconds)
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(milliseconds: 500));
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     // Tap first 8 numbers to show mid-game state
     // Scope finders to SchulteGrid to avoid matching '1' in '10', '11', etc.
     for (int num = 1; num <= 8; num++) {
@@ -297,10 +312,10 @@ void main() {
       );
       if (finder.evaluate().isNotEmpty) {
         await tester.tap(finder.first);
-        await tester.pumpAndSettle();
+        await _pumpFrames(tester);
       }
     }
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     await _takeScreenshot(binding, tester, 'game');
 
     // --- Screen 3: Result (3 stars, record) ---
@@ -331,22 +346,22 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(milliseconds: 500));
-    await _takeScreenshot(binding, tester, 'result', settle: false);
+    await _takeScreenshot(binding, tester, 'result');
 
     // --- Screen 4: Characters ---
     testRouter.go('/character');
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     await _takeScreenshot(binding, tester, 'characters');
 
     // --- Screen 5: Progress ---
     testRouter.go('/progress');
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     await _takeScreenshot(binding, tester, 'progress');
 
     // --- Screen 6: Parent Dashboard ---
     parentPinVerifiedSession = true;
     testRouter.go('/parent/dashboard');
-    await tester.pumpAndSettle();
+    await _pumpFrames(tester);
     await _takeScreenshot(binding, tester, 'parent');
   });
 }
