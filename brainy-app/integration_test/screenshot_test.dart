@@ -1,5 +1,4 @@
 // integration_test/screenshot_test.dart
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'package:brainy/constants/app_constants.dart';
 import 'package:brainy/features/game/widgets/schulte_grid.dart';
@@ -49,7 +49,8 @@ Future<void> _pumpFrames(WidgetTester tester, {int frames = 10}) async {
   }
 }
 
-/// Save a screenshot to screenshots/raw/{device}/{locale}/{name}.png
+/// Take a screenshot. The name encodes the full path so the driver's
+/// onScreenshot callback saves it to screenshots/raw/{device}/{locale}/{name}.png
 Future<void> _takeScreenshot(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
@@ -58,12 +59,9 @@ Future<void> _takeScreenshot(
   // Pump a few frames to let layout settle, but don't use pumpAndSettle
   // because many screens have repeating animations (bobbing character, etc.)
   await _pumpFrames(tester);
-  final dir = Directory('screenshots/raw/$_deviceName/$_locale');
-  if (!dir.existsSync()) dir.createSync(recursive: true);
-
-  // Use binding.takeScreenshot which works on iOS simulators
-  final bytes = await binding.takeScreenshot(name);
-  File('${dir.path}/$name.png').writeAsBytesSync(bytes);
+  // Encode the output path in the screenshot name.
+  // The driver's onScreenshot callback saves to screenshots/{name}.png
+  await binding.takeScreenshot('raw/$_deviceName/$_locale/$name');
 }
 
 /// Create a test GoRouter without FirebaseAnalyticsObserver
@@ -236,6 +234,12 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
+    // Init RevenueCat so native SDK doesn't crash when CharacterScreen
+    // calls SubscriptionService.isPremium() in initState.
+    await Purchases.configure(
+      PurchasesConfiguration(AppConstants.revenueCatApiKey),
+    );
+
     // Init Hive for testing
     await Hive.initFlutter();
     Hive.registerAdapter(GameSessionAdapter());
@@ -273,6 +277,7 @@ void main() {
         ],
         child: MaterialApp.router(
           title: 'Brainy',
+          debugShowCheckedModeBanner: false,
           theme: AppTheme.darkTheme,
           routerConfig: testRouter,
           locale: Locale(_locale),
@@ -350,7 +355,7 @@ void main() {
 
     // --- Screen 4: Characters ---
     testRouter.go('/character');
-    await _pumpFrames(tester);
+    await _pumpFrames(tester, frames: 20);
     await _takeScreenshot(binding, tester, 'characters');
 
     // --- Screen 5: Progress ---
@@ -363,5 +368,7 @@ void main() {
     testRouter.go('/parent/dashboard');
     await _pumpFrames(tester);
     await _takeScreenshot(binding, tester, 'parent');
+
+    debugPrint('✅ All 6 screenshots captured for $_deviceName/$_locale');
   });
 }
