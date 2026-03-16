@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
 import 'package:brainy/constants/app_constants.dart';
+import 'package:brainy/features/game/widgets/schulte_grid.dart';
 import 'package:brainy/app/theme.dart';
 import 'package:brainy/l10n/app_localizations.dart';
 import 'package:brainy/models/session.dart';
@@ -42,9 +43,10 @@ String _deviceName = 'unknown';
 Future<void> _takeScreenshot(
   IntegrationTestWidgetsFlutterBinding binding,
   WidgetTester tester,
-  String name,
-) async {
-  await tester.pumpAndSettle();
+  String name, {
+  bool settle = true,
+}) async {
+  if (settle) await tester.pumpAndSettle();
   final dir = Directory('screenshots/raw/$_deviceName/$_locale');
   if (!dir.existsSync()) dir.createSync(recursive: true);
 
@@ -287,11 +289,15 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     await tester.pumpAndSettle();
     // Tap first 8 numbers to show mid-game state
+    // Scope finders to SchulteGrid to avoid matching '1' in '10', '11', etc.
     for (int num = 1; num <= 8; num++) {
-      final finder = find.text('$num');
+      final finder = find.descendant(
+        of: find.byType(SchulteGrid),
+        matching: find.text('$num'),
+      );
       if (finder.evaluate().isNotEmpty) {
         await tester.tap(finder.first);
-        await tester.pump(const Duration(milliseconds: 300));
+        await tester.pumpAndSettle();
       }
     }
     await tester.pumpAndSettle();
@@ -325,7 +331,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(milliseconds: 500));
-    await _takeScreenshot(binding, tester, 'result');
+    await _takeScreenshot(binding, tester, 'result', settle: false);
 
     // --- Screen 4: Characters ---
     testRouter.go('/character');
