@@ -21,22 +21,36 @@ platform :ios do
       keychain_password: "",
     )
 
-    # Install the provisioning profile
-    install_provisioning_profile(path: "fastlane/profile.mobileprovision")
+    # Install the provisioning profile and get its UUID
+    profile_uuid = install_provisioning_profile(path: "fastlane/profile.mobileprovision")
 
-    # Get version from pubspec.yaml
-    pubspec = File.read("../../pubspec.yaml")
-    version = pubspec.match(/version:\s*(\S+)/)[1]
-    version_name, build_number = version.split("+")
+    # Switch to manual code signing for CI
+    update_code_signing_settings(
+      use_automatic_signing: false,
+      path: "Runner.xcodeproj",
+      team_id: "3GWRDGA8B7",
+      code_sign_identity: "Apple Distribution",
+      profile_uuid: profile_uuid,
+      bundle_identifier: "com.brainyapp.brainy",
+    )
 
-    # Build the Flutter IPA
+    # Build Flutter assets (no code signing — Fastlane handles that)
     Dir.chdir("../..") do
-      sh("flutter", "build", "ipa",
+      sh("flutter", "build", "ios",
         "--release",
+        "--no-codesign",
         "--dart-define=REVENUECAT_API_KEY=#{ENV['REVENUECAT_API_KEY']}",
-        "--export-options-plist=ios/ExportOptions.plist",
       )
     end
+
+    # Archive and export IPA with proper signing
+    build_app(
+      workspace: "Runner.xcworkspace",
+      scheme: "Runner",
+      export_method: "app-store-connect",
+      output_directory: "../../build/ios/ipa",
+      output_name: "brainy.ipa",
+    )
 
     # Upload to TestFlight
     upload_to_testflight(
