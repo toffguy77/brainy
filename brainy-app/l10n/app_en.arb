@@ -8,6 +8,7 @@
   "continue_": "Continue",
   "skip": "Skip",
   "back": "Back",
+  "comingSoon": "Coming soon",
   "result": "Result",
   "newRecord": "New Record!",
   "greatResult": "Great Result!",
@@ -197,7 +198,7 @@
   "paywallBenefit5": "Gorbov-Schulte mode",
   "paywallPlanYear": "Year",
   "paywallPlanMonth": "Month",
-  "paywallPlanFamily": "Family (3 kids)",
+  "paywallPlanFamily": "Family",
   "paywallBestPrice": "Best price",
   "paywallPerMonth": "~{price}/mo",
   "@paywallPerMonth": {
@@ -265,5 +266,91 @@
       "seconds": {"type": "int"},
       "stars": {"type": "int"}
     }
-  }
+  },
+
+  "gridDetailTitle": "Table {size}×{size}",
+  "@gridDetailTitle": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "periodWeek": "Week",
+  "periodMonth": "Month",
+  "periodThreeMonths": "3M",
+  "periodYear": "Year",
+  "periodAll": "All",
+  "chartTimeLabel": "COMPLETION TIME",
+  "statBestTime": "Best",
+  "statAverageTime": "Average",
+  "statTotalGames": "Total games",
+  "gridDetailNoData": "No data yet for {size}×{size}",
+  "@gridDetailNoData": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "gridDetailPlayMore": "Play a few games to see progress",
+  "legendDailyBest": "Daily best",
+  "legendAllAttempts": "All attempts",
+  "legendRecord": "Record",
+
+  "achievementsTitle": "Achievements",
+  "achievementsCount": "{unlocked} / {total}",
+  "@achievementsCount": {
+    "placeholders": {
+      "unlocked": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "achievementUnlocked": "Achievement Unlocked!",
+  "achievementFirstGame": "First Game",
+  "achievementFirstGameDesc": "Complete your first session",
+  "achievementPersonalRecord": "Record Breaker",
+  "achievementPersonalRecordDesc": "Set a personal record",
+  "achievementSpeedDemon": "Speed Demon",
+  "achievementSpeedDemonDesc": "Complete 3×3 in 5 seconds or less",
+  "achievementMaster5x5": "5×5 Master",
+  "achievementMaster5x5Desc": "Complete 5×5 in 20 seconds or less",
+  "achievementFocusMode": "Focus Mode",
+  "achievementFocusModeDesc": "Complete a session without mistakes",
+  "achievementStreak3": "3-Day Streak",
+  "achievementStreak3Desc": "Play 3 days in a row",
+  "achievementStreak7": "Week Warrior",
+  "achievementStreak7Desc": "Play 7 days in a row",
+  "achievementStreak30": "Monthly Legend",
+  "achievementStreak30Desc": "Play 30 days in a row",
+  "achievementNightOwl": "Night Owl",
+  "achievementNightOwlDesc": "Play a session after 10 PM",
+  "achievementCoinHoarder": "Coin Hoarder",
+  "achievementCoinHoarderDesc": "Accumulate 500 coins",
+
+  "league": "League",
+  "leagueTitle": "Weekly League",
+  "leagueBronze": "Bronze",
+  "leagueSilver": "Silver",
+  "leagueGold": "Gold",
+  "leaguePlatinum": "Platinum",
+  "leagueWeeklyXp": "{xp} XP this week",
+  "@leagueWeeklyXp": {
+    "placeholders": {
+      "xp": {"type": "int"}
+    }
+  },
+  "leagueNextTier": "{xp} XP to {tier}",
+  "@leagueNextTier": {
+    "placeholders": {
+      "xp": {"type": "int"},
+      "tier": {"type": "String"}
+    }
+  },
+  "leagueMaxTier": "Highest league reached!",
+  "leagueResetsMonday": "Resets every Monday",
+  "leagueYou": "You",
+  "leagueConnectTitle": "Compete with real players!",
+  "leagueConnectSubtitle": "Connect Game Center to see real leaderboards",
+  "leagueConnect": "Connect",
+  "leagueFullRanking": "Full Ranking",
+  "leagueLoading": "Loading leaderboard...",
+  "leagueError": "Could not load leaderboard",
+  "leagueNotConnected": "Game Center not connected"
 }

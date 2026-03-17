@@ -1,4 +1,3 @@
-import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:games_services/games_services.dart';
 import '../../models/leaderboard_entry.dart';

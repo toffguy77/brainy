@@ -8,6 +8,7 @@
   "continue_": "Продолжить",
   "skip": "Пропустить",
   "back": "Назад",
+  "comingSoon": "Скоро",
   "result": "Результат",
   "newRecord": "Новый рекорд!",
   "greatResult": "Отличный результат!",
@@ -197,7 +198,7 @@
   "paywallBenefit5": "Режим Горбова-Шульте",
   "paywallPlanYear": "Год",
   "paywallPlanMonth": "Месяц",
-  "paywallPlanFamily": "Семья (3 детей)",
+  "paywallPlanFamily": "Семейная",
   "paywallBestPrice": "Лучшая цена",
   "paywallPerMonth": "~{price}/мес",
   "@paywallPerMonth": {
@@ -265,5 +266,91 @@
       "seconds": {"type": "int"},
       "stars": {"type": "int"}
     }
-  }
+  },
+
+  "gridDetailTitle": "Таблица {size}×{size}",
+  "@gridDetailTitle": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "periodWeek": "Нед",
+  "periodMonth": "Мес",
+  "periodThreeMonths": "3М",
+  "periodYear": "Год",
+  "periodAll": "Всё",
+  "chartTimeLabel": "ВРЕМЯ ПРОХОЖДЕНИЯ",
+  "statBestTime": "Лучшее",
+  "statAverageTime": "Среднее",
+  "statTotalGames": "Всего игр",
+  "gridDetailNoData": "Ещё нет данных для {size}×{size}",
+  "@gridDetailNoData": {
+    "placeholders": {
+      "size": {"type": "int"}
+    }
+  },
+  "gridDetailPlayMore": "Сыграйте несколько раз, чтобы увидеть прогресс",
+  "legendDailyBest": "Daily best",
+  "legendAllAttempts": "Все попытки",
+  "legendRecord": "Рекорд",
+
+  "achievementsTitle": "Достижения",
+  "achievementsCount": "{unlocked} / {total}",
+  "@achievementsCount": {
+    "placeholders": {
+      "unlocked": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "achievementUnlocked": "Новое достижение!",
+  "achievementFirstGame": "Первая игра",
+  "achievementFirstGameDesc": "Заверши первую сессию",
+  "achievementPersonalRecord": "Рекордсмен",
+  "achievementPersonalRecordDesc": "Установи личный рекорд",
+  "achievementSpeedDemon": "Молния",
+  "achievementSpeedDemonDesc": "Пройди 3×3 за 5 секунд или быстрее",
+  "achievementMaster5x5": "Мастер 5×5",
+  "achievementMaster5x5Desc": "Пройди 5×5 за 20 секунд или быстрее",
+  "achievementFocusMode": "Фокус",
+  "achievementFocusModeDesc": "Пройди таблицу без ошибок",
+  "achievementStreak3": "Стрик 3 дня",
+  "achievementStreak3Desc": "Играй 3 дня подряд",
+  "achievementStreak7": "Неделя",
+  "achievementStreak7Desc": "Играй 7 дней подряд",
+  "achievementStreak30": "Легенда месяца",
+  "achievementStreak30Desc": "Играй 30 дней подряд",
+  "achievementNightOwl": "Ночная сова",
+  "achievementNightOwlDesc": "Сыграй сессию после 22:00",
+  "achievementCoinHoarder": "Копилка",
+  "achievementCoinHoarderDesc": "Накопи 500 монет",
+
+  "league": "Лига",
+  "leagueTitle": "Недельная лига",
+  "leagueBronze": "Бронза",
+  "leagueSilver": "Серебро",
+  "leagueGold": "Золото",
+  "leaguePlatinum": "Платина",
+  "leagueWeeklyXp": "{xp} XP за неделю",
+  "@leagueWeeklyXp": {
+    "placeholders": {
+      "xp": {"type": "int"}
+    }
+  },
+  "leagueNextTier": "{xp} XP до {tier}",
+  "@leagueNextTier": {
+    "placeholders": {
+      "xp": {"type": "int"},
+      "tier": {"type": "String"}
+    }
+  },
+  "leagueMaxTier": "Высшая лига достигнута!",
+  "leagueResetsMonday": "Обновляется каждый понедельник",
+  "leagueYou": "Ты",
+  "leagueConnectTitle": "Соревнуйся с реальными игроками!",
+  "leagueConnectSubtitle": "Подключи Game Center для настоящих лидербордов",
+  "leagueConnect": "Подключить",
+  "leagueFullRanking": "Полный рейтинг",
+  "leagueLoading": "Загрузка рейтинга...",
+  "leagueError": "Не удалось загрузить рейтинг",
+  "leagueNotConnected": "Game Center не подключён"
 }

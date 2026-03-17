@@ -146,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Назад'**
   String get back;
 
+  /// No description provided for @comingSoon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Скоро'**
+  String get comingSoon;
+
   /// No description provided for @result.
   ///
   /// In ru, this message translates to:
@@ -929,7 +935,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallPlanFamily.
   ///
   /// In ru, this message translates to:
-  /// **'Семья (3 детей)'**
+  /// **'Семейная'**
   String get paywallPlanFamily;
 
   /// No description provided for @paywallBestPrice.
@@ -1135,6 +1141,342 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Пройди за {seconds} сек для {stars}★'**
   String starHintNext(int seconds, int stars);
+
+  /// No description provided for @gridDetailTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Таблица {size}×{size}'**
+  String gridDetailTitle(int size);
+
+  /// No description provided for @periodWeek.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нед'**
+  String get periodWeek;
+
+  /// No description provided for @periodMonth.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мес'**
+  String get periodMonth;
+
+  /// No description provided for @periodThreeMonths.
+  ///
+  /// In ru, this message translates to:
+  /// **'3М'**
+  String get periodThreeMonths;
+
+  /// No description provided for @periodYear.
+  ///
+  /// In ru, this message translates to:
+  /// **'Год'**
+  String get periodYear;
+
+  /// No description provided for @periodAll.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всё'**
+  String get periodAll;
+
+  /// No description provided for @chartTimeLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'ВРЕМЯ ПРОХОЖДЕНИЯ'**
+  String get chartTimeLabel;
+
+  /// No description provided for @statBestTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лучшее'**
+  String get statBestTime;
+
+  /// No description provided for @statAverageTime.
+  ///
+  /// In ru, this message translates to:
+  /// **'Среднее'**
+  String get statAverageTime;
+
+  /// No description provided for @statTotalGames.
+  ///
+  /// In ru, this message translates to:
+  /// **'Всего игр'**
+  String get statTotalGames;
+
+  /// No description provided for @gridDetailNoData.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ещё нет данных для {size}×{size}'**
+  String gridDetailNoData(int size);
+
+  /// No description provided for @gridDetailPlayMore.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сыграйте несколько раз, чтобы увидеть прогресс'**
+  String get gridDetailPlayMore;
+
+  /// No description provided for @legendDailyBest.
+  ///
+  /// In ru, this message translates to:
+  /// **'Daily best'**
+  String get legendDailyBest;
+
+  /// No description provided for @legendAllAttempts.
+  ///
+  /// In ru, this message translates to:
+  /// **'Все попытки'**
+  String get legendAllAttempts;
+
+  /// No description provided for @legendRecord.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рекорд'**
+  String get legendRecord;
+
+  /// No description provided for @achievementsTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достижения'**
+  String get achievementsTitle;
+
+  /// No description provided for @achievementsCount.
+  ///
+  /// In ru, this message translates to:
+  /// **'{unlocked} / {total}'**
+  String achievementsCount(int unlocked, int total);
+
+  /// No description provided for @achievementUnlocked.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новое достижение!'**
+  String get achievementUnlocked;
+
+  /// No description provided for @achievementFirstGame.
+  ///
+  /// In ru, this message translates to:
+  /// **'Первая игра'**
+  String get achievementFirstGame;
+
+  /// No description provided for @achievementFirstGameDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Заверши первую сессию'**
+  String get achievementFirstGameDesc;
+
+  /// No description provided for @achievementPersonalRecord.
+  ///
+  /// In ru, this message translates to:
+  /// **'Рекордсмен'**
+  String get achievementPersonalRecord;
+
+  /// No description provided for @achievementPersonalRecordDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Установи личный рекорд'**
+  String get achievementPersonalRecordDesc;
+
+  /// No description provided for @achievementSpeedDemon.
+  ///
+  /// In ru, this message translates to:
+  /// **'Молния'**
+  String get achievementSpeedDemon;
+
+  /// No description provided for @achievementSpeedDemonDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пройди 3×3 за 5 секунд или быстрее'**
+  String get achievementSpeedDemonDesc;
+
+  /// No description provided for @achievementMaster5x5.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мастер 5×5'**
+  String get achievementMaster5x5;
+
+  /// No description provided for @achievementMaster5x5Desc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пройди 5×5 за 20 секунд или быстрее'**
+  String get achievementMaster5x5Desc;
+
+  /// No description provided for @achievementFocusMode.
+  ///
+  /// In ru, this message translates to:
+  /// **'Фокус'**
+  String get achievementFocusMode;
+
+  /// No description provided for @achievementFocusModeDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пройди таблицу без ошибок'**
+  String get achievementFocusModeDesc;
+
+  /// No description provided for @achievementStreak3.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик 3 дня'**
+  String get achievementStreak3;
+
+  /// No description provided for @achievementStreak3Desc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Играй 3 дня подряд'**
+  String get achievementStreak3Desc;
+
+  /// No description provided for @achievementStreak7.
+  ///
+  /// In ru, this message translates to:
+  /// **'Неделя'**
+  String get achievementStreak7;
+
+  /// No description provided for @achievementStreak7Desc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Играй 7 дней подряд'**
+  String get achievementStreak7Desc;
+
+  /// No description provided for @achievementStreak30.
+  ///
+  /// In ru, this message translates to:
+  /// **'Легенда месяца'**
+  String get achievementStreak30;
+
+  /// No description provided for @achievementStreak30Desc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Играй 30 дней подряд'**
+  String get achievementStreak30Desc;
+
+  /// No description provided for @achievementNightOwl.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ночная сова'**
+  String get achievementNightOwl;
+
+  /// No description provided for @achievementNightOwlDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сыграй сессию после 22:00'**
+  String get achievementNightOwlDesc;
+
+  /// No description provided for @achievementCoinHoarder.
+  ///
+  /// In ru, this message translates to:
+  /// **'Копилка'**
+  String get achievementCoinHoarder;
+
+  /// No description provided for @achievementCoinHoarderDesc.
+  ///
+  /// In ru, this message translates to:
+  /// **'Накопи 500 монет'**
+  String get achievementCoinHoarderDesc;
+
+  /// No description provided for @league.
+  ///
+  /// In ru, this message translates to:
+  /// **'Лига'**
+  String get league;
+
+  /// No description provided for @leagueTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Недельная лига'**
+  String get leagueTitle;
+
+  /// No description provided for @leagueBronze.
+  ///
+  /// In ru, this message translates to:
+  /// **'Бронза'**
+  String get leagueBronze;
+
+  /// No description provided for @leagueSilver.
+  ///
+  /// In ru, this message translates to:
+  /// **'Серебро'**
+  String get leagueSilver;
+
+  /// No description provided for @leagueGold.
+  ///
+  /// In ru, this message translates to:
+  /// **'Золото'**
+  String get leagueGold;
+
+  /// No description provided for @leaguePlatinum.
+  ///
+  /// In ru, this message translates to:
+  /// **'Платина'**
+  String get leaguePlatinum;
+
+  /// No description provided for @leagueWeeklyXp.
+  ///
+  /// In ru, this message translates to:
+  /// **'{xp} XP за неделю'**
+  String leagueWeeklyXp(int xp);
+
+  /// No description provided for @leagueNextTier.
+  ///
+  /// In ru, this message translates to:
+  /// **'{xp} XP до {tier}'**
+  String leagueNextTier(int xp, String tier);
+
+  /// No description provided for @leagueMaxTier.
+  ///
+  /// In ru, this message translates to:
+  /// **'Высшая лига достигнута!'**
+  String get leagueMaxTier;
+
+  /// No description provided for @leagueResetsMonday.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обновляется каждый понедельник'**
+  String get leagueResetsMonday;
+
+  /// No description provided for @leagueYou.
+  ///
+  /// In ru, this message translates to:
+  /// **'Ты'**
+  String get leagueYou;
+
+  /// No description provided for @leagueConnectTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Соревнуйся с реальными игроками!'**
+  String get leagueConnectTitle;
+
+  /// No description provided for @leagueConnectSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключи Game Center для настоящих лидербордов'**
+  String get leagueConnectSubtitle;
+
+  /// No description provided for @leagueConnect.
+  ///
+  /// In ru, this message translates to:
+  /// **'Подключить'**
+  String get leagueConnect;
+
+  /// No description provided for @leagueFullRanking.
+  ///
+  /// In ru, this message translates to:
+  /// **'Полный рейтинг'**
+  String get leagueFullRanking;
+
+  /// No description provided for @leagueLoading.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загрузка рейтинга...'**
+  String get leagueLoading;
+
+  /// No description provided for @leagueError.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось загрузить рейтинг'**
+  String get leagueError;
+
+  /// No description provided for @leagueNotConnected.
+  ///
+  /// In ru, this message translates to:
+  /// **'Game Center не подключён'**
+  String get leagueNotConnected;
 }
 
 class _AppLocalizationsDelegate
