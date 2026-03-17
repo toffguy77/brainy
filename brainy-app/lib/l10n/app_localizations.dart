@@ -1477,6 +1477,10 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Game Center не подключён'**
   String get leagueNotConnected;
+
+  String appVersionLabel(String version, String build);
+
+  String get versionCopied;
 }
 
 class _AppLocalizationsDelegate

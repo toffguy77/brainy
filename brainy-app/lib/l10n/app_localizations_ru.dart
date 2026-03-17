@@ -749,4 +749,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get leagueNotConnected => 'Game Center не подключён';
+
+  @override
+  String appVersionLabel(String version, String build) {
+    return 'Версия $version ($build)';
+  }
+
+  @override
+  String get versionCopied => 'Версия скопирована';
 }

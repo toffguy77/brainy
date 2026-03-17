@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
@@ -281,6 +283,40 @@ class ParentSettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 24),
+          FutureBuilder<PackageInfo>(
+            future: PackageInfo.fromPlatform(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const SizedBox.shrink();
+              final info = snapshot.data!;
+              final versionText = l10n.appVersionLabel(
+                info.version,
+                info.buildNumber,
+              );
+              return GestureDetector(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: versionText));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.versionCopied),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
+                child: Center(
+                  child: Text(
+                    versionText,
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 13,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

@@ -747,4 +747,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get leagueNotConnected => 'Game Center not connected';
+
+  @override
+  String appVersionLabel(String version, String build) {
+    return 'Version $version ($build)';
+  }
+
+  @override
+  String get versionCopied => 'Version copied';
 }
