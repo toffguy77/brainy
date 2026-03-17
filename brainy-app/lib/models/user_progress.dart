@@ -13,6 +13,7 @@ class UserProgress extends HiveObject {
   String activeCharacterId;
   int lastSelectedGridSize;
   List<String> unlockedAccessories;
+  List<String> unlockedAchievements;
 
   UserProgress({
     this.coins = 0,
@@ -27,7 +28,9 @@ class UserProgress extends HiveObject {
     this.activeCharacterId = 'brainy',
     this.lastSelectedGridSize = 5,
     List<String>? unlockedAccessories,
-  }) : unlockedAccessories = unlockedAccessories ?? [];
+    List<String>? unlockedAchievements,
+  })  : unlockedAccessories = unlockedAccessories ?? [],
+        unlockedAchievements = unlockedAchievements ?? [];
 }
 
 // Field indices 0-11 are permanent. Future fields must start at 12+.
@@ -55,13 +58,14 @@ class UserProgressAdapter extends TypeAdapter<UserProgress> {
       activeCharacterId: fields[9] as String? ?? 'brainy',
       lastSelectedGridSize: fields[10] as int? ?? 5,
       unlockedAccessories: (fields[11] as List?)?.cast<String>() ?? [],
+      unlockedAchievements: (fields[12] as List?)?.cast<String>() ?? [],
     );
   }
 
   @override
   void write(BinaryWriter writer, UserProgress obj) {
     writer
-      ..writeByte(12) // number of fields
+      ..writeByte(13) // number of fields
       ..writeByte(0)
       ..write(obj.coins)
       ..writeByte(1)
@@ -85,6 +89,8 @@ class UserProgressAdapter extends TypeAdapter<UserProgress> {
       ..writeByte(10)
       ..write(obj.lastSelectedGridSize)
       ..writeByte(11)
-      ..write(obj.unlockedAccessories);
+      ..write(obj.unlockedAccessories)
+      ..writeByte(12)
+      ..write(obj.unlockedAchievements);
   }
 }

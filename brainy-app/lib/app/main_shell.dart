@@ -30,6 +30,10 @@ class MainShell extends StatelessWidget {
             icon: const Icon(Icons.bar_chart_rounded),
             label: l10n.progress,
           ),
+          NavigationDestination(
+            icon: const Icon(Icons.emoji_events_rounded),
+            label: l10n.league,
+          ),
         ],
       ),
     );
@@ -39,6 +43,7 @@ class MainShell extends StatelessWidget {
     final location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/character') || location.startsWith('/accessories')) return 1;
     if (location.startsWith('/progress')) return 2;
+    if (location.startsWith('/league')) return 3;
     return 0;
   }
 
@@ -50,6 +55,8 @@ class MainShell extends StatelessWidget {
         context.go('/character');
       case 2:
         context.go('/progress');
+      case 3:
+        context.go('/league');
     }
   }
 }

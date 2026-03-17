@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/haptic_service.dart';
 import '../../../shared/services/subscription_service.dart';
@@ -322,8 +324,9 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
                     ),
                     const SizedBox(height: 16),
                     // Restore + Terms + Privacy
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _LinkButton(
                           label: l10n.paywallRestore,
@@ -332,16 +335,20 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
                         _dot(),
                         _LinkButton(
                           label: l10n.paywallTerms,
-                          onTap: () {
-                            // TODO: open terms URL
-                          },
+                          onTap: () => _openLegalUrl(
+                            Localizations.localeOf(context).languageCode == 'ru'
+                                ? AppConstants.termsUrlRu
+                                : AppConstants.termsUrlEn,
+                          ),
                         ),
                         _dot(),
                         _LinkButton(
                           label: l10n.paywallPrivacy,
-                          onTap: () {
-                            // TODO: open privacy URL
-                          },
+                          onTap: () => _openLegalUrl(
+                            Localizations.localeOf(context).languageCode == 'ru'
+                                ? AppConstants.privacyPolicyUrlRu
+                                : AppConstants.privacyPolicyUrlEn,
+                          ),
                         ),
                       ],
                     ),
@@ -354,6 +361,13 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
         ),
       ),
     );
+  }
+
+  Future<void> _openLegalUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
   }
 
   Widget _dot() {
@@ -470,6 +484,10 @@ class _PackagePlanCards extends StatelessWidget {
     required this.onSelect,
   });
 
+  bool _isFamily(Package pkg) {
+    return pkg.storeProduct.identifier.contains('family');
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -477,13 +495,14 @@ class _PackagePlanCards extends StatelessWidget {
       children: List.generate(packages.length, (i) {
         final pkg = packages[i];
         final product = pkg.storeProduct;
-        final isSelected = i == selectedIndex;
         final isAnnual = pkg.packageType == PackageType.annual;
+        final isFamily = _isFamily(pkg);
+        final isSelected = i == selectedIndex;
 
         return Padding(
           padding: EdgeInsets.only(bottom: i < packages.length - 1 ? 12 : 0),
           child: _PlanCard(
-            title: _packageTitle(pkg, l10n),
+            title: isFamily ? l10n.paywallPlanFamily : _packageTitle(pkg, l10n),
             price: product.priceString,
             subtitle: isAnnual
                 ? l10n.paywallPerMonth(_monthlyPrice(product))
@@ -530,8 +549,8 @@ class _FallbackPlanCards extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final plans = [
       (l10n.paywallPlanYear, '\$24.99/yr', l10n.paywallPerMonth('\$2'), l10n.paywallBestPrice),
-      (l10n.paywallPlanMonth, '\$3.99/mo', null, null),
-      (l10n.paywallPlanFamily, '\$39.99/yr', null, null),
+      (l10n.paywallPlanMonth, '\$3.99/mo', null as String?, null as String?),
+      (l10n.paywallPlanFamily, '\$39.99/yr', null as String?, null as String?),
     ];
 
     return Column(
@@ -620,15 +639,18 @@ class _PlanCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontFamily: 'Nunito',
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: isSelected
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
+                      Flexible(
+                        child: Text(
+                          title,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected
+                                ? AppColors.textPrimary
+                                : AppColors.textSecondary,
+                          ),
                         ),
                       ),
                       if (badge != null) ...[

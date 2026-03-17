@@ -8,6 +8,8 @@ import '../../../shared/services/subscription_service.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../../parent/providers/parent_provider.dart';
+import '../../character/data/characters_data.dart';
+import '../../character/screens/character_screen.dart';
 import '../../subscription/widgets/premium_bottom_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -122,6 +124,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 
   Widget _buildCharacterPlaceholder() {
+    final progress = ref.watch(userProgressProvider);
+    final activeInfo = defaultCharacters.firstWhere(
+      (c) => c.id == progress.activeCharacterId,
+      orElse: () => defaultCharacters.first,
+    );
+
     return AnimatedBuilder(
       animation: _bobAnimation,
       builder: (context, child) {
@@ -134,13 +142,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         width: 200,
         height: 200,
         decoration: BoxDecoration(
-          gradient: AppColors.primaryGradient,
+          gradient: LinearGradient(
+            colors: [
+              activeInfo.color.withValues(alpha: 0.8),
+              activeInfo.color.withValues(alpha: 0.3),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            color: activeInfo.color.withValues(alpha: 0.5),
+            width: 3,
+          ),
         ),
-        child: const Icon(
-          Icons.face_rounded,
-          size: 100,
-          color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: characterAvatar(progress.activeCharacterId, size: 120),
         ),
       ),
     );

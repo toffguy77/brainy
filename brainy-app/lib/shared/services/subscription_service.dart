@@ -33,7 +33,10 @@ class SubscriptionService {
   static Future<List<Package>> getAvailablePackages() async {
     try {
       final offerings = await Purchases.getOfferings();
-      return offerings.current?.availablePackages ?? [];
+      final offering =
+          offerings.getOffering(AppConstants.revenueCatOfferingId) ??
+              offerings.current;
+      return offering?.availablePackages ?? [];
     } catch (_) {
       return [];
     }

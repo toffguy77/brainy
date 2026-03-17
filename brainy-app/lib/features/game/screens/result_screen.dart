@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../models/achievement.dart';
 import '../../../models/session.dart';
 import '../../../shared/services/haptic_service.dart';
+import '../../../shared/services/sound_service.dart';
 
 class ResultScreen extends StatefulWidget {
   final Map<String, dynamic>? extra;
@@ -22,6 +24,7 @@ class _ResultScreenState extends State<ResultScreen>
   int _xpEarned = 0;
   int _totalXp = 0;
   int _level = 1;
+  List<AchievementDef> _newAchievements = [];
 
   late final AnimationController _titleController;
   late final AnimationController _starsController;
@@ -54,6 +57,8 @@ class _ResultScreenState extends State<ResultScreen>
     _xpEarned = extra['xpEarned'] as int? ?? 0;
     _totalXp = extra['totalXp'] as int? ?? 0;
     _level = extra['level'] as int? ?? 1;
+    _newAchievements =
+        (extra['newAchievements'] as List<AchievementDef>?) ?? [];
 
     _titleController = AnimationController(
       vsync: this,
@@ -105,6 +110,80 @@ class _ResultScreenState extends State<ResultScreen>
         if (!mounted) return;
         _confettiController!.play();
         HapticService.recordBroken();
+      });
+    }
+
+    // Show achievement notifications
+    if (_newAchievements.isNotEmpty) {
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (!mounted) return;
+        _showAchievementNotifications();
+      });
+    }
+  }
+
+  void _showAchievementNotifications() {
+    final l10n = AppLocalizations.of(context)!;
+    SoundService.play(SoundEffect.achievement);
+
+    for (int i = 0; i < _newAchievements.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 800), () {
+        if (!mounted) return;
+        final achievement = _newAchievements[i];
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 3),
+            backgroundColor: AppColors.surface,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(
+                color: AppColors.accent.withValues(alpha: 0.5),
+                width: 1,
+              ),
+            ),
+            content: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    achievement.assetPath,
+                    width: 40,
+                    height: 40,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.achievementUnlocked,
+                        style: const TextStyle(
+                          fontFamily: 'Nunito',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.accent,
+                        ),
+                      ),
+                      Text(
+                        achievement.title(l10n),
+                        style: const TextStyle(
+                          fontFamily: 'Nunito',
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       });
     }
   }

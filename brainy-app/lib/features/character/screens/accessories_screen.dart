@@ -207,10 +207,9 @@ class _CharacterPreview extends StatelessWidget {
             borderRadius: BorderRadius.circular(60),
             border: Border.all(color: characterInfo.color, width: 3),
           ),
-          child: Icon(
-            characterIcon(characterInfo.id),
-            size: 60,
-            color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(12),
+            child: characterAvatar(characterInfo.id, size: 60),
           ),
         ),
         if (equipped.isNotEmpty) ...[

@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/user_progress.dart';
+import '../../../shared/services/sound_service.dart';
+import '../../character/providers/character_provider.dart';
 
 class UserProgressNotifier extends Notifier<UserProgress> {
   Box<UserProgress> get _box =>
@@ -65,10 +67,19 @@ class UserProgressNotifier extends Notifier<UserProgress> {
     // Streak bonuses
     if (state.currentStreak == 7) {
       state.coins += AppConstants.coinsForStreak7;
-      // TODO: trigger 'week_streak' achievement
     } else if (state.currentStreak == 30) {
       state.coins += AppConstants.coinsForStreak30;
-      // TODO: unlock Vortex character
+    }
+
+    // Streak achievements & character unlocks
+    if (state.currentStreak >= 7) {
+      final unlocked = await unlockAchievement('streak_7');
+      if (unlocked) SoundService.play(SoundEffect.achievement);
+    }
+    if (state.currentStreak >= 30) {
+      final unlocked30 = await unlockAchievement('streak_30');
+      if (unlocked30) SoundService.play(SoundEffect.achievement);
+      ref.read(characterProvider.notifier).unlockCharacter('vortex');
     }
 
     await _persist();
@@ -95,6 +106,17 @@ class UserProgressNotifier extends Notifier<UserProgress> {
 
   bool hasAccessory(String accessoryId) =>
       state.unlockedAccessories.contains(accessoryId);
+
+  Future<bool> unlockAchievement(String achievementId) async {
+    if (state.unlockedAchievements.contains(achievementId)) return false;
+    state.unlockedAchievements = List<String>.from(state.unlockedAchievements)
+      ..add(achievementId);
+    await _persist();
+    return true;
+  }
+
+  bool hasAchievement(String id) =>
+      state.unlockedAchievements.contains(id);
 
   Future<void> setSelectedGridSize(int size) async {
     state.lastSelectedGridSize = size;

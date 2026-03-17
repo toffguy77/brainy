@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/user_progress.dart';
+import '../../../shared/services/subscription_service.dart';
 import '../../character/data/characters_data.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
+import '../providers/achievements_provider.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -53,7 +56,9 @@ class ProgressScreen extends ConsumerWidget {
               locale: locale,
             ),
             const SizedBox(height: 24),
-            _RecordsSection(records: records, l10n: l10n),
+            _AchievementsSection(l10n: l10n, ref: ref),
+            const SizedBox(height: 24),
+            _RecordsSection(records: records, l10n: l10n, ref: ref),
             const SizedBox(height: 32),
           ],
         ),
@@ -464,14 +469,230 @@ class _GoalTile extends StatelessWidget {
   }
 }
 
-class _RecordsSection extends StatelessWidget {
-  final Map<int, int> records;
+class _AchievementsSection extends StatelessWidget {
   final AppLocalizations l10n;
+  final WidgetRef ref;
 
-  const _RecordsSection({required this.records, required this.l10n});
+  const _AchievementsSection({required this.l10n, required this.ref});
 
   @override
   Widget build(BuildContext context) {
+    final achievements = ref.watch(achievementsStateProvider);
+    final unlockedCount = achievements.where((a) => a.unlocked).length;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              l10n.achievementsTitle,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.achievementsCount(unlockedCount, achievements.length),
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: achievements
+              .map((a) => _BadgeItem(
+                    achievement: a,
+                    l10n: l10n,
+                  ))
+              .toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class _BadgeItem extends StatelessWidget {
+  final AchievementState achievement;
+  final AppLocalizations l10n;
+
+  const _BadgeItem({required this.achievement, required this.l10n});
+
+  @override
+  Widget build(BuildContext context) {
+    final def = achievement.def;
+    final unlocked = achievement.unlocked;
+
+    return GestureDetector(
+      onTap: () => _showDetail(context),
+      child: SizedBox(
+        width: 60,
+        child: Column(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: unlocked
+                  ? Image.asset(
+                      def.assetPath,
+                      width: 52,
+                      height: 52,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _badgePlaceholder(),
+                    )
+                  : Opacity(
+                      opacity: 0.4,
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.matrix(<double>[
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0.2126, 0.7152, 0.0722, 0, 0,
+                          0, 0, 0, 1, 0,
+                        ]),
+                        child: Image.asset(
+                          def.assetPath,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              _badgePlaceholder(),
+                        ),
+                      ),
+                    ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              def.title(l10n),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                color: unlocked
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _badgePlaceholder({double size = 52}) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(
+        Icons.emoji_events_rounded,
+        color: AppColors.textSecondary,
+        size: size * 0.5,
+      ),
+    );
+  }
+
+  void _showDetail(BuildContext context) {
+    final def = achievement.def;
+    final unlocked = achievement.unlocked;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            unlocked
+                ? Image.asset(
+                    def.assetPath,
+                    width: 80,
+                    height: 80,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => _badgePlaceholder(size: 80),
+                  )
+                : Opacity(
+                    opacity: 0.4,
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0, 0, 0, 1, 0,
+                      ]),
+                      child: Image.asset(
+                        def.assetPath,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            _badgePlaceholder(size: 80),
+                      ),
+                    ),
+                  ),
+            const SizedBox(height: 16),
+            Text(
+              def.title(l10n),
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: unlocked
+                    ? AppColors.textPrimary
+                    : AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              def.description(l10n),
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                color: AppColors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RecordsSection extends StatelessWidget {
+  final Map<int, int> records;
+  final AppLocalizations l10n;
+  final WidgetRef ref;
+
+  const _RecordsSection({
+    required this.records,
+    required this.l10n,
+    required this.ref,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isPremium = ref.watch(isPremiumProvider).value ?? false;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -512,6 +733,13 @@ class _RecordsSection extends StatelessWidget {
                 _RecordChip(
                   gridSize: size,
                   seconds: records[size],
+                  onTap: () {
+                    if (isPremium) {
+                      context.push('/progress/grid-detail?size=$size');
+                    } else {
+                      context.push('/paywall');
+                    }
+                  },
                 ),
             ],
           ),
@@ -523,49 +751,73 @@ class _RecordsSection extends StatelessWidget {
 class _RecordChip extends StatelessWidget {
   final int gridSize;
   final int? seconds;
+  final VoidCallback? onTap;
 
-  const _RecordChip({required this.gridSize, required this.seconds});
+  const _RecordChip({
+    required this.gridSize,
+    required this.seconds,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final hasRecord = seconds != null;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: hasRecord
-            ? AppColors.primary.withValues(alpha: 0.15)
-            : AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: hasRecord
-            ? Border.all(
-                color: AppColors.primary.withValues(alpha: 0.3),
-                width: 1,
-              )
-            : null,
-      ),
-      child: Column(
-        children: [
-          Text(
-            '$gridSize×$gridSize',
-            style: TextStyle(
-              fontFamily: 'Nunito',
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color:
-                  hasRecord ? AppColors.textPrimary : AppColors.textSecondary,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: hasRecord
+              ? AppColors.primary.withValues(alpha: 0.15)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: hasRecord
+              ? Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  width: 1,
+                )
+              : null,
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Column(
+              children: [
+                Text(
+                  '$gridSize×$gridSize',
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: hasRecord
+                        ? AppColors.textPrimary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  hasRecord ? '${seconds}s' : '—',
+                  style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: hasRecord
+                        ? AppColors.secondary
+                        : AppColors.textSecondary,
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            hasRecord ? '${seconds}s' : '—',
-            style: TextStyle(
-              fontFamily: 'Nunito',
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-              color: hasRecord ? AppColors.secondary : AppColors.textSecondary,
+            const SizedBox(width: 4),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: hasRecord
+                  ? AppColors.textSecondary
+                  : AppColors.textSecondary.withValues(alpha: 0.5),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

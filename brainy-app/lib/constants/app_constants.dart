@@ -95,9 +95,15 @@ class AppConstants {
   // RevenueCat
   static const String revenueCatApiKey = String.fromEnvironment(
     'REVENUECAT_API_KEY',
-    defaultValue: 'test_WtvrALanvuosOAfJiyHAvmrDCJW',
+    defaultValue: 'appl_UoxUlnvJRWlCsjkQJkJIeoYxxJZ',
   );
-  static const String revenueCatEntitlement = 'Brainy Pro';
+  static const String revenueCatEntitlement = 'brainy_pro';
+  static const String revenueCatOfferingId = 'default';
+
+  // RevenueCat Product IDs
+  static const String productIdMonthly = 'brainy_pro_monthly';
+  static const String productIdYearly = 'brainy_pro_yearly';
+  static const String productIdFamily = 'brainy_pro_family';
 
   // Hive box names
   static const String sessionsBox = 'sessions';
@@ -120,4 +126,13 @@ class AppConstants {
 
   // Grid sizes for home screen picker (excludes 9x9 Gorbov)
   static const List<int> pickerGridSizes = [3, 4, 5, 6, 7];
+
+  // Legal URLs
+  static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
+  static const String privacyPolicyUrlRu =
+      '$legalBaseUrl/privacy-policy-ru.html';
+  static const String privacyPolicyUrlEn =
+      '$legalBaseUrl/privacy-policy-en.html';
+  static const String termsUrlRu = '$legalBaseUrl/terms-ru.html';
+  static const String termsUrlEn = '$legalBaseUrl/terms-en.html';
 }

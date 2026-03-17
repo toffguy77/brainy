@@ -10,21 +10,23 @@ import '../../game/providers/user_progress_provider.dart';
 import '../data/characters_data.dart';
 import '../providers/character_provider.dart';
 
-IconData characterIcon(String id) {
-  switch (id) {
-    case 'brainy':
-      return Icons.psychology_rounded;
-    case 'zap':
-      return Icons.bolt_rounded;
-    case 'vortex':
-      return Icons.cyclone_rounded;
-    case 'pixel':
-      return Icons.grid_view_rounded;
-    case 'glitch':
-      return Icons.bug_report_rounded;
-    default:
-      return Icons.face_rounded;
-  }
+Widget characterAvatar(String id, {required double size, Color? color}) {
+  final info = defaultCharacters.firstWhere(
+    (c) => c.id == id,
+    orElse: () => defaultCharacters.first,
+  );
+  return Image.asset(
+    info.assetPath,
+    width: size,
+    height: size,
+    fit: BoxFit.contain,
+    color: color,
+    errorBuilder: (_, __, ___) => Icon(
+      Icons.face_rounded,
+      size: size,
+      color: color ?? AppColors.textSecondary,
+    ),
+  );
 }
 
 class CharacterScreen extends ConsumerStatefulWidget {
@@ -171,28 +173,24 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                       width: double.infinity,
                       height: 48,
                       child: Material(
-                        color: AppColors.surface,
+                        color: AppColors.surface.withValues(alpha: 0.5),
                         borderRadius: BorderRadius.circular(16),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(16),
-                          onTap: () => context.go('/accessories'),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.auto_awesome_rounded,
-                                  color: AppColors.secondary, size: 20),
-                              const SizedBox(width: 8),
-                              Text(
-                                l10n.accessoriesCustomize,
-                                style: const TextStyle(
-                                  fontFamily: 'Nunito',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.secondary,
-                                ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.auto_awesome_rounded,
+                                color: AppColors.textSecondary.withValues(alpha: 0.5), size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${l10n.accessoriesCustomize} — ${l10n.comingSoon}',
+                              style: TextStyle(
+                                fontFamily: 'Nunito',
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textSecondary.withValues(alpha: 0.5),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -241,12 +239,19 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
             width: 3,
           ),
         ),
-        child: Icon(
-          characterIcon(info.id),
-          size: 80,
-          color: data.isUnlocked
-              ? Colors.white
-              : AppColors.textSecondary.withValues(alpha: 0.5),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: data.isUnlocked
+              ? characterAvatar(info.id, size: 80)
+              : ColorFiltered(
+                  colorFilter: const ColorFilter.matrix(<double>[
+                    0.2126, 0.7152, 0.0722, 0, 0,
+                    0.2126, 0.7152, 0.0722, 0, 0,
+                    0.2126, 0.7152, 0.0722, 0, 0,
+                    0, 0, 0, 0.5, 0,
+                  ]),
+                  child: characterAvatar(info.id, size: 80),
+                ),
         ),
       ),
     );
@@ -353,10 +358,14 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                 ),
               ),
               const SizedBox(height: 24),
-              Icon(
-                Icons.lock_rounded,
-                size: 48,
-                color: info.color,
+              ColorFiltered(
+                colorFilter: const ColorFilter.matrix(<double>[
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0.2126, 0.7152, 0.0722, 0, 0,
+                  0, 0, 0, 0.6, 0,
+                ]),
+                child: characterAvatar(info.id, size: 64),
               ),
               const SizedBox(height: 16),
               Text(
@@ -478,12 +487,20 @@ class _CharacterCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              characterIcon(info.id),
-              size: 56,
-              color: isUnlocked
-                  ? info.color
-                  : AppColors.textSecondary.withValues(alpha: 0.4),
+            SizedBox(
+              width: 56,
+              height: 56,
+              child: isUnlocked
+                  ? characterAvatar(info.id, size: 56)
+                  : ColorFiltered(
+                      colorFilter: const ColorFilter.matrix(<double>[
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0.2126, 0.7152, 0.0722, 0, 0,
+                        0, 0, 0, 0.4, 0,
+                      ]),
+                      child: characterAvatar(info.id, size: 56),
+                    ),
             ),
             const SizedBox(height: 12),
             Text(

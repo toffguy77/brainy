@@ -10,9 +10,11 @@ import '../features/game/screens/result_screen.dart';
 import '../features/character/screens/accessories_screen.dart';
 import '../features/character/screens/character_screen.dart';
 import '../features/progress/screens/progress_screen.dart';
+import '../features/progress/screens/grid_detail_screen.dart';
 import '../features/parent/screens/parent_pin_screen.dart';
 import '../features/parent/screens/parent_dashboard_screen.dart';
 import '../features/parent/screens/parent_settings_screen.dart';
+import '../features/league/screens/league_screen.dart';
 import '../features/subscription/screens/paywall_screen.dart';
 import 'main_shell.dart';
 
@@ -83,6 +85,18 @@ final router = GoRouter(
         GoRoute(
           path: '/progress',
           builder: (context, state) => const ProgressScreen(),
+        ),
+        GoRoute(
+          path: '/league',
+          builder: (context, state) => const LeagueScreen(),
+        ),
+        GoRoute(
+          path: '/progress/grid-detail',
+          builder: (context, state) {
+            final size =
+                int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
+            return GridDetailScreen(gridSize: size);
+          },
         ),
       ],
     ),

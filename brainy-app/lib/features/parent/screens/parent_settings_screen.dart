@@ -203,12 +203,14 @@ class ParentSettingsScreen extends ConsumerWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          l10n.settingsReminderTime,
-                          style: const TextStyle(
-                            fontFamily: 'Nunito',
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
+                        Flexible(
+                          child: Text(
+                            l10n.settingsReminderTime,
+                            style: const TextStyle(
+                              fontFamily: 'Nunito',
+                              fontSize: 14,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                         Row(
