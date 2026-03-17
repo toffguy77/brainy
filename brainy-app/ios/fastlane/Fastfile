@@ -45,9 +45,13 @@ platform :ios do
       )
     end
 
-    # Read profile name from the mobileprovision file
-    profile_info = sh("security cms -D -i fastlane/profile.mobileprovision", log: false)
-    profile_name = profile_info.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)[1]
+    # Read profile name from the installed provisioning profile
+    installed_profile = File.join(
+      Dir.home, "Library/Developer/Xcode/UserData/Provisioning Profiles",
+      "#{profile_uuid}.mobileprovision"
+    )
+    profile_plist = sh("security", "cms", "-D", "-i", installed_profile, log: false)
+    profile_name = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)[1]
     UI.message("Provisioning profile name: #{profile_name}")
 
     # Archive and export IPA with proper signing
