@@ -37,11 +37,15 @@ class SubscriptionService {
   static Future<List<Package>> getAvailablePackages() async {
     try {
       final offerings = await Purchases.getOfferings();
+      debugPrint('[SubscriptionService] offerings: ${offerings.all.keys}');
       final offering =
           offerings.getOffering(AppConstants.revenueCatOfferingId) ??
               offerings.current;
+      debugPrint('[SubscriptionService] offering: ${offering?.identifier}, '
+          'packages: ${offering?.availablePackages.length}');
       return offering?.availablePackages ?? [];
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[SubscriptionService] getAvailablePackages error: $e');
       return [];
     }
   }

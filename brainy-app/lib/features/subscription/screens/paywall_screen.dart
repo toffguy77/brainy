@@ -43,6 +43,8 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
 
   Future<void> _loadPackages() async {
     final packages = await SubscriptionService.getAvailablePackages();
+    debugPrint('[Paywall] loaded ${packages.length} packages: '
+        '${packages.map((p) => '${p.identifier}=${p.storeProduct.identifier}').join(', ')}');
     if (!mounted) return;
     setState(() {
       _packages = packages;
@@ -53,8 +55,22 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
   }
 
   Future<void> _purchase() async {
-    if (_packages.isEmpty || _purchasing) return;
+    if (_purchasing) return;
     setState(() => _purchasing = true);
+
+    // Retry loading packages if they weren't available initially
+    if (_packages.isEmpty) {
+      debugPrint('[Paywall] packages empty, retrying load...');
+      final packages = await SubscriptionService.getAvailablePackages();
+      if (!mounted) return;
+      if (packages.isNotEmpty) {
+        _packages = packages;
+      } else {
+        setState(() => _purchasing = false);
+        _showErrorDialog();
+        return;
+      }
+    }
 
     final result =
         await SubscriptionService.purchasePackage(_packages[_selectedPlanIndex]);
