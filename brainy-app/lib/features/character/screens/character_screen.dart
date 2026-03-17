@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/services/subscription_service.dart';
+import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../../models/character.dart';
 import '../../../models/user_progress.dart';
 import '../../game/providers/user_progress_provider.dart';
@@ -66,7 +66,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
 
     // Auto-unlock premium characters for subscribers
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final hasPremium = await SubscriptionService.isPremium();
+      final hasPremium = await ref.read(isPremiumProvider.future);
       if (!hasPremium || !mounted) return;
       for (final info in defaultCharacters) {
         if (info.unlockType == UnlockType.premium) {

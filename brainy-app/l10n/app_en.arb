@@ -207,7 +207,7 @@
     }
   },
   "paywallTryFree": "Start 7-day free trial",
-  "paywallSubscribe": "Subscribe",
+
   "paywallDisclaimer": "Cancel anytime. Manage subscription in App Store.",
   "paywallRestore": "Restore purchases",
   "paywallTerms": "Terms",
@@ -352,5 +352,14 @@
   "leagueFullRanking": "Full Ranking",
   "leagueLoading": "Loading leaderboard...",
   "leagueError": "Could not load leaderboard",
-  "leagueNotConnected": "Game Center not connected"
+  "leagueNotConnected": "Game Center not connected",
+
+  "appVersionLabel": "Version {version} ({buildNumber})",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": {"type": "Object"},
+      "buildNumber": {"type": "Object"}
+    }
+  },
+  "versionCopied": "Version copied"
 }

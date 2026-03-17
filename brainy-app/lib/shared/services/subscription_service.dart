@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import '../../constants/app_constants.dart';
+
+/// Result of a purchase or restore attempt.
+enum PurchaseResult { success, cancelled, error }
 
 class SubscriptionService {
   SubscriptionService._();
@@ -42,23 +46,39 @@ class SubscriptionService {
     }
   }
 
-  static Future<bool> purchasePackage(Package package) async {
+  static Future<PurchaseResult> purchasePackage(Package package) async {
     try {
       final customerInfo = await Purchases.purchasePackage(package);
-      return customerInfo.entitlements.active
+      final active = customerInfo.entitlements.active
           .containsKey(AppConstants.revenueCatEntitlement);
+      return active ? PurchaseResult.success : PurchaseResult.error;
+    } on PlatformException catch (e) {
+      if (e.code == '1' ||
+          e.details?['userCancelled'] == true ||
+          e.message?.contains('userCancelled') == true) {
+        return PurchaseResult.cancelled;
+      }
+      return PurchaseResult.error;
     } catch (_) {
-      return false;
+      return PurchaseResult.error;
     }
   }
 
-  static Future<bool> restorePurchases() async {
+  static Future<PurchaseResult> restorePurchases() async {
     try {
       final customerInfo = await Purchases.restorePurchases();
-      return customerInfo.entitlements.active
+      final active = customerInfo.entitlements.active
           .containsKey(AppConstants.revenueCatEntitlement);
+      return active ? PurchaseResult.success : PurchaseResult.error;
+    } on PlatformException catch (e) {
+      if (e.code == '1' ||
+          e.details?['userCancelled'] == true ||
+          e.message?.contains('userCancelled') == true) {
+        return PurchaseResult.cancelled;
+      }
+      return PurchaseResult.error;
     } catch (_) {
-      return false;
+      return PurchaseResult.error;
     }
   }
 }

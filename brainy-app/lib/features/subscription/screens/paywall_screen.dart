@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../constants/app_colors.dart';
@@ -55,33 +56,39 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
     if (_packages.isEmpty || _purchasing) return;
     setState(() => _purchasing = true);
 
-    final success =
+    final result =
         await SubscriptionService.purchasePackage(_packages[_selectedPlanIndex]);
 
     if (!mounted) return;
     setState(() => _purchasing = false);
 
-    if (success) {
-      HapticService.purchase();
-      ref.invalidate(isPremiumProvider);
-      await _showSuccessDialog();
-    } else {
-      _showErrorDialog();
+    switch (result) {
+      case PurchaseResult.success:
+        HapticService.purchase();
+        ref.invalidate(isPremiumProvider);
+        await _showSuccessDialog();
+      case PurchaseResult.cancelled:
+        break; // User cancelled — do nothing
+      case PurchaseResult.error:
+        _showErrorDialog();
     }
   }
 
   Future<void> _restore() async {
     setState(() => _purchasing = true);
-    final success = await SubscriptionService.restorePurchases();
+    final result = await SubscriptionService.restorePurchases();
     if (!mounted) return;
     setState(() => _purchasing = false);
 
-    if (success) {
-      HapticService.purchase();
-      ref.invalidate(isPremiumProvider);
-      await _showSuccessDialog();
-    } else {
-      _showErrorDialog();
+    switch (result) {
+      case PurchaseResult.success:
+        HapticService.purchase();
+        ref.invalidate(isPremiumProvider);
+        await _showSuccessDialog();
+      case PurchaseResult.cancelled:
+        break;
+      case PurchaseResult.error:
+        _showErrorDialog();
     }
   }
 
@@ -529,7 +536,11 @@ class _PackagePlanCards extends StatelessWidget {
 
   String _monthlyPrice(StoreProduct product) {
     final monthly = product.price / 12;
-    return monthly.toStringAsFixed(0);
+    final format = NumberFormat.simpleCurrency(
+      name: product.currencyCode,
+      decimalDigits: 0,
+    );
+    return format.format(monthly.round());
   }
 }
 
@@ -547,11 +558,18 @@ class _FallbackPlanCards extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final plans = [
-      (l10n.paywallPlanYear, '\$24.99/yr', l10n.paywallPerMonth('\$2'), l10n.paywallBestPrice),
-      (l10n.paywallPlanMonth, '\$3.99/mo', null as String?, null as String?),
-      (l10n.paywallPlanFamily, '\$39.99/yr', null as String?, null as String?),
-    ];
+    final isRu = Localizations.localeOf(context).languageCode == 'ru';
+    final plans = isRu
+        ? [
+            (l10n.paywallPlanYear, '1 990 ₽/год', l10n.paywallPerMonth('166₽'), l10n.paywallBestPrice),
+            (l10n.paywallPlanMonth, '299 ₽/мес', null as String?, null as String?),
+            (l10n.paywallPlanFamily, '2 990 ₽/год', null as String?, null as String?),
+          ]
+        : [
+            (l10n.paywallPlanYear, '\$24.99/yr', l10n.paywallPerMonth('\$2'), l10n.paywallBestPrice),
+            (l10n.paywallPlanMonth, '\$1.99/mo', null as String?, null as String?),
+            (l10n.paywallPlanFamily, '\$39.99/yr', null as String?, null as String?),
+          ];
 
     return Column(
       children: List.generate(plans.length, (i) {

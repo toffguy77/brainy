@@ -207,7 +207,7 @@
     }
   },
   "paywallTryFree": "Начать 7 дней бесплатно",
-  "paywallSubscribe": "Подписаться",
+
   "paywallDisclaimer": "Отмена в любое время. Управление подпиской в App Store.",
   "paywallRestore": "Восстановить покупки",
   "paywallTerms": "Условия",
@@ -352,5 +352,8 @@
   "leagueFullRanking": "Полный рейтинг",
   "leagueLoading": "Загрузка рейтинга...",
   "leagueError": "Не удалось загрузить рейтинг",
-  "leagueNotConnected": "Game Center не подключён"
+  "leagueNotConnected": "Game Center не подключён",
+
+  "appVersionLabel": "Версия {version} ({buildNumber})",
+  "versionCopied": "Версия скопирована"
 }

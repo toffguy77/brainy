@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/accessory.dart';
-import '../../../shared/services/subscription_service.dart';
+import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../game/providers/user_progress_provider.dart';
 import '../data/accessories_data.dart';
 import '../data/characters_data.dart';
@@ -499,7 +499,7 @@ class _AccessoryCard extends ConsumerWidget {
 
     // Not owned — attempt purchase
     if (accessory.isPremium) {
-      final hasPremium = await SubscriptionService.isPremium();
+      final hasPremium = await ref.read(isPremiumProvider.future);
       if (!hasPremium) {
         if (context.mounted) {
           _showPremiumDialog(context, l10n);

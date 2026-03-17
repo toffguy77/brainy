@@ -466,9 +466,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallTryFree => 'Start 7-day free trial';
 
   @override
-  String get paywallSubscribe => 'Subscribe';
-
-  @override
   String get paywallDisclaimer =>
       'Cancel anytime. Manage subscription in App Store.';
 
@@ -749,8 +746,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueNotConnected => 'Game Center not connected';
 
   @override
-  String appVersionLabel(String version, String build) {
-    return 'Version $version ($build)';
+  String appVersionLabel(Object buildNumber, Object version) {
+    return 'Version $version ($buildNumber)';
   }
 
   @override

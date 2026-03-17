@@ -467,9 +467,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paywallTryFree => 'Начать 7 дней бесплатно';
 
   @override
-  String get paywallSubscribe => 'Подписаться';
-
-  @override
   String get paywallDisclaimer =>
       'Отмена в любое время. Управление подпиской в App Store.';
 
@@ -751,8 +748,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueNotConnected => 'Game Center не подключён';
 
   @override
-  String appVersionLabel(String version, String build) {
-    return 'Версия $version ($build)';
+  String appVersionLabel(Object buildNumber, Object version) {
+    return 'Версия $version ($buildNumber)';
   }
 
   @override

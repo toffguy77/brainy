@@ -18,7 +18,7 @@ import '../../league/providers/game_services_provider.dart';
 import '../../league/providers/league_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../../shared/services/sound_service.dart';
-import '../../../shared/services/subscription_service.dart';
+import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 
 class GameScreen extends ConsumerStatefulWidget {
   final int gridSize;
@@ -43,7 +43,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // Guard: premium grid sizes require subscription
       if (AppConstants.premiumGridSizes.contains(widget.gridSize)) {
-        final hasPremium = await SubscriptionService.isPremium();
+        final hasPremium = await ref.read(isPremiumProvider.future);
         if (!hasPremium && mounted) {
           context.go('/paywall');
           return;

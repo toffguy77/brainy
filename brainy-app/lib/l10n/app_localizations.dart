@@ -956,12 +956,6 @@ abstract class AppLocalizations {
   /// **'Начать 7 дней бесплатно'**
   String get paywallTryFree;
 
-  /// No description provided for @paywallSubscribe.
-  ///
-  /// In ru, this message translates to:
-  /// **'Подписаться'**
-  String get paywallSubscribe;
-
   /// No description provided for @paywallDisclaimer.
   ///
   /// In ru, this message translates to:
@@ -1478,8 +1472,16 @@ abstract class AppLocalizations {
   /// **'Game Center не подключён'**
   String get leagueNotConnected;
 
-  String appVersionLabel(String version, String build);
+  /// No description provided for @appVersionLabel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия {version} ({buildNumber})'**
+  String appVersionLabel(Object buildNumber, Object version);
 
+  /// No description provided for @versionCopied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Версия скопирована'**
   String get versionCopied;
 }
 
