@@ -41,7 +41,7 @@ dependencies:
   fl_chart: ^0.66.0
 
   # Screenshots & sharing
-  screenshot: ^2.1.0
+  screenshot: ^3.0.0
   share_plus: ^10.1.4
   path_provider: ^2.1.5
 
