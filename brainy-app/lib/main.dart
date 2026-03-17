@@ -5,7 +5,6 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
@@ -15,6 +14,7 @@ import 'constants/app_constants.dart';
 import 'models/character.dart';
 import 'models/session.dart';
 import 'models/user_progress.dart';
+import 'features/league/providers/game_services_provider.dart';
 import 'shared/services/notification_service.dart';
 import 'shared/services/subscription_service.dart';
 
@@ -29,7 +29,6 @@ void main() async {
     // Send all uncaught Flutter errors to Crashlytics
     FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
-    MobileAds.instance.initialize();
     await Hive.initFlutter();
     Hive.registerAdapter(GameSessionAdapter());
     Hive.registerAdapter(UserProgressAdapter());
@@ -93,6 +92,7 @@ class _NotificationReschedulerState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _reschedule();
+      _signInToGameServices();
     });
   }
 
@@ -131,6 +131,16 @@ class _NotificationReschedulerState
       currentStreak: currentStreak,
       hasPlayedToday: hasPlayedToday,
     );
+  }
+
+  void _signInToGameServices() {
+    final service = ref.read(gameServicesProvider);
+    service.signIn().then((_) {
+      if (!mounted) return;
+      ref.read(isGameServicesSignedInProvider.notifier).state =
+          service.isSignedIn;
+      ref.read(playerNameProvider.notifier).state = service.playerName;
+    });
   }
 
   @override
