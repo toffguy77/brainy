@@ -21,8 +21,10 @@ platform :ios do
       keychain_password: "",
     )
 
-    # Install the provisioning profile and get its UUID
-    profile_uuid = install_provisioning_profile(path: "fastlane/profile.mobileprovision")
+    # Install the provisioning profile and extract its UUID
+    profile_path = install_provisioning_profile(path: "fastlane/profile.mobileprovision")
+    profile_uuid = File.basename(profile_path, ".mobileprovision")
+    UI.message("Provisioning profile UUID: #{profile_uuid}")
 
     # Switch to manual code signing for CI
     update_code_signing_settings(
@@ -43,11 +45,21 @@ platform :ios do
       )
     end
 
+    # Read profile name from the mobileprovision file
+    profile_info = sh("security cms -D -i fastlane/profile.mobileprovision", log: false)
+    profile_name = profile_info.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)[1]
+    UI.message("Provisioning profile name: #{profile_name}")
+
     # Archive and export IPA with proper signing
     build_app(
       workspace: "Runner.xcworkspace",
       scheme: "Runner",
       export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "com.brainyapp.brainy" => profile_name,
+        },
+      },
       output_directory: "../../build/ios/ipa",
       output_name: "brainy.ipa",
     )
