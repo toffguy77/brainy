@@ -33,6 +33,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get back => 'Назад';
 
   @override
+  String get comingSoon => 'Скоро';
+
+  @override
   String get result => 'Результат';
 
   @override
@@ -450,7 +453,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paywallPlanMonth => 'Месяц';
 
   @override
-  String get paywallPlanFamily => 'Семья (3 детей)';
+  String get paywallPlanFamily => 'Семейная';
 
   @override
   String get paywallBestPrice => 'Лучшая цена';
@@ -566,4 +569,184 @@ class AppLocalizationsRu extends AppLocalizations {
   String starHintNext(int seconds, int stars) {
     return 'Пройди за $seconds сек для $stars★';
   }
+
+  @override
+  String gridDetailTitle(int size) {
+    return 'Таблица $size×$size';
+  }
+
+  @override
+  String get periodWeek => 'Нед';
+
+  @override
+  String get periodMonth => 'Мес';
+
+  @override
+  String get periodThreeMonths => '3М';
+
+  @override
+  String get periodYear => 'Год';
+
+  @override
+  String get periodAll => 'Всё';
+
+  @override
+  String get chartTimeLabel => 'ВРЕМЯ ПРОХОЖДЕНИЯ';
+
+  @override
+  String get statBestTime => 'Лучшее';
+
+  @override
+  String get statAverageTime => 'Среднее';
+
+  @override
+  String get statTotalGames => 'Всего игр';
+
+  @override
+  String gridDetailNoData(int size) {
+    return 'Ещё нет данных для $size×$size';
+  }
+
+  @override
+  String get gridDetailPlayMore =>
+      'Сыграйте несколько раз, чтобы увидеть прогресс';
+
+  @override
+  String get legendDailyBest => 'Daily best';
+
+  @override
+  String get legendAllAttempts => 'Все попытки';
+
+  @override
+  String get legendRecord => 'Рекорд';
+
+  @override
+  String get achievementsTitle => 'Достижения';
+
+  @override
+  String achievementsCount(int unlocked, int total) {
+    return '$unlocked / $total';
+  }
+
+  @override
+  String get achievementUnlocked => 'Новое достижение!';
+
+  @override
+  String get achievementFirstGame => 'Первая игра';
+
+  @override
+  String get achievementFirstGameDesc => 'Заверши первую сессию';
+
+  @override
+  String get achievementPersonalRecord => 'Рекордсмен';
+
+  @override
+  String get achievementPersonalRecordDesc => 'Установи личный рекорд';
+
+  @override
+  String get achievementSpeedDemon => 'Молния';
+
+  @override
+  String get achievementSpeedDemonDesc => 'Пройди 3×3 за 5 секунд или быстрее';
+
+  @override
+  String get achievementMaster5x5 => 'Мастер 5×5';
+
+  @override
+  String get achievementMaster5x5Desc => 'Пройди 5×5 за 20 секунд или быстрее';
+
+  @override
+  String get achievementFocusMode => 'Фокус';
+
+  @override
+  String get achievementFocusModeDesc => 'Пройди таблицу без ошибок';
+
+  @override
+  String get achievementStreak3 => 'Стрик 3 дня';
+
+  @override
+  String get achievementStreak3Desc => 'Играй 3 дня подряд';
+
+  @override
+  String get achievementStreak7 => 'Неделя';
+
+  @override
+  String get achievementStreak7Desc => 'Играй 7 дней подряд';
+
+  @override
+  String get achievementStreak30 => 'Легенда месяца';
+
+  @override
+  String get achievementStreak30Desc => 'Играй 30 дней подряд';
+
+  @override
+  String get achievementNightOwl => 'Ночная сова';
+
+  @override
+  String get achievementNightOwlDesc => 'Сыграй сессию после 22:00';
+
+  @override
+  String get achievementCoinHoarder => 'Копилка';
+
+  @override
+  String get achievementCoinHoarderDesc => 'Накопи 500 монет';
+
+  @override
+  String get league => 'Лига';
+
+  @override
+  String get leagueTitle => 'Недельная лига';
+
+  @override
+  String get leagueBronze => 'Бронза';
+
+  @override
+  String get leagueSilver => 'Серебро';
+
+  @override
+  String get leagueGold => 'Золото';
+
+  @override
+  String get leaguePlatinum => 'Платина';
+
+  @override
+  String leagueWeeklyXp(int xp) {
+    return '$xp XP за неделю';
+  }
+
+  @override
+  String leagueNextTier(int xp, String tier) {
+    return '$xp XP до $tier';
+  }
+
+  @override
+  String get leagueMaxTier => 'Высшая лига достигнута!';
+
+  @override
+  String get leagueResetsMonday => 'Обновляется каждый понедельник';
+
+  @override
+  String get leagueYou => 'Ты';
+
+  @override
+  String get leagueConnectTitle => 'Соревнуйся с реальными игроками!';
+
+  @override
+  String get leagueConnectSubtitle =>
+      'Подключи Game Center для настоящих лидербордов';
+
+  @override
+  String get leagueConnect => 'Подключить';
+
+  @override
+  String get leagueFullRanking => 'Полный рейтинг';
+
+  @override
+  String get leagueLoading => 'Загрузка рейтинга...';
+
+  @override
+  String get leagueError => 'Не удалось загрузить рейтинг';
+
+  @override
+  String get leagueNotConnected => 'Game Center не подключён';
 }

@@ -33,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get back => 'Back';
 
   @override
+  String get comingSoon => 'Coming soon';
+
+  @override
   String get result => 'Result';
 
   @override
@@ -449,7 +452,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallPlanMonth => 'Month';
 
   @override
-  String get paywallPlanFamily => 'Family (3 kids)';
+  String get paywallPlanFamily => 'Family';
 
   @override
   String get paywallBestPrice => 'Best price';
@@ -565,4 +568,183 @@ class AppLocalizationsEn extends AppLocalizations {
   String starHintNext(int seconds, int stars) {
     return 'Finish in ${seconds}s for $stars★';
   }
+
+  @override
+  String gridDetailTitle(int size) {
+    return 'Table $size×$size';
+  }
+
+  @override
+  String get periodWeek => 'Week';
+
+  @override
+  String get periodMonth => 'Month';
+
+  @override
+  String get periodThreeMonths => '3M';
+
+  @override
+  String get periodYear => 'Year';
+
+  @override
+  String get periodAll => 'All';
+
+  @override
+  String get chartTimeLabel => 'COMPLETION TIME';
+
+  @override
+  String get statBestTime => 'Best';
+
+  @override
+  String get statAverageTime => 'Average';
+
+  @override
+  String get statTotalGames => 'Total games';
+
+  @override
+  String gridDetailNoData(int size) {
+    return 'No data yet for $size×$size';
+  }
+
+  @override
+  String get gridDetailPlayMore => 'Play a few games to see progress';
+
+  @override
+  String get legendDailyBest => 'Daily best';
+
+  @override
+  String get legendAllAttempts => 'All attempts';
+
+  @override
+  String get legendRecord => 'Record';
+
+  @override
+  String get achievementsTitle => 'Achievements';
+
+  @override
+  String achievementsCount(int unlocked, int total) {
+    return '$unlocked / $total';
+  }
+
+  @override
+  String get achievementUnlocked => 'Achievement Unlocked!';
+
+  @override
+  String get achievementFirstGame => 'First Game';
+
+  @override
+  String get achievementFirstGameDesc => 'Complete your first session';
+
+  @override
+  String get achievementPersonalRecord => 'Record Breaker';
+
+  @override
+  String get achievementPersonalRecordDesc => 'Set a personal record';
+
+  @override
+  String get achievementSpeedDemon => 'Speed Demon';
+
+  @override
+  String get achievementSpeedDemonDesc => 'Complete 3×3 in 5 seconds or less';
+
+  @override
+  String get achievementMaster5x5 => '5×5 Master';
+
+  @override
+  String get achievementMaster5x5Desc => 'Complete 5×5 in 20 seconds or less';
+
+  @override
+  String get achievementFocusMode => 'Focus Mode';
+
+  @override
+  String get achievementFocusModeDesc => 'Complete a session without mistakes';
+
+  @override
+  String get achievementStreak3 => '3-Day Streak';
+
+  @override
+  String get achievementStreak3Desc => 'Play 3 days in a row';
+
+  @override
+  String get achievementStreak7 => 'Week Warrior';
+
+  @override
+  String get achievementStreak7Desc => 'Play 7 days in a row';
+
+  @override
+  String get achievementStreak30 => 'Monthly Legend';
+
+  @override
+  String get achievementStreak30Desc => 'Play 30 days in a row';
+
+  @override
+  String get achievementNightOwl => 'Night Owl';
+
+  @override
+  String get achievementNightOwlDesc => 'Play a session after 10 PM';
+
+  @override
+  String get achievementCoinHoarder => 'Coin Hoarder';
+
+  @override
+  String get achievementCoinHoarderDesc => 'Accumulate 500 coins';
+
+  @override
+  String get league => 'League';
+
+  @override
+  String get leagueTitle => 'Weekly League';
+
+  @override
+  String get leagueBronze => 'Bronze';
+
+  @override
+  String get leagueSilver => 'Silver';
+
+  @override
+  String get leagueGold => 'Gold';
+
+  @override
+  String get leaguePlatinum => 'Platinum';
+
+  @override
+  String leagueWeeklyXp(int xp) {
+    return '$xp XP this week';
+  }
+
+  @override
+  String leagueNextTier(int xp, String tier) {
+    return '$xp XP to $tier';
+  }
+
+  @override
+  String get leagueMaxTier => 'Highest league reached!';
+
+  @override
+  String get leagueResetsMonday => 'Resets every Monday';
+
+  @override
+  String get leagueYou => 'You';
+
+  @override
+  String get leagueConnectTitle => 'Compete with real players!';
+
+  @override
+  String get leagueConnectSubtitle =>
+      'Connect Game Center to see real leaderboards';
+
+  @override
+  String get leagueConnect => 'Connect';
+
+  @override
+  String get leagueFullRanking => 'Full Ranking';
+
+  @override
+  String get leagueLoading => 'Loading leaderboard...';
+
+  @override
+  String get leagueError => 'Could not load leaderboard';
+
+  @override
+  String get leagueNotConnected => 'Game Center not connected';
 }

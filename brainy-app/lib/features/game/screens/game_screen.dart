@@ -5,6 +5,7 @@ import '../providers/game_provider.dart';
 import '../providers/records_provider.dart';
 import '../providers/sessions_provider.dart';
 import '../providers/user_progress_provider.dart';
+import '../../progress/providers/achievements_provider.dart';
 import '../widgets/schulte_grid.dart';
 import '../widgets/game_header.dart';
 import '../widgets/countdown_overlay.dart';
@@ -13,6 +14,8 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../shared/services/haptic_service.dart';
 import '../../../shared/services/notification_service.dart';
+import '../../league/providers/game_services_provider.dart';
+import '../../league/providers/league_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../../shared/services/sound_service.dart';
 import '../../../shared/services/subscription_service.dart';
@@ -170,6 +173,20 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     await progress.addCoins(session.coinsEarned);
     SoundService.play(SoundEffect.coins);
     await progress.addXp(session.xpEarned);
+
+    // Submit scores to Game Center / Play Games
+    final gameServices = ref.read(gameServicesProvider);
+    if (gameServices.isSignedIn) {
+      final weeklyXp = ref.read(weeklyXpProvider);
+      gameServices.submitWeeklyXp(weeklyXp);
+      if (isRecord) {
+        gameServices.submitBestTime(
+          gridSize: session.gridSize,
+          timeMs: session.durationSeconds * 1000,
+        );
+      }
+    }
+
     final levelAfter = ref.read(userProgressProvider).level;
     if (levelAfter > levelBefore) {
       SoundService.play(SoundEffect.levelUp);
@@ -187,6 +204,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       hasPlayedToday: true,
     );
 
+    // Check achievements
+    final newAchievements = await checkAchievements(session: session, ref: ref);
+
     if (!mounted) return;
     final progressAfter = ref.read(userProgressProvider);
     context.go('/result', extra: {
@@ -195,6 +215,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       'xpEarned': session.xpEarned,
       'totalXp': progressAfter.xp,
       'level': progressAfter.level,
+      'newAchievements': newAchievements,
     });
   }
 }
