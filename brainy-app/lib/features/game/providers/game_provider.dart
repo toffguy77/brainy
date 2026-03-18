@@ -64,6 +64,88 @@ List<List<GridCell>> generateGorbovGrid(int size) {
   return grid;
 }
 
+class GorbovTapResult {
+  final bool isCorrect;
+  final bool isAlreadyFound;
+  final GameState newState;
+  const GorbovTapResult({
+    required this.isCorrect,
+    this.isAlreadyFound = false,
+    required this.newState,
+  });
+}
+
+/// Pure function for testable gorbov tap logic.
+GorbovTapResult processGorbovTap(GameState state, int row, int col) {
+  final cell = state.grid[row][col];
+
+  if (cell.isFound) {
+    return GorbovTapResult(isCorrect: false, isAlreadyFound: true, newState: state);
+  }
+
+  final expectedColor = state.nextExpectedColor;
+  final expectedNumber = expectedColor == 'white'
+      ? state.nextWhiteNumber
+      : state.nextRedNumber;
+
+  if (cell.color != expectedColor || cell.number != expectedNumber) {
+    // Wrong tap
+    final newGrid = _copyGridStatic(state.grid);
+    newGrid[row][col].isError = true;
+    return GorbovTapResult(
+      isCorrect: false,
+      newState: state.copyWith(
+        grid: newGrid,
+        mistakesCount: state.mistakesCount + 1,
+        penaltySeconds: state.penaltySeconds + 2,
+      ),
+    );
+  }
+
+  // Correct tap
+  final newGrid = _copyGridStatic(state.grid);
+  newGrid[row][col].isFound = true;
+  newGrid[row][col].isError = false;
+
+  final newWhite = expectedColor == 'white'
+      ? state.nextWhiteNumber + 1
+      : state.nextWhiteNumber;
+  final newRed = expectedColor == 'red'
+      ? state.nextRedNumber - 1
+      : state.nextRedNumber;
+  final newExpected = expectedColor == 'white' ? 'red' : 'white';
+
+  var newState = state.copyWith(
+    grid: newGrid,
+    nextWhiteNumber: newWhite,
+    nextRedNumber: newRed,
+    nextExpectedColor: newExpected,
+  );
+
+  // Check completion
+  if (newState.isCompleted) {
+    newState = newState.copyWith(status: GameStatus.finished);
+  }
+
+  return GorbovTapResult(isCorrect: true, newState: newState);
+}
+
+/// Static grid copy for pure functions
+List<List<GridCell>> _copyGridStatic(List<List<GridCell>> grid) {
+  return grid
+      .map((row) => row
+          .map((cell) => GridCell(
+                number: cell.number,
+                row: cell.row,
+                col: cell.col,
+                color: cell.color,
+                isFound: cell.isFound,
+                isError: cell.isError,
+              ))
+          .toList())
+      .toList();
+}
+
 class GameNotifier extends Notifier<GameState> {
   Timer? _timer;
   Timer? _countdownTimer;
@@ -133,10 +215,42 @@ class GameNotifier extends Notifier<GameState> {
     final cell = state.grid[row][col];
     if (cell.isFound) return;
 
-    if (cell.number == state.nextNumber) {
-      _handleCorrectTap(row, col);
+    if (state.mode == 'gorbov') {
+      _handleGorbovTap(row, col);
     } else {
-      _handleWrongTap(row, col);
+      if (cell.number == state.nextNumber) {
+        _handleCorrectTap(row, col);
+      } else {
+        _handleWrongTap(row, col);
+      }
+    }
+  }
+
+  void _handleGorbovTap(int row, int col) {
+    final result = processGorbovTap(state, row, col);
+
+    if (result.isAlreadyFound) return;
+
+    if (result.isCorrect) {
+      HapticService.correctTap();
+      SoundService.play(SoundEffect.tapCorrect);
+      state = result.newState;
+      if (state.status == GameStatus.finished) {
+        _timer?.cancel();
+      }
+    } else {
+      HapticService.wrongTap();
+      SoundService.play(SoundEffect.tapWrong);
+      state = result.newState;
+
+      // Clear error after delay
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (state.status == GameStatus.playing) {
+          final clearedGrid = _copyGrid();
+          clearedGrid[row][col].isError = false;
+          state = state.copyWith(grid: clearedGrid);
+        }
+      });
     }
   }
 
