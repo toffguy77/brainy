@@ -8,6 +8,7 @@ class AppColors {
   static const Color accent = Color(0xFFFDCB6E);
   static const Color success = Color(0xFF00B894);
   static const Color error = Color(0xFFFF7675);
+  static const Color gorbovRed = Color(0xFFE17055);
   static const Color background = Color(0xFF0D0D1A);
   static const Color surface = Color(0xFF1A1A2E);
   static const Color textPrimary = Color(0xFFFFFFFF);
