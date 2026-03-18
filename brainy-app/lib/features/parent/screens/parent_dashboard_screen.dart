@@ -551,6 +551,24 @@ class _SessionRow extends StatelessWidget {
               ),
             ),
           ),
+          if (session.mode == 'gorbov')
+            Container(
+              margin: const EdgeInsets.only(left: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE17055).withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                '\u0413',
+                style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFFE17055),
+                ),
+              ),
+            ),
           const SizedBox(width: 12),
           Text(
             '${session.durationSeconds}s',

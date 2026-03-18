@@ -324,7 +324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 !isPremium && AppConstants.premiumGridSizes.contains(size);
             final isSelected = _selectedGridSize == size;
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 2),
               child: _GridSizeChip(
                 size: size,
                 isSelected: isSelected,
@@ -507,8 +507,8 @@ class _GridSizeChip extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        width: 56,
-        height: 56,
+        width: 48,
+        height: 48,
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary
