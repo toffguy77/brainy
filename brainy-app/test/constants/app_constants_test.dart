@@ -17,9 +17,16 @@ void main() {
             containsAll([...AppConstants.freeGridSizes, ...AppConstants.premiumGridSizes]));
       });
 
-      test('picker grid sizes exclude 9x9 Gorbov', () {
-        expect(AppConstants.pickerGridSizes, [3, 4, 5, 6, 7]);
-        expect(AppConstants.pickerGridSizes, isNot(contains(9)));
+      test('picker grid sizes include all playable sizes', () {
+        expect(AppConstants.pickerGridSizes, [3, 4, 5, 6, 7, 9]);
+        expect(AppConstants.pickerGridSizes, containsAll(AppConstants.allGridSizes));
+      });
+
+      test('gorbov grid sizes are 5x5 and above', () {
+        expect(AppConstants.gorbovGridSizes, [5, 6, 7, 9]);
+        for (final size in AppConstants.gorbovGridSizes) {
+          expect(size, greaterThanOrEqualTo(5));
+        }
       });
     });
 

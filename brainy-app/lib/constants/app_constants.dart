@@ -124,8 +124,11 @@ class AppConstants {
   static const int defaultReminderHour = 20;
   static const int defaultReminderMinute = 0;
 
-  // Grid sizes for home screen picker (excludes 9x9 Gorbov)
-  static const List<int> pickerGridSizes = [3, 4, 5, 6, 7];
+  // Grid sizes for home screen picker
+  static const List<int> pickerGridSizes = [3, 4, 5, 6, 7, 9];
+
+  // Grid sizes available in Gorbov-Schulte mode (5x5 and above)
+  static const List<int> gorbovGridSizes = [5, 6, 7, 9];
 
   // Legal URLs
   static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
