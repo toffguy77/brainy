@@ -7,7 +7,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/subscription_service.dart';
-import '../../game/providers/records_provider.dart';
+import '../../game/providers/records_provider.dart' show recordKey, recordsProvider;
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../widgets/share_card.dart';
@@ -361,7 +361,7 @@ class _ProgressChart extends StatelessWidget {
 }
 
 class _BestResultsCard extends StatelessWidget {
-  final Map<int, int> records;
+  final Map<String, int> records;
   final AppLocalizations l10n;
   final bool isPremium;
 
@@ -392,7 +392,7 @@ class _BestResultsCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: AppConstants.allGridSizes.map((size) {
-              final record = records[size];
+              final record = records[recordKey('classic', size)];
               final isLocked = !isPremium && AppConstants.premiumGridSizes.contains(size);
               return _RecordChip(
                 label: '$size×$size',

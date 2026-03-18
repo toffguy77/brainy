@@ -151,10 +151,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     final isRecord = records.isPersonalRecord(
       gameState.gridSize,
       gameState.totalSeconds,
+      mode: gameState.mode,
     );
 
     if (isRecord) {
-      records.saveRecord(gameState.gridSize, gameState.totalSeconds);
+      records.saveRecord(gameState.gridSize, gameState.totalSeconds, mode: gameState.mode);
       HapticService.recordBroken();
       SoundService.play(SoundEffect.recordBroken);
     } else {

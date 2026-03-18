@@ -679,7 +679,7 @@ class _BadgeItem extends StatelessWidget {
 }
 
 class _RecordsSection extends StatelessWidget {
-  final Map<int, int> records;
+  final Map<String, int> records;
   final AppLocalizations l10n;
   final WidgetRef ref;
 
@@ -732,7 +732,7 @@ class _RecordsSection extends StatelessWidget {
               for (final size in [3, 4, 5, 6, 7, 9])
                 _RecordChip(
                   gridSize: size,
-                  seconds: records[size],
+                  seconds: records[recordKey('classic', size)],
                   onTap: () {
                     if (isPremium) {
                       context.push('/progress/grid-detail?size=$size');
