@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:brainy/features/game/providers/game_provider.dart';
-import 'package:brainy/models/game_state.dart';
 
 void main() {
   group('Gorbov grid generation', () {

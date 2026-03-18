@@ -48,9 +48,9 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
   GridStatsState _compute(
     int gridSize,
     List<GameSession> allSessions,
-    Map<int, int> records,
+    Map<String, int> records,
   ) {
-    final bestTimeAllTime = records[gridSize] ?? 0;
+    final bestTimeAllTime = records[recordKey('classic', gridSize)] ?? 0;
 
     // Filter by gridSize and classic mode
     final gridSessions = allSessions
