@@ -59,7 +59,7 @@
   "onboardingRecommended": "Recommended",
   "onboardingPaywallTitle": "Try Premium for free",
   "onboardingPaywallBenefit1": "All table sizes (6×6, 7×7, 9×9)",
-  "onboardingPaywallBenefit2": "All 5 characters",
+  "onboardingPaywallBenefit2": "Exclusive character",
   "onboardingPaywallBenefit3": "Full progress statistics",
   "onboardingPaywallBenefit4": "No ads",
   "onboardingTryFree": "Start 7-day free trial",
@@ -192,7 +192,7 @@
   "paywallTitle": "Brainy Premium",
   "paywallSubtitle": "Unlock everything and train without limits",
   "paywallBenefit1": "All table sizes — up to 9×9",
-  "paywallBenefit2": "5 unique characters",
+  "paywallBenefit2": "Exclusive character",
   "paywallBenefit3": "Parent progress panel",
   "paywallBenefit4": "No ads",
   "paywallBenefit5": "Gorbov-Schulte mode",
@@ -361,5 +361,24 @@
       "buildNumber": {"type": "Object"}
     }
   },
-  "versionCopied": "Version copied"
+  "versionCopied": "Version copied",
+  "gameModeClassic": "Classic",
+  "gameModeGorbov": "Gorbov",
+  "gorbovHintWhite": "Find: white {number}",
+  "@gorbovHintWhite": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "gorbovHintRed": "Find: red {number}",
+  "@gorbovHintRed": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "gorbovModeBadge": "Gorbov-Schulte",
+  "parentPremiumGateTitle": "Parent Progress Panel",
+  "parentPremiumGateSubtitle": "Track your child's progress with detailed statistics",
+  "parentPremiumGateUnlock": "Unlock with Premium",
+  "parentPremiumGateSettings": "Settings"
 }

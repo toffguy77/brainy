@@ -59,7 +59,7 @@
   "onboardingRecommended": "Рекомендуем",
   "onboardingPaywallTitle": "Попробуй Premium бесплатно",
   "onboardingPaywallBenefit1": "Все размеры таблиц (6×6, 7×7, 9×9)",
-  "onboardingPaywallBenefit2": "Все 5 персонажей",
+  "onboardingPaywallBenefit2": "Эксклюзивный персонаж",
   "onboardingPaywallBenefit3": "Полная статистика прогресса",
   "onboardingPaywallBenefit4": "Без рекламы",
   "onboardingTryFree": "Начать 7 дней бесплатно",
@@ -192,7 +192,7 @@
   "paywallTitle": "Brainy Premium",
   "paywallSubtitle": "Открой всё и тренируйся без ограничений",
   "paywallBenefit1": "Все размеры таблиц — до 9×9",
-  "paywallBenefit2": "5 уникальных персонажей",
+  "paywallBenefit2": "Эксклюзивный персонаж",
   "paywallBenefit3": "Панель прогресса для родителей",
   "paywallBenefit4": "Без рекламы",
   "paywallBenefit5": "Режим Горбова-Шульте",
@@ -355,5 +355,24 @@
   "leagueNotConnected": "Game Center не подключён",
 
   "appVersionLabel": "Версия {version} ({buildNumber})",
-  "versionCopied": "Версия скопирована"
+  "versionCopied": "Версия скопирована",
+  "gameModeClassic": "Классика",
+  "gameModeGorbov": "Горбов",
+  "gorbovHintWhite": "Найди: белую {number}",
+  "@gorbovHintWhite": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "gorbovHintRed": "Найди: красную {number}",
+  "@gorbovHintRed": {
+    "placeholders": {
+      "number": {"type": "int"}
+    }
+  },
+  "gorbovModeBadge": "Горбов-Шульте",
+  "parentPremiumGateTitle": "Панель прогресса для родителей",
+  "parentPremiumGateSubtitle": "Следите за прогрессом ребёнка с подробной статистикой",
+  "parentPremiumGateUnlock": "Открыть с Premium",
+  "parentPremiumGateSettings": "Настройки"
 }

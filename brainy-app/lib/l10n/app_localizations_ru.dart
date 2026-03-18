@@ -155,7 +155,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingPaywallBenefit1 => 'Все размеры таблиц (6×6, 7×7, 9×9)';
 
   @override
-  String get onboardingPaywallBenefit2 => 'Все 5 персонажей';
+  String get onboardingPaywallBenefit2 => 'Эксклюзивный персонаж';
 
   @override
   String get onboardingPaywallBenefit3 => 'Полная статистика прогресса';
@@ -435,7 +435,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get paywallBenefit1 => 'Все размеры таблиц — до 9×9';
 
   @override
-  String get paywallBenefit2 => '5 уникальных персонажей';
+  String get paywallBenefit2 => 'Эксклюзивный персонаж';
 
   @override
   String get paywallBenefit3 => 'Панель прогресса для родителей';
@@ -754,4 +754,36 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get versionCopied => 'Версия скопирована';
+
+  @override
+  String get gameModeClassic => 'Классика';
+
+  @override
+  String get gameModeGorbov => 'Горбов';
+
+  @override
+  String gorbovHintWhite(int number) {
+    return 'Найди: белую $number';
+  }
+
+  @override
+  String gorbovHintRed(int number) {
+    return 'Найди: красную $number';
+  }
+
+  @override
+  String get gorbovModeBadge => 'Горбов-Шульте';
+
+  @override
+  String get parentPremiumGateTitle => 'Панель прогресса для родителей';
+
+  @override
+  String get parentPremiumGateSubtitle =>
+      'Следите за прогрессом ребёнка с подробной статистикой';
+
+  @override
+  String get parentPremiumGateUnlock => 'Открыть с Premium';
+
+  @override
+  String get parentPremiumGateSettings => 'Настройки';
 }

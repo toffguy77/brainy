@@ -154,7 +154,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingPaywallBenefit1 => 'All table sizes (6×6, 7×7, 9×9)';
 
   @override
-  String get onboardingPaywallBenefit2 => 'All 5 characters';
+  String get onboardingPaywallBenefit2 => 'Exclusive character';
 
   @override
   String get onboardingPaywallBenefit3 => 'Full progress statistics';
@@ -434,7 +434,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paywallBenefit1 => 'All table sizes — up to 9×9';
 
   @override
-  String get paywallBenefit2 => '5 unique characters';
+  String get paywallBenefit2 => 'Exclusive character';
 
   @override
   String get paywallBenefit3 => 'Parent progress panel';
@@ -752,4 +752,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get versionCopied => 'Version copied';
+
+  @override
+  String get gameModeClassic => 'Classic';
+
+  @override
+  String get gameModeGorbov => 'Gorbov';
+
+  @override
+  String gorbovHintWhite(int number) {
+    return 'Find: white $number';
+  }
+
+  @override
+  String gorbovHintRed(int number) {
+    return 'Find: red $number';
+  }
+
+  @override
+  String get gorbovModeBadge => 'Gorbov-Schulte';
+
+  @override
+  String get parentPremiumGateTitle => 'Parent Progress Panel';
+
+  @override
+  String get parentPremiumGateSubtitle =>
+      'Track your child\'s progress with detailed statistics';
+
+  @override
+  String get parentPremiumGateUnlock => 'Unlock with Premium';
+
+  @override
+  String get parentPremiumGateSettings => 'Settings';
 }

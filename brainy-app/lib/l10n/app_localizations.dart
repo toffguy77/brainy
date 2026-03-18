@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingPaywallBenefit2.
   ///
   /// In ru, this message translates to:
-  /// **'Все 5 персонажей'**
+  /// **'Эксклюзивный персонаж'**
   String get onboardingPaywallBenefit2;
 
   /// No description provided for @onboardingPaywallBenefit3.
@@ -899,7 +899,7 @@ abstract class AppLocalizations {
   /// No description provided for @paywallBenefit2.
   ///
   /// In ru, this message translates to:
-  /// **'5 уникальных персонажей'**
+  /// **'Эксклюзивный персонаж'**
   String get paywallBenefit2;
 
   /// No description provided for @paywallBenefit3.
@@ -1483,6 +1483,60 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Версия скопирована'**
   String get versionCopied;
+
+  /// No description provided for @gameModeClassic.
+  ///
+  /// In ru, this message translates to:
+  /// **'Классика'**
+  String get gameModeClassic;
+
+  /// No description provided for @gameModeGorbov.
+  ///
+  /// In ru, this message translates to:
+  /// **'Горбов'**
+  String get gameModeGorbov;
+
+  /// No description provided for @gorbovHintWhite.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найди: белую {number}'**
+  String gorbovHintWhite(int number);
+
+  /// No description provided for @gorbovHintRed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найди: красную {number}'**
+  String gorbovHintRed(int number);
+
+  /// No description provided for @gorbovModeBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Горбов-Шульте'**
+  String get gorbovModeBadge;
+
+  /// No description provided for @parentPremiumGateTitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Панель прогресса для родителей'**
+  String get parentPremiumGateTitle;
+
+  /// No description provided for @parentPremiumGateSubtitle.
+  ///
+  /// In ru, this message translates to:
+  /// **'Следите за прогрессом ребёнка с подробной статистикой'**
+  String get parentPremiumGateSubtitle;
+
+  /// No description provided for @parentPremiumGateUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Открыть с Premium'**
+  String get parentPremiumGateUnlock;
+
+  /// No description provided for @parentPremiumGateSettings.
+  ///
+  /// In ru, this message translates to:
+  /// **'Настройки'**
+  String get parentPremiumGateSettings;
 }
 
 class _AppLocalizationsDelegate
