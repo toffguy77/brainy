@@ -43,6 +43,13 @@ Examples:
 - Spacer flex: 2 → 1
 - Toggle height: ~40px
 
+### Color Naming
+
+The original Gorbov-Schulte test uses black and red numbers on paper. In our dark theme,
+"black" becomes "white" (light text on dark background). The code uses `'white' | 'red'`
+as color identifiers. Red cells use a distinct warm red (#E17055 or similar) — NOT
+`AppColors.error` (#FF7675), to avoid confusion with error state highlighting.
+
 ### Game State Changes
 
 **`GridCell` model** — add `color` field:
@@ -51,18 +58,29 @@ class GridCell {
   final int number;
   final int row;
   final int col;
-  final String color; // 'white' | 'red' (only used in gorbov mode)
+  final String color; // 'white' | 'red' (default 'white' for classic mode)
   bool isFound;
   bool isError;
 }
 ```
 
+Note: existing code already has `mode` field in both `GameState` and `GameSession`.
+No changes needed to the session model.
+
 **`GameState`** — add tracking for alternating sequence:
-- `nextWhiteNumber` — next expected white number (ascending)
-- `nextRedNumber` — next expected red number (descending)
-- `nextExpectedColor` — 'white' or 'red' (alternates on correct tap)
+- `nextWhiteNumber` — next expected white number (ascending, starts at 1)
+- `nextRedNumber` — next expected red number (descending, starts at max)
+- `nextExpectedColor` — 'white' or 'red' (alternates on correct tap, starts 'white')
 - `totalNumbers` in gorbov = N² (same as classic)
-- `isCompleted` when all cells found
+
+**`isCompleted` logic for gorbov mode:**
+In classic mode: `nextNumber > totalNumbers`.
+In gorbov mode: game is complete when all cells are found. Track via a `foundCount` field
+or derive from `nextWhiteNumber > whiteCount && nextRedNumber < 1`. The existing
+`nextNumber` field is unused in gorbov mode — keep it at default, use the new fields.
+
+**`copyWith`** must include all new fields (`nextWhiteNumber`, `nextRedNumber`,
+`nextExpectedColor`). These fields are nullable/defaulted so classic mode is unaffected.
 
 ### Game Provider Changes
 
@@ -93,9 +111,17 @@ class GridCell {
 
 ### Session & Records
 
-- Sessions saved with `mode: 'gorbov'`
+- Sessions saved with `mode: 'gorbov'` (field already exists in GameSession model)
 - Records tracked separately per mode per grid size
-- Parent dashboard shows gorbov sessions distinctly
+
+**Records storage migration:**
+Current `RecordsNotifier` uses Hive box `records` with keys like `"5"` (gridSize as string)
+mapping to `int` (best time). To support per-mode records:
+- Change key format to `"classic_5"`, `"gorbov_5"`, etc.
+- On first launch after update, migrate existing keys: `"5"` → `"classic_5"` for all sizes
+- Migration runs in `RecordsNotifier.build()` — check if old-format keys exist, remap them
+
+**Parent dashboard** — show gorbov sessions with a mode badge in recent sessions list
 
 ---
 
@@ -112,11 +138,17 @@ smallest screens. If tight, reduce chip width from 56 to 50px or use horizontal 
 
 ## 3. Paywall Character Text
 
-Change `paywallBenefit2` localization:
+Change character-related paywall strings in **both** paywall locations:
+
+**Main paywall** (`paywallBenefit2`):
 - EN: "5 unique characters" → "Exclusive character"
 - RU: "5 уникальных персонажей" → "Эксклюзивный персонаж"
 
-No logic changes — just string update in ARB files and generated localizations.
+**Onboarding paywall** (`onboardingPaywallBenefit2`):
+- EN: "All 5 characters" → "Exclusive character"
+- RU: "Все 5 персонажей" → "Эксклюзивный персонаж"
+
+No logic changes — just string updates in ARB files and generated localizations.
 
 ---
 
@@ -130,12 +162,13 @@ After PIN verification, check subscription status:
 
 ### Premium Gate Screen
 
-Full-screen upsell replacing the dashboard content:
+Full-screen replacement of the entire dashboard screen (including app bar):
 - Blurred/dimmed preview of dashboard (or static illustration)
 - Lock icon + "Parent Progress Panel"
 - Subtitle: "Track your child's progress with detailed statistics"
 - Button: "Unlock with Premium" → navigates to `/paywall`
 - Back button returns to home
+- Separate "Settings" button remains visible → navigates to `/parent/settings`
 
 ### Parent Settings
 
@@ -153,7 +186,30 @@ if (!isPremium) return _PremiumGateScreen();
 
 ---
 
-## 5. Tests
+## 5. New Localization Keys
+
+### Gorbov mode (home screen toggle)
+- `gameModeClassic`: EN "Classic" / RU "Классика"
+- `gameModeGorbov`: EN "Gorbov" / RU "Горбов"
+
+### Gorbov game screen
+- `gorbovHintWhite`: EN "Find: white {number}" / RU "Найди: белую {number}"
+- `gorbovHintRed`: EN "Find: red {number}" / RU "Найди: красную {number}"
+- `gorbovModeBadge`: EN "Gorbov-Schulte" / RU "Горбов-Шульте"
+
+### Parent dashboard gate
+- `parentPremiumGateTitle`: EN "Parent Progress Panel" / RU "Панель прогресса для родителей"
+- `parentPremiumGateSubtitle`: EN "Track your child's progress with detailed statistics" / RU "Следите за прогрессом ребёнка с подробной статистикой"
+- `parentPremiumGateUnlock`: EN "Unlock with Premium" / RU "Открыть с Premium"
+- `parentPremiumGateSettings`: EN "Settings" / RU "Настройки"
+
+### Updated keys
+- `paywallBenefit2`: EN "Exclusive character" / RU "Эксклюзивный персонаж"
+- `onboardingPaywallBenefit2`: EN "Exclusive character" / RU "Эксклюзивный персонаж"
+
+---
+
+## 6. Tests
 
 ### Gorbov-Schulte Tests
 - Grid generation: correct number distribution (white/red counts)
@@ -180,20 +236,26 @@ if (!isPremium) return _PremiumGateScreen();
 
 ## Files to Create/Modify
 
-### New Files
-- None expected — all changes fit in existing files
+All paths relative to `brainy-app/`.
 
 ### Modified Files
-- `lib/constants/app_constants.dart` — pickerGridSizes, gorbov grid sizes
-- `lib/models/game_state.dart` — GridCell color, gorbov tracking fields
+- `lib/constants/app_constants.dart` — pickerGridSizes, gorbov grid sizes, update comment
+- `lib/models/game_state.dart` — GridCell color field, gorbov tracking fields, copyWith
 - `lib/features/game/providers/game_provider.dart` — gorbov grid gen, tap logic
+- `lib/features/game/providers/records_provider.dart` — per-mode keys, migration
 - `lib/features/game/widgets/schulte_grid.dart` — colored cell rendering
 - `lib/features/game/widgets/game_header.dart` — mode indicator
 - `lib/features/home/screens/home_screen.dart` — mode toggle, layout adjustments
 - `lib/features/parent/screens/parent_dashboard_screen.dart` — premium gate
-- `lib/features/subscription/screens/paywall_screen.dart` — benefit text (if hardcoded)
-- `lib/l10n/app_en.arb` — paywallBenefit2, gorbov strings
-- `lib/l10n/app_ru.arb` — paywallBenefit2, gorbov strings
-- `lib/l10n/app_localizations_en.dart` — generated
-- `lib/l10n/app_localizations_ru.dart` — generated
-- `test/` — new test files for gorbov logic, premium gates
+- `l10n/app_en.arb` — new keys + updated paywallBenefit2
+- `l10n/app_ru.arb` — new keys + updated paywallBenefit2
+- `lib/l10n/app_localizations_en.dart` — regenerated
+- `lib/l10n/app_localizations_ru.dart` — regenerated
+- `lib/l10n/app_localizations.dart` — regenerated
+
+### New Test Files
+- `test/game/gorbov_grid_generation_test.dart`
+- `test/game/gorbov_tap_logic_test.dart`
+- `test/game/records_migration_test.dart`
+- `test/home/mode_toggle_test.dart`
+- `test/parent/dashboard_premium_gate_test.dart`

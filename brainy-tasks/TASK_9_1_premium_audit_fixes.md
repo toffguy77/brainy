@@ -52,6 +52,12 @@
 - Spacer flex: 2 → 1
 - Высота тогла: ~40px
 
+### Именование цветов
+
+Оригинальный тест Горбова-Шульте использует чёрные и красные числа на бумаге. В тёмной теме
+«чёрные» становятся «белыми» (светлый текст на тёмном фоне). В коде используем `'white' | 'red'`.
+Красные ячейки — тёплый красный (#E17055), НЕ `AppColors.error` (#FF7675), чтобы не путать с подсветкой ошибок.
+
 ### Модель данных
 
 **`GridCell`** — добавить поле `color`:
@@ -60,16 +66,27 @@ class GridCell {
   final int number;
   final int row;
   final int col;
-  final String color; // 'white' | 'red'
+  final String color; // 'white' | 'red' (default 'white' для классики)
   bool isFound;
   bool isError;
 }
 ```
 
+Примечание: поле `mode` уже существует в `GameState` и `GameSession`. Модель сессии менять не нужно.
+
 **`GameState`** — добавить поля для отслеживания чередования:
-- `nextWhiteNumber` — следующее белое число
-- `nextRedNumber` — следующее красное число
-- `nextExpectedColor` — 'white' или 'red'
+- `nextWhiteNumber` — следующее белое число (по возрастанию, начинается с 1)
+- `nextRedNumber` — следующее красное число (по убыванию, начинается с max)
+- `nextExpectedColor` — 'white' или 'red' (чередуется, начинается с 'white')
+
+**Логика завершения в режиме Горбов:**
+В классике: `nextNumber > totalNumbers`.
+В Горбове: игра завершена когда все ячейки найдены. Отслеживать через `foundCount` или
+вычислять из `nextWhiteNumber > whiteCount && nextRedNumber < 1`. Поле `nextNumber`
+не используется в режиме Горбов — оставить по умолчанию.
+
+**`copyWith`** — включить все новые поля. Nullable/со значениями по умолчанию,
+чтобы классический режим не затронуть.
 
 ### Игровая логика (GameProvider)
 
@@ -98,9 +115,17 @@ class GridCell {
 
 ### Сессии и рекорды
 
-- Сессии сохраняются с `mode: 'gorbov'`
+- Сессии сохраняются с `mode: 'gorbov'` (поле уже существует в GameSession)
 - Рекорды отслеживаются отдельно по режимам и размерам
-- В панели родителя сессии Горбова отображаются отдельно
+
+**Миграция хранилища рекордов:**
+Текущий `RecordsNotifier` использует Hive box `records` с ключами вида `"5"` (gridSize как строка)
+→ `int` (лучшее время). Для поддержки per-mode рекордов:
+- Новый формат ключей: `"classic_5"`, `"gorbov_5"` и т.д.
+- При первом запуске после обновления — миграция: `"5"` → `"classic_5"` для всех размеров
+- Миграция в `RecordsNotifier.build()` — проверить наличие старых ключей, переименовать
+
+В панели родителя — сессии Горбова с бейджем режима в списке последних сессий
 
 ---
 
@@ -114,11 +139,17 @@ class GridCell {
 
 ## 3. Текст про персонажей на пейволле
 
-Изменить `paywallBenefit2`:
+Изменить строки про персонажей в **обоих** местах:
+
+**Основной пейволл** (`paywallBenefit2`):
 - EN: `"5 unique characters"` → `"Exclusive character"`
 - RU: `"5 уникальных персонажей"` → `"Эксклюзивный персонаж"`
 
-Только строковое изменение в ARB-файлах и сгенерированных локализациях.
+**Онбординг пейволл** (`onboardingPaywallBenefit2`):
+- EN: `"All 5 characters"` → `"Exclusive character"`
+- RU: `"Все 5 персонажей"` → `"Эксклюзивный персонаж"`
+
+Только строковые изменения в ARB-файлах и сгенерированных локализациях.
 
 ---
 
@@ -132,12 +163,13 @@ class GridCell {
 
 ### Экран-заглушка
 
-Полноэкранный upsell:
+Полноэкранная замена всего экрана дашборда (включая app bar):
 - Замыленный/затемнённый превью дашборда (или статичная иллюстрация)
 - Иконка замка + «Панель прогресса для родителей»
 - Подзаголовок: «Следите за прогрессом ребёнка с подробной статистикой»
 - Кнопка: «Открыть с Premium» → навигация на `/paywall`
 - Кнопка назад → на home
+- Кнопка «Настройки» остаётся видимой → навигация на `/parent/settings`
 
 ### Настройки
 
@@ -170,18 +202,52 @@ class GridCell {
 
 ---
 
+## Новые ключи локализации
+
+### Тогл режима (home screen)
+- `gameModeClassic`: EN "Classic" / RU "Классика"
+- `gameModeGorbov`: EN "Gorbov" / RU "Горбов"
+
+### Экран игры (Горбов)
+- `gorbovHintWhite`: EN "Find: white {number}" / RU "Найди: белую {number}"
+- `gorbovHintRed`: EN "Find: red {number}" / RU "Найди: красную {number}"
+- `gorbovModeBadge`: EN "Gorbov-Schulte" / RU "Горбов-Шульте"
+
+### Заглушка дашборда
+- `parentPremiumGateTitle`: EN "Parent Progress Panel" / RU "Панель прогресса для родителей"
+- `parentPremiumGateSubtitle`: EN "Track your child's progress..." / RU "Следите за прогрессом..."
+- `parentPremiumGateUnlock`: EN "Unlock with Premium" / RU "Открыть с Premium"
+- `parentPremiumGateSettings`: EN "Settings" / RU "Настройки"
+
+### Обновлённые ключи
+- `paywallBenefit2`: EN "Exclusive character" / RU "Эксклюзивный персонаж"
+- `onboardingPaywallBenefit2`: EN "Exclusive character" / RU "Эксклюзивный персонаж"
+
+---
+
 ## Изменяемые файлы
 
-- `lib/constants/app_constants.dart` — pickerGridSizes, размеры Горбова
-- `lib/models/game_state.dart` — цвет в GridCell, поля для Горбова
+Все пути относительно `brainy-app/`.
+
+### Модифицируемые
+- `lib/constants/app_constants.dart` — pickerGridSizes, размеры Горбова, обновить комментарий
+- `lib/models/game_state.dart` — цвет в GridCell, поля Горбова, copyWith
 - `lib/features/game/providers/game_provider.dart` — генерация Горбова, логика тапа
+- `lib/features/game/providers/records_provider.dart` — per-mode ключи, миграция
 - `lib/features/game/widgets/schulte_grid.dart` — цветные ячейки
 - `lib/features/game/widgets/game_header.dart` — индикатор режима
 - `lib/features/home/screens/home_screen.dart` — тогл режима, layout
 - `lib/features/parent/screens/parent_dashboard_screen.dart` — premium gate
-- `lib/l10n/app_en.arb` — paywallBenefit2, строки Горбова
-- `lib/l10n/app_ru.arb` — paywallBenefit2, строки Горбова
-- `test/` — новые тесты
+- `l10n/app_en.arb` — новые ключи + обновлённые
+- `l10n/app_ru.arb` — новые ключи + обновлённые
+- `lib/l10n/app_localizations*.dart` — регенерация
+
+### Новые тесты
+- `test/game/gorbov_grid_generation_test.dart`
+- `test/game/gorbov_tap_logic_test.dart`
+- `test/game/records_migration_test.dart`
+- `test/home/mode_toggle_test.dart`
+- `test/parent/dashboard_premium_gate_test.dart`
 
 ---
 
