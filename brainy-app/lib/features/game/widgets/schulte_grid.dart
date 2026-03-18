@@ -99,6 +99,7 @@ class _GridCellWidgetState extends State<GridCellWidget>
   Color get _textColor {
     if (widget.cell?.isFound == true) return AppColors.success;
     if (widget.cell?.isError == true) return AppColors.error;
+    if (widget.cell?.color == 'red') return AppColors.gorbovRed;
     return AppColors.textPrimary;
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/game_provider.dart';
 import '../../../models/game_state.dart';
 import '../../../constants/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 class GameHeader extends ConsumerWidget {
   final GameState gameState;
@@ -16,7 +17,7 @@ class GameHeader extends ConsumerWidget {
         children: [
           _PauseButton(gameState: gameState),
           const Spacer(),
-          _NextNumberBadge(number: gameState.nextNumber),
+          _NextNumberBadge(gameState: gameState),
           const Spacer(),
           _TimerDisplay(seconds: gameState.totalSeconds),
         ],
@@ -57,31 +58,66 @@ class _PauseButton extends ConsumerWidget {
 }
 
 class _NextNumberBadge extends StatelessWidget {
-  final int number;
-  const _NextNumberBadge({required this.number});
+  final GameState gameState;
+  const _NextNumberBadge({required this.gameState});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final isGorbov = gameState.mode == 'gorbov';
+
+    String hintText;
+    int displayNumber;
+    Color badgeColor;
+
+    if (isGorbov) {
+      if (gameState.nextExpectedColor == 'white') {
+        hintText = l10n.gorbovHintWhite(gameState.nextWhiteNumber);
+        displayNumber = gameState.nextWhiteNumber;
+        badgeColor = AppColors.textPrimary;
+      } else {
+        hintText = l10n.gorbovHintRed(gameState.nextRedNumber);
+        displayNumber = gameState.nextRedNumber;
+        badgeColor = AppColors.gorbovRed;
+      }
+    } else {
+      hintText = '';
+      displayNumber = gameState.nextNumber;
+      badgeColor = Colors.white;
+    }
+
     return Column(
       children: [
-        const Text(
-          'Найди',
-          style: TextStyle(
-            color: AppColors.textSecondary,
-            fontSize: 12,
+        if (isGorbov)
+          Text(
+            hintText,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              color: AppColors.textSecondary,
+              fontSize: 12,
+            ),
+          )
+        else
+          const Text(
+            'Найди',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+            ),
           ),
-        ),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           decoration: BoxDecoration(
-            gradient: AppColors.primaryGradient,
+            gradient: isGorbov && gameState.nextExpectedColor == 'red'
+                ? const LinearGradient(colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
+                : AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            '$number',
-            style: const TextStyle(
-              color: Colors.white,
+            '$displayNumber',
+            style: TextStyle(
+              color: badgeColor,
               fontSize: 28,
               fontWeight: FontWeight.w800,
             ),

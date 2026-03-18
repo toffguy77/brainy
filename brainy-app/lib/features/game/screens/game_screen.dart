@@ -97,7 +97,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   Widget _buildProgressBar(GameState gameState) {
-    final found = gameState.nextNumber - 1;
+    final found = gameState.mode == 'gorbov'
+        ? (gameState.nextWhiteNumber - 1) + (gameState.redCount - gameState.nextRedNumber)
+        : gameState.nextNumber - 1;
     final total = gameState.totalNumbers;
     final progress = total > 0 ? found / total : 0.0;
 
