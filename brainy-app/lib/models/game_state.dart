@@ -4,6 +4,7 @@ class GridCell {
   final int number;
   final int row;
   final int col;
+  final String color; // 'white' | 'red'
   bool isFound;
   bool isError;
 
@@ -11,6 +12,7 @@ class GridCell {
     required this.number,
     required this.row,
     required this.col,
+    this.color = 'white',
     this.isFound = false,
     this.isError = false,
   });
@@ -26,6 +28,12 @@ class GameState {
   final int penaltySeconds;
   final String mode;
   final int? countdownValue;
+  // Gorbov-Schulte fields
+  final int nextWhiteNumber;
+  final int nextRedNumber;
+  final String nextExpectedColor; // 'white' | 'red'
+  final int whiteCount;
+  final int redCount;
 
   const GameState({
     this.status = GameStatus.idle,
@@ -37,11 +45,22 @@ class GameState {
     this.penaltySeconds = 0,
     this.mode = 'classic',
     this.countdownValue,
+    this.nextWhiteNumber = 1,
+    this.nextRedNumber = 0,
+    this.nextExpectedColor = 'white',
+    this.whiteCount = 0,
+    this.redCount = 0,
   });
 
   int get totalSeconds => elapsedSeconds + penaltySeconds;
   int get totalNumbers => gridSize * gridSize;
-  bool get isCompleted => nextNumber > totalNumbers;
+
+  bool get isCompleted {
+    if (mode == 'gorbov') {
+      return nextWhiteNumber > whiteCount && nextRedNumber < 1;
+    }
+    return nextNumber > totalNumbers;
+  }
 
   GameState copyWith({
     GameStatus? status,
@@ -53,6 +72,11 @@ class GameState {
     int? penaltySeconds,
     String? mode,
     int? countdownValue,
+    int? nextWhiteNumber,
+    int? nextRedNumber,
+    String? nextExpectedColor,
+    int? whiteCount,
+    int? redCount,
   }) {
     return GameState(
       status: status ?? this.status,
@@ -64,6 +88,11 @@ class GameState {
       penaltySeconds: penaltySeconds ?? this.penaltySeconds,
       mode: mode ?? this.mode,
       countdownValue: countdownValue,
+      nextWhiteNumber: nextWhiteNumber ?? this.nextWhiteNumber,
+      nextRedNumber: nextRedNumber ?? this.nextRedNumber,
+      nextExpectedColor: nextExpectedColor ?? this.nextExpectedColor,
+      whiteCount: whiteCount ?? this.whiteCount,
+      redCount: redCount ?? this.redCount,
     );
   }
 }

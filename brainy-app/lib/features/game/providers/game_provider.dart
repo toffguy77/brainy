@@ -179,6 +179,7 @@ class GameNotifier extends Notifier<GameState> {
                   number: cell.number,
                   row: cell.row,
                   col: cell.col,
+                  color: cell.color,
                   isFound: cell.isFound,
                   isError: cell.isError,
                 ))
