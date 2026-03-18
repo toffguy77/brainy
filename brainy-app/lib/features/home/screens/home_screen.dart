@@ -22,6 +22,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   late int _selectedGridSize;
+  String _selectedMode = 'classic';
   late final AnimationController _idleController;
   late final Animation<double> _bobAnimation;
 
@@ -64,7 +65,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             children: [
               const SizedBox(height: 16),
               _buildTopBar(progress, l10n),
-              const Spacer(flex: 2),
+              const Spacer(flex: 1),
               _buildCharacterPlaceholder(),
               const SizedBox(height: 8),
               Text(
@@ -76,7 +77,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   color: AppColors.textSecondary,
                 ),
               ),
-              const Spacer(flex: 2),
+              const Spacer(flex: 1),
+              _buildModeToggle(isPremium, l10n),
+              const SizedBox(height: 16),
               _buildGridSizePicker(l10n, isFixedMode, effectiveGridSize, isPremium),
               const SizedBox(height: 24),
               _buildPlayButton(l10n, effectiveGridSize, isPremium),
@@ -139,8 +142,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         );
       },
       child: Container(
-        width: 200,
-        height: 200,
+        width: 160,
+        height: 160,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -160,6 +163,118 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           padding: const EdgeInsets.all(24),
           child: characterAvatar(progress.activeCharacterId, size: 120),
         ),
+      ),
+    );
+  }
+
+  Widget _buildModeToggle(bool isPremium, AppLocalizations l10n) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 40),
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => setState(() => _selectedMode = 'classic'),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: _selectedMode == 'classic'
+                      ? AppColors.primaryGradient
+                      : null,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text(
+                    l10n.gameModeClassic,
+                    style: TextStyle(
+                      fontFamily: 'Nunito',
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: _selectedMode == 'classic'
+                          ? AppColors.textPrimary
+                          : AppColors.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                if (!isPremium) {
+                  showPremiumBottomSheet(
+                    context,
+                    feature: l10n.gorbovModeBadge,
+                    benefit: l10n.paywallBenefit5,
+                  );
+                  return;
+                }
+                setState(() {
+                  _selectedMode = 'gorbov';
+                  if (_selectedGridSize < 5) _selectedGridSize = 5;
+                });
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: _selectedMode == 'gorbov'
+                      ? const LinearGradient(
+                          colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
+                      : null,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Center(
+                      child: Text(
+                        l10n.gameModeGorbov,
+                        style: TextStyle(
+                          fontFamily: 'Nunito',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: _selectedMode == 'gorbov'
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                    ),
+                    if (!isPremium)
+                      Positioned(
+                        top: -6,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 5, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'PRO',
+                            style: TextStyle(
+                              fontFamily: 'Nunito',
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.background,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -201,7 +316,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: AppConstants.pickerGridSizes.map((size) {
+          children: (_selectedMode == 'gorbov'
+                ? AppConstants.gorbovGridSizes
+                : AppConstants.pickerGridSizes)
+            .map((size) {
             final isLocked =
                 !isPremium && AppConstants.premiumGridSizes.contains(size);
             final isSelected = _selectedGridSize == size;
@@ -255,7 +373,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 );
                 return;
               }
-              context.go('/game?size=$effectiveGridSize&mode=classic');
+              context.go('/game?size=$effectiveGridSize&mode=$_selectedMode');
             },
             child: Center(
               child: Text(
