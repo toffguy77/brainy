@@ -7,10 +7,66 @@ import '../../../models/session.dart';
 import '../../../shared/services/haptic_service.dart';
 import '../../../shared/services/sound_service.dart';
 
+final _random = Random();
+
+/// Generate a classic Schulte grid (all white numbers 1..size²)
+List<List<GridCell>> generateClassicGrid(int size) {
+  final numbers = List.generate(size * size, (i) => i + 1)..shuffle(_random);
+  final grid = <List<GridCell>>[];
+  for (int row = 0; row < size; row++) {
+    final rowCells = <GridCell>[];
+    for (int col = 0; col < size; col++) {
+      rowCells.add(GridCell(
+        number: numbers[row * size + col],
+        row: row,
+        col: col,
+      ));
+    }
+    grid.add(rowCells);
+  }
+  return grid;
+}
+
+/// Generate a Gorbov-Schulte grid (white + red numbers)
+List<List<GridCell>> generateGorbovGrid(int size) {
+  final total = size * size;
+  final whiteCount = (total + 1) ~/ 2; // ceil(total/2)
+  final redCount = total ~/ 2;          // floor(total/2)
+
+  final whites = List.generate(whiteCount, (i) => GridCell(
+    number: i + 1,
+    row: 0, col: 0,
+    color: 'white',
+  ));
+  final reds = List.generate(redCount, (i) => GridCell(
+    number: i + 1,
+    row: 0, col: 0,
+    color: 'red',
+  ));
+
+  final allCells = [...whites, ...reds]..shuffle(_random);
+
+  final grid = <List<GridCell>>[];
+  for (int row = 0; row < size; row++) {
+    final rowCells = <GridCell>[];
+    for (int col = 0; col < size; col++) {
+      final idx = row * size + col;
+      final cell = allCells[idx];
+      rowCells.add(GridCell(
+        number: cell.number,
+        row: row,
+        col: col,
+        color: cell.color,
+      ));
+    }
+    grid.add(rowCells);
+  }
+  return grid;
+}
+
 class GameNotifier extends Notifier<GameState> {
   Timer? _timer;
   Timer? _countdownTimer;
-  final _random = Random();
   final _uuid = const Uuid();
 
   @override
@@ -20,7 +76,12 @@ class GameNotifier extends Notifier<GameState> {
     _timer?.cancel();
     _countdownTimer?.cancel();
 
-    final grid = _generateGrid(gridSize);
+    final grid = mode == 'gorbov'
+        ? generateGorbovGrid(gridSize)
+        : generateClassicGrid(gridSize);
+
+    final whiteCount = (gridSize * gridSize + 1) ~/ 2;
+    final redCount = gridSize * gridSize ~/ 2;
 
     state = GameState(
       status: GameStatus.countdown,
@@ -29,27 +90,14 @@ class GameNotifier extends Notifier<GameState> {
       nextNumber: 1,
       mode: mode,
       countdownValue: 3,
+      nextWhiteNumber: 1,
+      nextRedNumber: redCount,
+      nextExpectedColor: 'white',
+      whiteCount: whiteCount,
+      redCount: redCount,
     );
 
     _startCountdown();
-  }
-
-  List<List<GridCell>> _generateGrid(int size) {
-    final numbers = List.generate(size * size, (i) => i + 1)..shuffle(_random);
-    final grid = <List<GridCell>>[];
-
-    for (int row = 0; row < size; row++) {
-      final rowCells = <GridCell>[];
-      for (int col = 0; col < size; col++) {
-        rowCells.add(GridCell(
-          number: numbers[row * size + col],
-          row: row,
-          col: col,
-        ));
-      }
-      grid.add(rowCells);
-    }
-    return grid;
   }
 
   void _startCountdown() {
