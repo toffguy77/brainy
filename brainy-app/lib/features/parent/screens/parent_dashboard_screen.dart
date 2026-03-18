@@ -24,6 +24,8 @@ class ParentDashboardScreen extends ConsumerWidget {
 
     final isPremium = ref.watch(isPremiumProvider).value ?? false;
 
+    if (!isPremium) return const _PremiumGateScreen();
+
     final now = DateTime.now();
     final weekAgo = now.subtract(const Duration(days: 7));
     final weekSessions = sessions
@@ -576,6 +578,113 @@ class _SessionRow extends StatelessWidget {
                 size: 16, color: AppColors.accent),
           ],
         ],
+      ),
+    );
+  }
+}
+
+class _PremiumGateScreen extends StatelessWidget {
+  const _PremiumGateScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.background,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textPrimary),
+          onPressed: () => context.go('/home'),
+        ),
+        title: Text(
+          l10n.parentTitle,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_rounded, color: AppColors.textPrimary),
+            onPressed: () => context.go('/parent/settings'),
+          ),
+        ],
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(40),
+                ),
+                child: const Icon(
+                  Icons.lock_rounded,
+                  size: 36,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                l10n.parentPremiumGateTitle,
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                l10n.parentPremiumGateSubtitle,
+                style: const TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 15,
+                  color: AppColors.textSecondary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: AppColors.primaryGradient,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => context.go('/paywall'),
+                      child: Center(
+                        child: Text(
+                          l10n.parentPremiumGateUnlock,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
