@@ -1,0 +1,5 @@
+- New characters and achievements system
+- Parent progress dashboard
+- Daily streaks for motivation
+- Improved stats and charts
+- Bug fixes and performance improvements
