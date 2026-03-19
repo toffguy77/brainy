@@ -1,6 +1,6 @@
 name: brainy
 description: Brain training app for kids with Schulte tables
-version: 1.1.0+14
+version: 1.1.0+15
 
 environment:
   sdk: ^3.11.1
