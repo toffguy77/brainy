@@ -21,6 +21,10 @@ build/
 # Superpowers brainstorming sessions
 .superpowers/
 
+# Firebase Cloud Functions
+functions/node_modules/
+functions/lib/
+
 # Miscellaneous
 *.log
 *.tmp

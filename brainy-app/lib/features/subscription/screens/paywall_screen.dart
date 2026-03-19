@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
@@ -19,8 +17,6 @@ class PaywallScreen extends ConsumerStatefulWidget {
 
 class _PaywallScreenState extends ConsumerState<PaywallScreen>
     with TickerProviderStateMixin {
-  List<Package> _packages = [];
-  bool _loading = true;
   int _selectedPlanIndex = 0;
   bool _purchasing = false;
   late final AnimationController _benefitController;
@@ -32,7 +28,6 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..forward();
-    _loadPackages();
   }
 
   @override
@@ -41,69 +36,44 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
     super.dispose();
   }
 
-  Future<void> _loadPackages() async {
-    final packages = await SubscriptionService.getAvailablePackages();
-    debugPrint('[Paywall] loaded ${packages.length} packages: '
-        '${packages.map((p) => '${p.identifier}=${p.storeProduct.identifier}').join(', ')}');
-    if (!mounted) return;
-    setState(() {
-      _packages = packages;
-      _loading = false;
-      // Default to annual plan (first package) or index 0
-      _selectedPlanIndex = 0;
-    });
-  }
+  SubscriptionPlan get _selectedPlan =>
+      _selectedPlanIndex == 0 ? SubscriptionPlan.yearly : SubscriptionPlan.monthly;
 
   Future<void> _purchase() async {
     if (_purchasing) return;
     setState(() => _purchasing = true);
 
-    // Retry loading packages if they weren't available initially
-    if (_packages.isEmpty) {
-      debugPrint('[Paywall] packages empty, retrying load...');
-      final packages = await SubscriptionService.getAvailablePackages();
-      if (!mounted) return;
-      if (packages.isNotEmpty) {
-        _packages = packages;
-      } else {
-        setState(() => _purchasing = false);
-        _showErrorDialog();
-        return;
-      }
-    }
-
-    final result =
-        await SubscriptionService.purchasePackage(_packages[_selectedPlanIndex]);
+    final result = await SubscriptionService.purchase(_selectedPlan);
 
     if (!mounted) return;
     setState(() => _purchasing = false);
 
     switch (result) {
-      case PurchaseResult.success:
+      case BrainyPurchaseResult.success:
         HapticService.purchase();
         ref.invalidate(isPremiumProvider);
         await _showSuccessDialog();
-      case PurchaseResult.cancelled:
+      case BrainyPurchaseResult.cancelled:
         break; // User cancelled — do nothing
-      case PurchaseResult.error:
+      case BrainyPurchaseResult.error:
         _showErrorDialog();
     }
   }
 
-  Future<void> _restore() async {
+  Future<void> _checkSubscription() async {
     setState(() => _purchasing = true);
-    final result = await SubscriptionService.restorePurchases();
+    final result = await SubscriptionService.checkSubscription();
     if (!mounted) return;
     setState(() => _purchasing = false);
 
     switch (result) {
-      case PurchaseResult.success:
+      case BrainyPurchaseResult.success:
         HapticService.purchase();
         ref.invalidate(isPremiumProvider);
         await _showSuccessDialog();
-      case PurchaseResult.cancelled:
+      case BrainyPurchaseResult.cancelled:
         break;
-      case PurchaseResult.error:
+      case BrainyPurchaseResult.error:
         _showErrorDialog();
     }
   }
@@ -270,31 +240,22 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
                     // Animated benefits
                     _AnimatedBenefitsList(controller: _benefitController),
                     const SizedBox(height: 32),
-                    // Plan cards
-                    if (_loading)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 32),
-                        child: Text(
-                          l10n.paywallLoading,
-                          style: const TextStyle(
-                            fontFamily: 'Nunito',
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                      )
-                    else if (_packages.isEmpty)
-                      _FallbackPlanCards(
-                        selectedIndex: _selectedPlanIndex,
-                        onSelect: (i) =>
-                            setState(() => _selectedPlanIndex = i),
-                      )
-                    else
-                      _PackagePlanCards(
-                        packages: _packages,
-                        selectedIndex: _selectedPlanIndex,
-                        onSelect: (i) =>
-                            setState(() => _selectedPlanIndex = i),
-                      ),
+                    // Plan cards (hardcoded RUB prices)
+                    _PlanCard(
+                      title: l10n.paywallPlanYear,
+                      price: '1 990 \u20BD/\u0433\u043E\u0434',
+                      subtitle: l10n.paywallPerMonth('166\u20BD'),
+                      badge: l10n.paywallBestPrice,
+                      isSelected: _selectedPlanIndex == 0,
+                      onTap: () => setState(() => _selectedPlanIndex = 0),
+                    ),
+                    const SizedBox(height: 12),
+                    _PlanCard(
+                      title: l10n.paywallPlanMonth,
+                      price: '299 \u20BD/\u043C\u0435\u0441',
+                      isSelected: _selectedPlanIndex == 1,
+                      onTap: () => setState(() => _selectedPlanIndex = 1),
+                    ),
                     const SizedBox(height: 24),
                     // CTA button
                     SizedBox(
@@ -346,14 +307,14 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
-                    // Restore + Terms + Privacy
+                    // Check subscription + Terms + Privacy
                     Wrap(
                       alignment: WrapAlignment.center,
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         _LinkButton(
                           label: l10n.paywallRestore,
-                          onTap: _purchasing ? null : _restore,
+                          onTap: _purchasing ? null : _checkSubscription,
                         ),
                         _dot(),
                         _LinkButton(
@@ -397,7 +358,7 @@ class _PaywallScreenState extends ConsumerState<PaywallScreen>
     return const Padding(
       padding: EdgeInsets.symmetric(horizontal: 8),
       child: Text(
-        '·',
+        '\u00B7',
         style: TextStyle(
           color: AppColors.textSecondary,
           fontSize: 14,
@@ -490,117 +451,6 @@ class _BenefitRow extends StatelessWidget {
           size: 20,
         ),
       ],
-    );
-  }
-}
-
-// --- Plan cards (from RevenueCat packages) ---
-
-class _PackagePlanCards extends StatelessWidget {
-  final List<Package> packages;
-  final int selectedIndex;
-  final ValueChanged<int> onSelect;
-
-  const _PackagePlanCards({
-    required this.packages,
-    required this.selectedIndex,
-    required this.onSelect,
-  });
-
-  bool _isFamily(Package pkg) {
-    return pkg.storeProduct.identifier.contains('family');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Column(
-      children: List.generate(packages.length, (i) {
-        final pkg = packages[i];
-        final product = pkg.storeProduct;
-        final isAnnual = pkg.packageType == PackageType.annual;
-        final isFamily = _isFamily(pkg);
-        final isSelected = i == selectedIndex;
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: i < packages.length - 1 ? 12 : 0),
-          child: _PlanCard(
-            title: isFamily ? l10n.paywallPlanFamily : _packageTitle(pkg, l10n),
-            price: product.priceString,
-            subtitle: isAnnual
-                ? l10n.paywallPerMonth(_monthlyPrice(product))
-                : null,
-            badge: isAnnual ? l10n.paywallBestPrice : null,
-            isSelected: isSelected,
-            onTap: () => onSelect(i),
-          ),
-        );
-      }),
-    );
-  }
-
-  String _packageTitle(Package pkg, AppLocalizations l10n) {
-    switch (pkg.packageType) {
-      case PackageType.annual:
-        return l10n.paywallPlanYear;
-      case PackageType.monthly:
-        return l10n.paywallPlanMonth;
-      default:
-        return pkg.storeProduct.title;
-    }
-  }
-
-  String _monthlyPrice(StoreProduct product) {
-    final monthly = product.price / 12;
-    final format = NumberFormat.simpleCurrency(
-      name: product.currencyCode,
-      decimalDigits: 0,
-    );
-    return format.format(monthly.round());
-  }
-}
-
-// --- Fallback plan cards (when RevenueCat not configured) ---
-
-class _FallbackPlanCards extends StatelessWidget {
-  final int selectedIndex;
-  final ValueChanged<int> onSelect;
-
-  const _FallbackPlanCards({
-    required this.selectedIndex,
-    required this.onSelect,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isRu = Localizations.localeOf(context).languageCode == 'ru';
-    final plans = isRu
-        ? [
-            (l10n.paywallPlanYear, '1 990 ₽/год', l10n.paywallPerMonth('166₽'), l10n.paywallBestPrice),
-            (l10n.paywallPlanMonth, '299 ₽/мес', null as String?, null as String?),
-            (l10n.paywallPlanFamily, '2 990 ₽/год', null as String?, null as String?),
-          ]
-        : [
-            (l10n.paywallPlanYear, '\$24.99/yr', l10n.paywallPerMonth('\$2'), l10n.paywallBestPrice),
-            (l10n.paywallPlanMonth, '\$1.99/mo', null as String?, null as String?),
-            (l10n.paywallPlanFamily, '\$39.99/yr', null as String?, null as String?),
-          ];
-
-    return Column(
-      children: List.generate(plans.length, (i) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: i < plans.length - 1 ? 12 : 0),
-          child: _PlanCard(
-            title: plans[i].$1,
-            price: plans[i].$2,
-            subtitle: plans[i].$3,
-            badge: plans[i].$4,
-            isSelected: i == selectedIndex,
-            onTap: () => onSelect(i),
-          ),
-        );
-      }),
     );
   }
 }

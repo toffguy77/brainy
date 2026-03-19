@@ -92,18 +92,35 @@ class AppConstants {
   static const int recommendedFrequencyMinutes = 10;
   static const int onboardingPageCount = 7;
 
-  // RevenueCat
-  static const String revenueCatApiKey = String.fromEnvironment(
-    'REVENUECAT_API_KEY',
-    defaultValue: 'appl_UoxUlnvJRWlCsjkQJkJIeoYxxJZ',
-  );
-  static const String revenueCatEntitlement = 'brainy_pro';
-  static const String revenueCatOfferingId = 'default';
+  // RevenueCat (commented out — using YooKassa for Russian market)
+  // static const String revenueCatApiKey = String.fromEnvironment(
+  //   'REVENUECAT_API_KEY',
+  //   defaultValue: 'appl_UoxUlnvJRWlCsjkQJkJIeoYxxJZ',
+  // );
+  // static const String revenueCatEntitlement = 'brainy_pro';
+  // static const String revenueCatOfferingId = 'default';
+  // static const String productIdMonthly = 'brainy_pro_monthly';
+  // static const String productIdYearly = 'brainy_pro_yearly';
+  // static const String productIdFamily = 'brainy_pro_family';
 
-  // RevenueCat Product IDs
-  static const String productIdMonthly = 'brainy_pro_monthly';
-  static const String productIdYearly = 'brainy_pro_yearly';
-  static const String productIdFamily = 'brainy_pro_family';
+  // YooKassa
+  static const String yookassaClientKey = String.fromEnvironment(
+    'YOOKASSA_CLIENT_KEY',
+    defaultValue: 'test_...',
+  );
+  static const String yookassaShopId = String.fromEnvironment(
+    'YOOKASSA_SHOP_ID',
+    defaultValue: '...',
+  );
+
+  // Subscription plans (RUB)
+  static const double monthlyPriceRub = 299.0;
+  static const double yearlyPriceRub = 1990.0;
+
+  // Hive keys for subscription cache
+  static const String subscriptionStatusKey = 'subscriptionStatus';
+  static const String subscriptionExpiresAtKey = 'subscriptionExpiresAt';
+  static const String subscriptionPlanKey = 'subscriptionPlan';
 
   // Hive box names
   static const String sessionsBox = 'sessions';
