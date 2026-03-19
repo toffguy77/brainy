@@ -20,6 +20,7 @@ FONT_PATH = PROJECT_DIR / "assets" / "fonts" / "Nunito-Bold.ttf"
 DEVICES = {
     "6.7": (1290, 2796),
     "6.5": (1242, 2688),
+    "ipad-13": (2048, 2732),
 }
 
 SCREENS = ["home", "game", "result", "characters", "progress", "parent"]

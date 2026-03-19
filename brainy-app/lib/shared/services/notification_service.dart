@@ -69,7 +69,7 @@ class NotificationService {
       android: androidSettings,
       iOS: iosSettings,
     );
-    await _plugin.initialize(settings);
+    await _plugin.initialize(settings: settings);
   }
 
   static Future<bool> requestPermission() async {
@@ -88,7 +88,7 @@ class NotificationService {
     required bool hasPlayedToday,
     String locale = 'en',
   }) async {
-    await _plugin.cancel(_notificationId);
+    await _plugin.cancel(id: _notificationId);
 
     if (!enabled || hasPlayedToday) return;
 
@@ -101,11 +101,11 @@ class NotificationService {
         : _pickMotivationMessage(locale);
 
     await _plugin.zonedSchedule(
-      _notificationId,
-      'Brainy',
-      message,
-      _nextInstanceOfTime(effectiveHour, effectiveMinute),
-      NotificationDetails(
+      id: _notificationId,
+      title: 'Brainy',
+      body: message,
+      scheduledDate: _nextInstanceOfTime(effectiveHour, effectiveMinute),
+      notificationDetails: NotificationDetails(
         android: AndroidNotificationDetails(
           _channelId,
           _channelName,
@@ -117,8 +117,6 @@ class NotificationService {
         iOS: const DarwinNotificationDetails(),
       ),
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.wallClockTime,
       matchDateTimeComponents: DateTimeComponents.time,
     );
   }

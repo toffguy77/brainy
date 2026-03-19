@@ -58,9 +58,11 @@ class ShareCard extends StatelessWidget {
     final file = File('${dir.path}/brainy_progress.png');
     await file.writeAsBytes(imageBytes);
 
-    await Share.shareXFiles(
-      [XFile(file.path)],
-      sharePositionOrigin: sharePosition,
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(file.path)],
+        sharePositionOrigin: sharePosition,
+      ),
     );
   }
 
