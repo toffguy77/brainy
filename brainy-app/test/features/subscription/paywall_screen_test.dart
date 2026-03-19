@@ -29,41 +29,24 @@ void main() {
       expect(find.byIcon(Icons.workspace_premium_rounded), findsOneWidget);
     });
 
-    testWidgets('renders two plan cards with RUB prices', (tester) async {
+    testWidgets('shows coming soon badge', (tester) async {
       await tester.pumpWidget(_createTestApp());
       await tester.pumpAndSettle();
-      // Check for RUB prices
-      expect(find.textContaining('1 990'), findsOneWidget);
-      expect(find.textContaining('299'), findsOneWidget);
+      expect(find.textContaining('Скоро'), findsOneWidget);
+      expect(find.byIcon(Icons.access_time_rounded), findsOneWidget);
     });
 
-    testWidgets('no family plan displayed', (tester) async {
+    testWidgets('shows follow/subscribe CTA button', (tester) async {
       await tester.pumpWidget(_createTestApp());
       await tester.pumpAndSettle();
-      // Family plan should NOT be present
-      expect(find.textContaining('family'), findsNothing);
-      expect(find.textContaining('Family'), findsNothing);
+      expect(find.textContaining('Подписаться'), findsOneWidget);
     });
 
-    testWidgets('yearly plan is selected by default', (tester) async {
+    testWidgets('no plan cards or prices displayed', (tester) async {
       await tester.pumpWidget(_createTestApp());
       await tester.pumpAndSettle();
-      // The yearly plan card should show the price
-      expect(find.textContaining('1 990'), findsOneWidget);
-    });
-
-    testWidgets('can switch between plans by tapping', (tester) async {
-      await tester.pumpWidget(_createTestApp());
-      await tester.pumpAndSettle();
-
-      // Tap on monthly plan card — scroll into view first since it may be off-screen
-      final monthlyCard = find.textContaining('299');
-      expect(monthlyCard, findsOneWidget);
-      await tester.ensureVisible(monthlyCard);
-      await tester.pumpAndSettle();
-      await tester.tap(monthlyCard);
-      await tester.pumpAndSettle();
-      // After tap, monthly should be selected — we just verify no crash
+      expect(find.textContaining('1 990'), findsNothing);
+      expect(find.textContaining('299'), findsNothing);
     });
 
     testWidgets('renders close button', (tester) async {
@@ -72,17 +55,9 @@ void main() {
       expect(find.byIcon(Icons.close_rounded), findsOneWidget);
     });
 
-    testWidgets('renders CTA button', (tester) async {
-      await tester.pumpWidget(_createTestApp());
-      await tester.pumpAndSettle();
-      // The CTA button exists (InkWell within gradient container)
-      expect(find.byType(InkWell), findsWidgets);
-    });
-
     testWidgets('renders benefits list with check icons', (tester) async {
       await tester.pumpWidget(_createTestApp());
       await tester.pumpAndSettle();
-      // Benefits have check icons — 5 benefits = 5 check icons
       expect(find.byIcon(Icons.check_rounded), findsNWidgets(5));
     });
 
@@ -96,11 +71,9 @@ void main() {
       expect(find.byIcon(Icons.swap_horiz_rounded), findsOneWidget);
     });
 
-    testWidgets('renders legal links section with GestureDetectors',
-        (tester) async {
+    testWidgets('renders legal links', (tester) async {
       await tester.pumpWidget(_createTestApp());
       await tester.pumpAndSettle();
-      // Should find multiple GestureDetectors for plan cards and legal links
       expect(find.byType(GestureDetector), findsWidgets);
     });
 

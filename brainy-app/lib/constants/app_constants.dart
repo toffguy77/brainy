@@ -147,6 +147,9 @@ class AppConstants {
   // Grid sizes available in Gorbov-Schulte mode (5x5 and above)
   static const List<int> gorbovGridSizes = [5, 6, 7, 9];
 
+  // Premium waitlist (coming soon)
+  static const String premiumWaitlistUrl = 'https://t.me/brainy_app';
+
   // Legal URLs
   static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
   static const String privacyPolicyUrlRu =
