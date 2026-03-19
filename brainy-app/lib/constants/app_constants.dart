@@ -148,7 +148,7 @@ class AppConstants {
   static const List<int> gorbovGridSizes = [5, 6, 7, 9];
 
   // Premium waitlist (coming soon)
-  static const String premiumWaitlistUrl = 'https://t.me/brainy_app';
+  static const String premiumWaitlistUrl = 'https://t.me/+O7pPZ6DJ3Vo4MDJi';
 
   // Legal URLs
   static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
