@@ -51,7 +51,9 @@ platform :ios do
       "#{profile_uuid}.mobileprovision"
     )
     profile_plist = sh("security", "cms", "-D", "-i", installed_profile, log: false)
-    profile_name = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)[1]
+    match_result = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)
+    UI.user_error!("Could not extract profile name from provisioning profile") unless match_result
+    profile_name = match_result[1]
     UI.message("Provisioning profile name: #{profile_name}")
 
     # Archive and export IPA with proper signing
@@ -145,7 +147,9 @@ platform :ios do
       "#{profile_uuid}.mobileprovision"
     )
     profile_plist = sh("security", "cms", "-D", "-i", installed_profile, log: false)
-    profile_name = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)[1]
+    match_result = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)
+    UI.user_error!("Could not extract profile name from provisioning profile") unless match_result
+    profile_name = match_result[1]
 
     build_app(
       workspace: "Runner.xcworkspace",
