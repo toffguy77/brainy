@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/league.dart';
 import '../providers/game_services_provider.dart';
@@ -44,8 +47,11 @@ class LeagueScreen extends ConsumerWidget {
               const SizedBox(height: 16),
             ],
             standingsAsync.when(
-              data: (standings) =>
-                  _StandingsList(standings: standings, l10n: l10n),
+              data: (standings) => _StandingsList(
+                standings: standings,
+                l10n: l10n,
+                onEditName: () => _showEditNameDialog(context, ref, l10n),
+              ),
               loading: () => Padding(
                 padding: const EdgeInsets.all(32),
                 child: Column(
@@ -94,6 +100,83 @@ class LeagueScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showEditNameDialog(
+    BuildContext context, WidgetRef ref, AppLocalizations l10n) {
+  final currentName = ref.read(playerNameProvider);
+  final controller = TextEditingController(text: currentName ?? '');
+
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Text(
+        l10n.leagueEditName,
+        style: const TextStyle(
+          fontFamily: 'Nunito',
+          fontWeight: FontWeight.w800,
+          color: AppColors.textPrimary,
+        ),
+      ),
+      content: TextField(
+        controller: controller,
+        autofocus: true,
+        maxLength: 20,
+        style: const TextStyle(
+          fontFamily: 'Nunito',
+          color: AppColors.textPrimary,
+        ),
+        decoration: InputDecoration(
+          hintText: l10n.leagueEditNameHint,
+          hintStyle: const TextStyle(
+            fontFamily: 'Nunito',
+            color: AppColors.textSecondary,
+          ),
+          enabledBorder: UnderlineInputBorder(
+            borderSide: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.3)),
+          ),
+          focusedBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: AppColors.primary),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text(
+            l10n.leagueEditNameCancel,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            final newName = controller.text.trim();
+            if (newName.isNotEmpty) {
+              HapticFeedback.lightImpact();
+              final box = Hive.box(AppConstants.userBox);
+              box.put(AppConstants.customPlayerNameKey, newName);
+              ref.read(playerNameProvider.notifier).state = newName;
+            }
+            Navigator.pop(ctx);
+          },
+          child: Text(
+            l10n.leagueEditNameSave,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _ConnectCard extends StatelessWidget {
@@ -151,8 +234,11 @@ class _ConnectCard extends StatelessWidget {
                 await service.signIn();
                 ref.read(isGameServicesSignedInProvider.notifier).state =
                     service.isSignedIn;
+                final box = Hive.box(AppConstants.userBox);
+                final customName =
+                    box.get(AppConstants.customPlayerNameKey) as String?;
                 ref.read(playerNameProvider.notifier).state =
-                    service.playerName;
+                    customName ?? service.playerName;
                 ref.invalidate(leagueStandingsProvider);
               },
               style: ElevatedButton.styleFrom(
@@ -366,8 +452,13 @@ class _TierProgress extends StatelessWidget {
 class _StandingsList extends StatelessWidget {
   final List<LeaguePlayer> standings;
   final AppLocalizations l10n;
+  final VoidCallback? onEditName;
 
-  const _StandingsList({required this.standings, required this.l10n});
+  const _StandingsList({
+    required this.standings,
+    required this.l10n,
+    this.onEditName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -384,6 +475,7 @@ class _StandingsList extends StatelessWidget {
               player: standings[i],
               l10n: l10n,
               isLast: i == standings.length - 1,
+              onTap: standings[i].isCurrentUser ? onEditName : null,
             ),
         ],
       ),
@@ -396,17 +488,21 @@ class _PlayerRow extends StatelessWidget {
   final LeaguePlayer player;
   final AppLocalizations l10n;
   final bool isLast;
+  final VoidCallback? onTap;
 
   const _PlayerRow({
     required this.rank,
     required this.player,
     required this.l10n,
     required this.isLast,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: player.isCurrentUser
@@ -465,8 +561,16 @@ class _PlayerRow extends StatelessWidget {
                   : AppColors.textSecondary,
             ),
           ),
+          if (player.isCurrentUser && onTap != null) ...[
+            const SizedBox(width: 8),
+            const Icon(
+              Icons.edit_rounded,
+              size: 16,
+              color: AppColors.textSecondary,
+            ),
+          ],
         ],
       ),
-    );
+    ));
   }
 }

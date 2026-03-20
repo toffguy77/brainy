@@ -69,6 +69,7 @@ final leagueStandingsProvider = FutureProvider<List<LeaguePlayer>>((ref) async {
     userXp: userXp,
     tier: LeagueTier.fromWeeklyXp(userXp),
     userLevel: progress.level,
+    playerName: pName,
   );
 });
 
@@ -110,6 +111,7 @@ List<LeaguePlayer> _buildSimulatedStandings({
   required int userXp,
   required LeagueTier tier,
   required int userLevel,
+  String? playerName,
 }) {
   final rng = Random(tier.index * 1000 + DateTime.now().weekday);
   final minXp = tier.xpThreshold;
@@ -129,7 +131,7 @@ List<LeaguePlayer> _buildSimulatedStandings({
   }
 
   players.add(LeaguePlayer(
-    name: 'Lv$userLevel',
+    name: playerName ?? 'Lv$userLevel',
     weeklyXp: userXp,
     isCurrentUser: true,
   ));

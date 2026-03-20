@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:brainy/constants/app_constants.dart';
 import 'package:brainy/features/league/providers/league_provider.dart';
 import 'package:brainy/features/league/providers/game_services_provider.dart';
 import 'package:brainy/features/league/screens/league_screen.dart';
@@ -26,6 +29,18 @@ Widget _buildTestApp({required List<Override> overrides}) {
 }
 
 void main() {
+  setUpAll(() async {
+    final tempDir = await Directory.systemTemp.createTemp('hive_test_');
+    Hive.init(tempDir.path);
+    await Hive.openBox(AppConstants.userBox);
+  });
+
+  setUp(() async {
+    if (Hive.isBoxOpen(AppConstants.userBox)) {
+      await Hive.box(AppConstants.userBox).clear();
+    }
+  });
+
   group('LeagueScreen', () {
     testWidgets('shows connect card when not signed in', (tester) async {
       await tester.pumpWidget(_buildTestApp(
@@ -98,6 +113,133 @@ void main() {
       expect(find.text('MiddlePlayer'), findsOneWidget);
       expect(find.text('You'), findsOneWidget);
       expect(find.text('500 XP'), findsOneWidget);
+    });
+
+    testWidgets('shows edit icon on current user row', (tester) async {
+      await tester.pumpWidget(_buildTestApp(
+        overrides: [
+          isGameServicesSignedInProvider.overrideWith((ref) => false),
+          weeklyXpProvider.overrideWithValue(100),
+          currentLeagueProvider.overrideWithValue(LeagueTier.bronze),
+          leagueStandingsProvider.overrideWith((ref) async {
+            return [
+              const LeaguePlayer(
+                  name: 'Other', weeklyXp: 200),
+              const LeaguePlayer(
+                  name: 'Me', weeklyXp: 100, isCurrentUser: true),
+            ];
+          }),
+        ],
+      ));
+
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.edit_rounded), findsOneWidget);
+    });
+
+    testWidgets('tap on current user row opens edit name dialog',
+        (tester) async {
+      await tester.pumpWidget(_buildTestApp(
+        overrides: [
+          isGameServicesSignedInProvider.overrideWith((ref) => true),
+          playerNameProvider.overrideWith((ref) => 'OldName'),
+          weeklyXpProvider.overrideWithValue(100),
+          currentLeagueProvider.overrideWithValue(LeagueTier.bronze),
+          leagueStandingsProvider.overrideWith((ref) async {
+            return [
+              const LeaguePlayer(
+                  name: 'OldName', weeklyXp: 100, isCurrentUser: true),
+            ];
+          }),
+        ],
+      ));
+
+      await tester.pumpAndSettle();
+
+      // Scroll down to make the edit icon visible, then tap it
+      await tester.scrollUntilVisible(
+        find.byIcon(Icons.edit_rounded),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byIcon(Icons.edit_rounded));
+      await tester.pumpAndSettle();
+
+      // Dialog should appear
+      expect(find.text('Edit name'), findsOneWidget);
+      expect(find.byType(TextField), findsOneWidget);
+    });
+
+    testWidgets('edit name dialog saves custom name to Hive',
+        (tester) async {
+      await tester.pumpWidget(_buildTestApp(
+        overrides: [
+          isGameServicesSignedInProvider.overrideWith((ref) => true),
+          playerNameProvider.overrideWith((ref) => 'OldName'),
+          weeklyXpProvider.overrideWithValue(100),
+          currentLeagueProvider.overrideWithValue(LeagueTier.bronze),
+          leagueStandingsProvider.overrideWith((ref) async {
+            return [
+              const LeaguePlayer(
+                  name: 'OldName', weeklyXp: 100, isCurrentUser: true),
+            ];
+          }),
+        ],
+      ));
+
+      await tester.pumpAndSettle();
+
+      // Scroll and open dialog
+      await tester.scrollUntilVisible(
+        find.byIcon(Icons.edit_rounded),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byIcon(Icons.edit_rounded));
+      await tester.pumpAndSettle();
+
+      // Clear and type new name
+      await tester.enterText(find.byType(TextField), 'NewPlayer');
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      // Verify saved in Hive
+      final box = Hive.box(AppConstants.userBox);
+      expect(box.get(AppConstants.customPlayerNameKey), 'NewPlayer');
+    });
+
+    testWidgets('edit name dialog cancel does not save', (tester) async {
+      await tester.pumpWidget(_buildTestApp(
+        overrides: [
+          isGameServicesSignedInProvider.overrideWith((ref) => true),
+          playerNameProvider.overrideWith((ref) => 'OldName'),
+          weeklyXpProvider.overrideWithValue(100),
+          currentLeagueProvider.overrideWithValue(LeagueTier.bronze),
+          leagueStandingsProvider.overrideWith((ref) async {
+            return [
+              const LeaguePlayer(
+                  name: 'OldName', weeklyXp: 100, isCurrentUser: true),
+            ];
+          }),
+        ],
+      ));
+
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.byIcon(Icons.edit_rounded),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byIcon(Icons.edit_rounded));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(find.byType(TextField), 'ShouldNotSave');
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      final box = Hive.box(AppConstants.userBox);
+      expect(box.get(AppConstants.customPlayerNameKey), isNull);
     });
 
     testWidgets('shows loading state', (tester) async {

@@ -353,6 +353,10 @@
   "leagueLoading": "Loading leaderboard...",
   "leagueError": "Could not load leaderboard",
   "leagueNotConnected": "Game Center not connected",
+  "leagueEditName": "Edit name",
+  "leagueEditNameHint": "Enter your name",
+  "leagueEditNameSave": "Save",
+  "leagueEditNameCancel": "Cancel",
 
   "appVersionLabel": "Version {version} ({buildNumber})",
   "@appVersionLabel": {

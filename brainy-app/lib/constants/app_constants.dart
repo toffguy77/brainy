@@ -130,6 +130,9 @@ class AppConstants {
   static const String progressBox = 'progress';
   static const String progressDataKey = 'data';
 
+  // Custom player name
+  static const String customPlayerNameKey = 'customPlayerName';
+
   // Sound & haptic settings
   static const String soundEnabledKey = 'soundEnabled';
   static const String hapticEnabledKey = 'hapticEnabled';

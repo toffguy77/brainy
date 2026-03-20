@@ -34,7 +34,7 @@ tags: [gamecenter, leaderboard, league, ranking, weekly, besttime]
 
 ## Идентификация игрока
 
-Имя берётся только из Game Center / Play Games через `GameServicesService.getPlayerName()`. Если сервис не подключён — отображается «Lv{N}».
+Имя берётся из Game Center / Play Games через `GameServicesService.getPlayerName()`. Пользователь может задать кастомное имя через тап на свою строку в лидерборде — оно сохраняется в Hive (`userBox['customPlayerName']`) и используется вместо имени из Game Center. Кастомное имя — только локальное, другие игроки в Game Center видят оригинальное имя. Если ни кастомного, ни Game Center имени нет — отображается «Lv{N}».
 
 ## Экран лиги
 

@@ -353,6 +353,10 @@
   "leagueLoading": "Загрузка рейтинга...",
   "leagueError": "Не удалось загрузить рейтинг",
   "leagueNotConnected": "Game Center не подключён",
+  "leagueEditName": "Изменить имя",
+  "leagueEditNameHint": "Введи своё имя",
+  "leagueEditNameSave": "Сохранить",
+  "leagueEditNameCancel": "Отмена",
 
   "appVersionLabel": "Версия {version} ({buildNumber})",
   "versionCopied": "Версия скопирована",

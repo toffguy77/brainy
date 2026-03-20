@@ -748,6 +748,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueNotConnected => 'Game Center не подключён';
 
   @override
+  String get leagueEditName => 'Изменить имя';
+
+  @override
+  String get leagueEditNameHint => 'Введи своё имя';
+
+  @override
+  String get leagueEditNameSave => 'Сохранить';
+
+  @override
+  String get leagueEditNameCancel => 'Отмена';
+
+  @override
   String appVersionLabel(Object buildNumber, Object version) {
     return 'Версия $version ($buildNumber)';
   }

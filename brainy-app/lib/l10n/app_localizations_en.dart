@@ -746,6 +746,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueNotConnected => 'Game Center not connected';
 
   @override
+  String get leagueEditName => 'Edit name';
+
+  @override
+  String get leagueEditNameHint => 'Enter your name';
+
+  @override
+  String get leagueEditNameSave => 'Save';
+
+  @override
+  String get leagueEditNameCancel => 'Cancel';
+
+  @override
   String appVersionLabel(Object buildNumber, Object version) {
     return 'Version $version ($buildNumber)';
   }

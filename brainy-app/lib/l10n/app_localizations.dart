@@ -1472,6 +1472,30 @@ abstract class AppLocalizations {
   /// **'Game Center не подключён'**
   String get leagueNotConnected;
 
+  /// No description provided for @leagueEditName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Изменить имя'**
+  String get leagueEditName;
+
+  /// No description provided for @leagueEditNameHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Введи своё имя'**
+  String get leagueEditNameHint;
+
+  /// No description provided for @leagueEditNameSave.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сохранить'**
+  String get leagueEditNameSave;
+
+  /// No description provided for @leagueEditNameCancel.
+  ///
+  /// In ru, this message translates to:
+  /// **'Отмена'**
+  String get leagueEditNameCancel;
+
   /// No description provided for @appVersionLabel.
   ///
   /// In ru, this message translates to:

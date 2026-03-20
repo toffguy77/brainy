@@ -139,7 +139,12 @@ class _NotificationReschedulerState
       if (!mounted) return;
       ref.read(isGameServicesSignedInProvider.notifier).state =
           service.isSignedIn;
-      ref.read(playerNameProvider.notifier).state = service.playerName;
+      // Use custom name from Hive if set, otherwise Game Center name
+      final box = Hive.box(AppConstants.userBox);
+      final customName =
+          box.get(AppConstants.customPlayerNameKey) as String?;
+      ref.read(playerNameProvider.notifier).state =
+          customName ?? service.playerName;
     });
   }
 
