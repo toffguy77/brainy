@@ -19,21 +19,26 @@ Full feature development cycle with two checkpoints.
 
 ### Phase 2: Implementation (autonomous)
 
-5. **Write code** — implementation + tests + localization (l10n/*.arb).
-6. **Update plans** — modify affected files in `docs/plans/features/` to reflect new behavior. If behavior described in ANY existing plan changes, that plan MUST be updated.
-7. **Verify locally:**
+5. **Write code** — implementation + localization (l10n/*.arb).
+6. **E2E тесты** — не просто генерировать тесты, а думать:
+   - Прочитать существующие тесты в затронутых модулях (`test/`, `integration_test/`).
+   - Если существующие тесты ломаются — разобраться: это баг в новом коде или тест устарел? Если баг — чинить код, не тест. Если тест устарел — обновить тест с пониманием нового поведения.
+   - Писать новые тесты на добавленное поведение: проверять реальные сценарии (happy path + edge cases), а не формально покрывать строки.
+   - Тесты должны быть стабильными (не flaky), учитывать scroll, animations, async providers.
+7. **Update plans** — modify affected files in `docs/plans/features/` to reflect new behavior. If behavior described in ANY existing plan changes, that plan MUST be updated.
+8. **Verify locally:**
    - `cd brainy-app && flutter test`
    - `cd brainy-app && flutter analyze`
    - `cd brainy-app && flutter build ios --no-codesign`
-8. **If verification fails** — fix and re-run. Do not present to user until all green.
+9. **If verification fails** — разобраться в причине. Не чинить тесты вслепую — если тест падает, это может быть баг в коде. Не представлять результат пользователю, пока всё не зелёное.
 
 **CHECKPOINT 2:** Show test results, build output, and `git diff`. Wait for explicit "ok" from user.
 
 ### Phase 3: Ship (after approval)
 
-9. **Commit** — code + updated plans in one commit.
-10. **Push** — to feature branch.
-11. **Create PR** — against main with summary of changes.
+10. **Commit** — code + updated plans + tests in one commit.
+11. **Push** — to feature branch.
+12. **Create PR** — against main with summary of changes.
 
 ## Rules
 
