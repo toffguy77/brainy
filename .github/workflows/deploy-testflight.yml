@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'brainy-app/lib/**'
+      - 'brainy-app/pubspec.yaml'
+      - 'brainy-app/pubspec.lock'
+      - 'brainy-app/ios/**'
+      - 'brainy-app/android/**'
+      - 'brainy-app/l10n/**'
+      - 'brainy-app/assets/**'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
