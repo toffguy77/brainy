@@ -1,0 +1,84 @@
+name: Monitor App Store Review Status
+
+on:
+  schedule:
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  check-review-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check App Store review status
+        env:
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_ID: '6760589477'
+        run: |
+          pip install PyJWT requests cryptography
+
+          python3 << 'PYTHON_SCRIPT'
+          import jwt, time, requests, json, os, base64
+
+          KEY_ID = os.environ["APP_STORE_CONNECT_KEY_ID"]
+          ISSUER_ID = os.environ["APP_STORE_CONNECT_ISSUER_ID"]
+          API_KEY = os.environ["APP_STORE_CONNECT_API_KEY"]
+          APP_ID = os.environ["APP_ID"]
+
+          private_key = base64.b64decode(API_KEY).decode("utf-8")
+
+          now = int(time.time())
+          token = jwt.encode(
+              {"iss": ISSUER_ID, "iat": now, "exp": now + 1200, "aud": "appstoreconnect-v1"},
+              private_key, algorithm="ES256",
+              headers={"kid": KEY_ID, "typ": "JWT"}
+          )
+
+          H = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+          BASE = "https://api.appstoreconnect.apple.com/v1"
+
+          r = requests.get(f"{BASE}/apps/{APP_ID}/appStoreVersions?limit=1&sort=-createdDate", headers=H)
+          r.raise_for_status()
+          versions = r.json()["data"]
+
+          if not versions:
+              print("No app store versions found")
+              exit(0)
+
+          v = versions[0]
+          state = v["attributes"]["appVersionState"]
+          version = v["attributes"]["versionString"]
+
+          ALERT_STATES = ["REJECTED", "METADATA_REJECTED", "DEVELOPER_REJECTED", "READY_FOR_SALE"]
+
+          print(f"Version {version}: {state}")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              if state in ALERT_STATES:
+                  f.write(f"should_create_issue=true\n")
+                  f.write(f"version={version}\n")
+                  f.write(f"state={state}\n")
+              else:
+                  f.write(f"should_create_issue=false\n")
+          PYTHON_SCRIPT
+        id: check
+
+      - name: Create issue if status needs attention
+        if: steps.check.outputs.should_create_issue == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --repo ${{ github.repository }} --label "app-store" --search "v${{ steps.check.outputs.version }} ${{ steps.check.outputs.state }}" --json number --jq length)
+          if [ "$EXISTING" = "0" ]; then
+            gh issue create \
+              --repo ${{ github.repository }} \
+              --title "App Store: v${{ steps.check.outputs.version }} — ${{ steps.check.outputs.state }}" \
+              --body "Version **${{ steps.check.outputs.version }}** status changed to **${{ steps.check.outputs.state }}**. Check App Store Connect for details." \
+              --label "app-store"
+          fi
