@@ -29,3 +29,4 @@ functions/lib/
 *.log
 *.tmp
 *.bak
+.playwright-mcp/
