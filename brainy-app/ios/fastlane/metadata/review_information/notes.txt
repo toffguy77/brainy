@@ -1,1 +1,1 @@
-This is a brain training app for kids ages 6-14 using Schulte tables. No login or account required. All features work offline. The app is free with no in-app purchases at this time — premium features are marked as "Coming soon".
+This is a brain training app using Schulte tables (3×3 to 9×9 grids). No login or account required. All features work offline. The app is free with no in-app purchases at this time — premium features are marked as "Coming soon".
