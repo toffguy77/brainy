@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../../models/character.dart';
 import '../../../models/user_progress.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../data/characters_data.dart';
 import '../providers/character_provider.dart';
+import '../widgets/dressed_avatar.dart';
 
 Widget characterAvatar(String id, {required double size, Color? color}) {
   final info = defaultCharacters.firstWhere(
@@ -64,16 +64,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
       CurvedAnimation(parent: _bobController, curve: Curves.easeInOut),
     );
 
-    // Auto-unlock premium characters for subscribers
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final hasPremium = await ref.read(isPremiumProvider.future);
-      if (!hasPremium || !mounted) return;
-      for (final info in defaultCharacters) {
-        if (info.unlockType == UnlockType.premium) {
-          ref.read(characterProvider.notifier).unlockCharacter(info.id);
-        }
-      }
-    });
   }
 
   @override
@@ -94,7 +84,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
     final activeInfo = defaultCharacters[_currentPage];
@@ -123,7 +112,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                 _buildCharacterPreview(activeInfo, activeData),
                 const SizedBox(height: 12),
                 Text(
-                  activeInfo.name(locale),
+                  activeInfo.name(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 24,
@@ -133,7 +122,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  activeInfo.description(locale),
+                  activeInfo.description(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 14,
@@ -156,9 +145,8 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                         info: info,
                         isUnlocked: data.isUnlocked,
                         isActive: isActive,
-                        locale: locale,
                         onTap: () =>
-                            _onCharacterTap(info, data, progress, l10n, locale),
+                            _onCharacterTap(info, data, progress, l10n),
                       );
                     },
                   ),
@@ -173,24 +161,32 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                       width: double.infinity,
                       height: 48,
                       child: Material(
-                        color: AppColors.surface.withValues(alpha: 0.5),
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.auto_awesome_rounded,
-                                color: AppColors.textSecondary.withValues(alpha: 0.5), size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${l10n.accessoriesCustomize} — ${l10n.comingSoon}',
-                              style: TextStyle(
-                                fontFamily: 'Nunito',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                        child: InkWell(
+                          key: const Key('accessoriesButton'),
+                          borderRadius: BorderRadius.circular(16),
+                          // Dress the character on screen, which may not be
+                          // the active one.
+                          onTap: () => context.push(
+                              '/accessories?character=${activeInfo.id}'),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.auto_awesome_rounded,
+                                  color: AppColors.primary, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n.accessoriesCustomize,
+                                style: const TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -198,7 +194,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   const SizedBox(height: 12),
                 ],
                 _buildActionButton(
-                    activeInfo, activeData, progress, l10n, locale),
+                    activeInfo, activeData, progress, l10n),
                 const SizedBox(height: 24),
               ],
             ),
@@ -242,7 +238,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: data.isUnlocked
-              ? characterAvatar(info.id, size: 80)
+              ? DressedAvatar(characterId: info.id, size: 80)
               : ColorFiltered(
                   colorFilter: const ColorFilter.matrix(<double>[
                     0.2126, 0.7152, 0.0722, 0, 0,
@@ -283,18 +279,10 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
     CharacterData data,
     UserProgress progress,
     AppLocalizations l10n,
-    String locale,
   ) {
     if (!data.isUnlocked) {
-      if (info.unlockType == UnlockType.premium) {
-        return _ActionButton(
-          label: l10n.characterUnlockPremium,
-          color: AppColors.accent,
-          onTap: () => context.go('/paywall'),
-        );
-      }
       return _ActionButton(
-        label: info.unlockCondition(locale),
+        label: info.unlockCondition(l10n),
         color: AppColors.surface,
         onTap: null,
       );
@@ -321,10 +309,9 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
     CharacterData data,
     UserProgress progress,
     AppLocalizations l10n,
-    String locale,
   ) {
     if (!data.isUnlocked) {
-      _showLockedBottomSheet(info, l10n, locale);
+      _showLockedBottomSheet(info, l10n);
       return;
     }
     if (progress.activeCharacterId != info.id) {
@@ -335,7 +322,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
   void _showLockedBottomSheet(
     CharacterInfo info,
     AppLocalizations l10n,
-    String locale,
   ) {
     showModalBottomSheet(
       context: context,
@@ -369,7 +355,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                info.name(locale),
+                info.name(l10n),
                 style: const TextStyle(
                   fontFamily: 'Nunito',
                   fontSize: 22,
@@ -379,7 +365,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                info.description(locale),
+                info.description(l10n),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: 'Nunito',
@@ -396,7 +382,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  info.unlockCondition(locale),
+                  info.unlockCondition(l10n),
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 16,
@@ -405,40 +391,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   ),
                 ),
               ),
-              if (info.unlockType == UnlockType.premium) ...[
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Navigator.pop(context);
-                          this.context.go('/paywall');
-                        },
-                        child: Center(
-                          child: Text(
-                            l10n.characterUnlockPremium,
-                            style: const TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
               const SizedBox(height: 16),
             ],
           ),
@@ -452,19 +404,18 @@ class _CharacterCard extends StatelessWidget {
   final CharacterInfo info;
   final bool isUnlocked;
   final bool isActive;
-  final String locale;
   final VoidCallback onTap;
 
   const _CharacterCard({
     required this.info,
     required this.isUnlocked,
     required this.isActive,
-    required this.locale,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -504,7 +455,7 @@ class _CharacterCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              info.name(locale),
+              info.name(l10n),
               style: TextStyle(
                 fontFamily: 'Nunito',
                 fontSize: 16,
@@ -526,7 +477,7 @@ class _CharacterCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    info.unlockCondition(locale),
+                    info.unlockCondition(l10n),
                     style: const TextStyle(
                       fontFamily: 'Nunito',
                       fontSize: 11,

@@ -135,7 +135,7 @@ class _GridCellWidgetState extends State<GridCellWidget>
                     color: AppColors.success,
                   )
                 : Text(
-                    '${widget.cell?.number ?? ''}',
+                    widget.cell?.display ?? '',
                     style: TextStyle(
                       color: _textColor,
                       fontSize: _fontSize(),

@@ -5,12 +5,19 @@ import 'package:intl/intl.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../constants/game_modes.dart';
+import '../../game/game_mode_text.dart';
 import '../providers/grid_stats_provider.dart';
 
 class GridDetailScreen extends ConsumerStatefulWidget {
   final int gridSize;
+  final String mode;
 
-  const GridDetailScreen({super.key, required this.gridSize});
+  const GridDetailScreen({
+    super.key,
+    required this.gridSize,
+    this.mode = GameModes.classic,
+  });
 
   @override
   ConsumerState<GridDetailScreen> createState() => _GridDetailScreenState();
@@ -20,7 +27,7 @@ class _GridDetailScreenState extends ConsumerState<GridDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final stats = ref.watch(gridStatsProvider(widget.gridSize));
+    final stats = ref.watch(gridStatsProvider((mode: widget.mode, gridSize: widget.gridSize)));
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -32,7 +39,8 @@ class _GridDetailScreenState extends ConsumerState<GridDetailScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          l10n.gridDetailTitle(widget.gridSize),
+          '${gameModeLabel(l10n, widget.mode)} · '
+          '${l10n.gridDetailTitle(widget.gridSize)}',
           style: const TextStyle(
             fontFamily: 'Nunito',
             fontWeight: FontWeight.w800,
@@ -49,7 +57,7 @@ class _GridDetailScreenState extends ConsumerState<GridDetailScreen> {
               selected: stats.period,
               onChanged: (period) {
                 ref
-                    .read(gridStatsProvider(widget.gridSize).notifier)
+                    .read(gridStatsProvider((mode: widget.mode, gridSize: widget.gridSize)).notifier)
                     .setPeriod(period);
               },
               l10n: l10n,
@@ -475,9 +483,9 @@ class _StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bestStars = _starsForTime(stats.gridSize, stats.bestTime ?? 0);
+    final bestStars = _starsForTime(stats.mode, stats.gridSize, stats.bestTime ?? 0);
     final avgStars =
-        _starsForTime(stats.gridSize, stats.averageTime?.toInt() ?? 0);
+        _starsForTime(stats.mode, stats.gridSize, stats.averageTime?.toInt() ?? 0);
 
     return Row(
       children: [
@@ -504,8 +512,8 @@ class _StatsRow extends StatelessWidget {
     );
   }
 
-  int _starsForTime(int gridSize, int seconds) {
-    final thresholds = AppConstants.starThresholds[gridSize];
+  int _starsForTime(String mode, int gridSize, int seconds) {
+    final thresholds = AppConstants.starThresholdsFor(mode, gridSize);
     if (thresholds == null || seconds <= 0) return 0;
     if (seconds <= thresholds[0]) return 3;
     if (seconds <= thresholds[1]) return 2;

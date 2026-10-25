@@ -7,11 +7,11 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 
 ## Обзор
 
-7-экранный онбординг (PageView) при первом запуске. Собирает данные о ребёнке и показывает мягкий paywall. После завершения сохраняется флаг `onboardingCompleted: true` в Hive — повторные запуски открывают сразу `/home`.
+6-экранный онбординг (PageView) при первом запуске. Собирает данные о ребёнке. После завершения сохраняется флаг `onboardingCompleted: true` в Hive — повторные запуски открывают сразу `/home`.
 
-## Структура (7 страниц)
+## Структура (6 страниц)
 
-Константа: `AppConstants.onboardingPageCount = 7`.
+Константа: `AppConstants.onboardingPageCount = 6`.
 
 ### Страница 1 — Приветствие (`welcome_page.dart`)
 - Анимированный логотип Brainy
@@ -33,30 +33,28 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 ### Страница 4 — Возраст ребёнка (`age_page.dart`)
 - «Сколько лет ребёнку?»
 - 3 карточки: 6-9, 10-12, 13-14
-- Сохранение в Hive по ключу `childAge`
+- Выбор карточки переходит на следующую страницу; в Hive (`childAge`) пишется при завершении онбординга
 
 ### Страница 5 — Главная цель (`goals_page.dart`)
 - «Какая главная цель?»
 - 4 карточки (множественный выбор): concentration, reading, exams, fun
-- Сохранение по ключу `goals`
+- В Hive (`goals`) пишется при завершении онбординга
 
-### Страница 6 — Частота тренировок (`frequency_page.dart`)
+### Страница 6 — Частота тренировок (`frequency_page.dart`) — последняя
 - «Как часто заниматься?»
 - 3 карточки: 5 мин, 10 мин (рекомендуем), 15+ мин
-- Сохранение по ключу `dailyGoalMinutes`
+- Выбор завершает онбординг: сохраняет `onboardingCompleted: true` и запрашивает разрешение на уведомления (внутри `completeOnboarding()`)
+- Сохранение по ключу `dailyGoalMinutes` (и в `UserProgress.dailyGoalMinutes`). Используется как дневная цель:
+  на главной — полоса «Сегодня: X из N мин» по сумме времени сегодняшних сессий, родитель может
+  изменить цель в настройках
 
-### Страница 7 — Мягкий Paywall (`paywall_page.dart`)
-- Запрос разрешения на уведомления
-- Список преимуществ Premium
-- Кнопка переходит на кастомный `PaywallScreen`
-- Ссылка «Продолжить без подписки» -> `/home`
-- Сохранение `onboardingCompleted: true`
 
 ## Навигация
 
-- Кнопка [Далее] или свайп между страницами
-- Кнопка [Назад] на страницах 2+
-- Индикатор прогресса: 7 точек
+- Кнопка [Далее] (на страницах 2, 3, 5); на странице возраста выбор карточки сам переходит дальше.
+  Свайп отключён (`NeverScrollableScrollPhysics`); на странице целей [Далее] активна после выбора хотя бы одной цели
+- Кнопка [Назад] на страницах 2+ (системный жест «назад» тоже листает на страницу назад)
+- Индикатор прогресса: 6 точек
 - После завершения: роутер перенаправляет на `/home`
 
 ## Опции
@@ -76,5 +74,5 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 ## Ключевые файлы
 
 - `brainy-app/lib/features/onboarding/screens/onboarding_screen.dart`
-- `brainy-app/lib/features/onboarding/pages/` — 7 файлов страниц
+- `brainy-app/lib/features/onboarding/pages/` — 6 файлов страниц
 - `brainy-app/lib/features/onboarding/providers/onboarding_provider.dart`

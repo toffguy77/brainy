@@ -8,7 +8,6 @@ import '../pages/welcome_page.dart';
 import '../pages/age_page.dart';
 import '../pages/goals_page.dart';
 import '../pages/frequency_page.dart';
-import '../pages/paywall_page.dart';
 import '../pages/schulte_info_page.dart';
 import '../pages/science_page.dart';
 
@@ -74,7 +73,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     AgePage(),
                     GoalsPage(),
                     FrequencyPage(),
-                    PaywallPage(),
                   ],
                 ),
               ),

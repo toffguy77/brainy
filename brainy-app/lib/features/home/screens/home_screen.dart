@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/services/subscription_service.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../character/data/characters_data.dart';
-import '../../character/screens/character_screen.dart';
-import '../../subscription/widgets/premium_bottom_sheet.dart';
+import '../../character/widgets/dressed_avatar.dart';
+import '../providers/training_goals_provider.dart';
+import '../../game/game_mode_text.dart';
+import '../../../constants/game_modes.dart';
+import '../../../models/session.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,14 +25,23 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen>
     with SingleTickerProviderStateMixin {
   late int _selectedGridSize;
-  String _selectedMode = 'classic';
+  String _selectedMode = GameModes.classic;
   late final AnimationController _idleController;
   late final Animation<double> _bobAnimation;
 
   @override
   void initState() {
     super.initState();
-    _selectedGridSize = ref.read(userProgressProvider).lastSelectedGridSize;
+    final savedMode =
+        Hive.box(AppConstants.userBox).get(AppConstants.lastSelectedModeKey)
+            as String?;
+    if (savedMode != null && GameModes.all.contains(savedMode)) {
+      _selectedMode = savedMode;
+    }
+    _selectedGridSize = AppConstants.clampGridSizeForMode(
+      _selectedMode,
+      ref.read(userProgressProvider).lastSelectedGridSize,
+    );
     _idleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1800),
@@ -51,42 +63,88 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final progress = ref.watch(userProgressProvider);
     final sessions = ref.watch(sessionsProvider);
     final parentSettings = ref.watch(parentProvider);
-    final isPremium = ref.watch(isPremiumProvider).value ?? false;
-    final isFixedMode = parentSettings.gridSizeMode == 'fixed';
-    final effectiveGridSize =
-        isFixedMode ? parentSettings.fixedGridSize : _selectedGridSize;
+    final isFixedMode =
+        parentSettings.gridSizeMode == AppConstants.gridSizeModeFixed;
+    // A parent-fixed size may not exist in the chosen mode (letters stops at
+    // 5x5, Gorbov starts at 5x5), so it is clamped like a picked size.
+    final effectiveGridSize = AppConstants.clampGridSizeForMode(
+      _selectedMode,
+      isFixedMode ? parentSettings.fixedGridSize : _selectedGridSize,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              _buildTopBar(progress, l10n),
-              const Spacer(flex: 1),
-              _buildCharacterPlaceholder(),
-              const SizedBox(height: 8),
-              Text(
-                l10n.levelLabel(progress.level),
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+        // Scrolls only when the screen is too short (iPhone SE, large text).
+        // Otherwise the min-height box plus spaceBetween spreads the three
+        // groups over the screen, as the Spacers used to.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: _buildTopBar(progress, l10n),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        children: [
+                          _buildCharacterPlaceholder(),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.levelLabel(progress.level),
+                            style: const TextStyle(
+                              fontFamily: 'Nunito',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _DailyGoalBar(
+                            playedSeconds: ref.watch(todayPlaySecondsProvider),
+                            goalMinutes: progress.dailyGoalMinutes,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        _buildModeToggle(l10n),
+                        Text(
+                          _modeHint(_selectedMode, l10n),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildGridSizePicker(
+                          l10n,
+                          isFixedMode,
+                          effectiveGridSize,
+                        ),
+                        if (!isFixedMode)
+                          _buildSuggestion(l10n, sessions, effectiveGridSize),
+                        const SizedBox(height: 24),
+                        _buildPlayButton(l10n, effectiveGridSize),
+                        const SizedBox(height: 16),
+                        _buildLastResult(sessions, l10n),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(flex: 1),
-              _buildModeToggle(isPremium, l10n),
-              const SizedBox(height: 16),
-              _buildGridSizePicker(l10n, isFixedMode, effectiveGridSize, isPremium),
-              const SizedBox(height: 24),
-              _buildPlayButton(l10n, effectiveGridSize, isPremium),
-              const SizedBox(height: 16),
-              _buildLastResult(sessions, l10n),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
         ),
       ),
@@ -102,9 +160,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       children: [
         _CoinsDisplay(coins: progress.coins),
         const Spacer(),
-        _StreakDisplay(
-          streak: progress.currentStreak,
-          label: l10n.streakDays(progress.currentStreak),
+        Flexible(
+          child: _StreakDisplay(
+            streak: progress.currentStreak,
+            label: l10n.streakDays(progress.currentStreak),
+          ),
         ),
         const SizedBox(width: 8),
         GestureDetector(
@@ -161,126 +221,99 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: characterAvatar(progress.activeCharacterId, size: 120),
+          child: DressedAvatar(
+            characterId: progress.activeCharacterId,
+            size: 112,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildModeToggle(bool isPremium, AppLocalizations l10n) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40),
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
+  static const _modes = GameModes.all;
+
+  String _modeLabel(String mode, AppLocalizations l10n) =>
+      gameModeLabel(l10n, mode);
+
+  String _modeHint(String mode, AppLocalizations l10n) =>
+      gameModeHint(l10n, mode);
+
+  /// Four modes no longer fit a two-segment toggle at these font sizes, so the
+  /// selector is a 2x2 grid of chips.
+  Widget _buildModeToggle(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
         children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedMode = 'classic'),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: _selectedMode == 'classic'
-                      ? AppColors.primaryGradient
-                      : null,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    l10n.gameModeClassic,
-                    style: TextStyle(
-                      fontFamily: 'Nunito',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: _selectedMode == 'classic'
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (!isPremium) {
-                  showPremiumBottomSheet(
-                    context,
-                    feature: l10n.gorbovModeBadge,
-                    benefit: l10n.paywallBenefit5,
-                  );
-                  return;
-                }
-                setState(() {
-                  _selectedMode = 'gorbov';
-                  if (_selectedGridSize < 5) _selectedGridSize = 5;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: _selectedMode == 'gorbov'
-                      ? const LinearGradient(
-                          colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
-                      : null,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Center(
-                      child: Text(
-                        l10n.gameModeGorbov,
-                        style: TextStyle(
-                          fontFamily: 'Nunito',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: _selectedMode == 'gorbov'
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    if (!isPremium)
-                      Positioned(
-                        top: -6,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: AppColors.accent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'PRO',
-                            style: TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.background,
-                            ),
-                          ),
-                        ),
-                      ),
+          for (int i = 0; i < _modes.length; i += 2)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  for (int j = i; j < i + 2 && j < _modes.length; j++) ...[
+                    if (j > i) const SizedBox(width: 8),
+                    Expanded(child: _modeChip(_modes[j], l10n)),
                   ],
-                ),
+                ],
               ),
             ),
-          ),
         ],
       ),
     );
   }
 
+  Widget _modeChip(String mode, AppLocalizations l10n) {
+    final isSelected = _selectedMode == mode;
+    return GestureDetector(
+      onTap: () => _onModeTap(mode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? null : AppColors.surface,
+          gradient: isSelected
+              ? (mode == GameModes.gorbov
+                    ? const LinearGradient(
+                        colors: [Color(0xFFE17055), Color(0xFFFDCB6E)],
+                      )
+                    : AppColors.primaryGradient)
+              : null,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            _modeLabel(mode, l10n),
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: isSelected
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onModeTap(String mode) {
+    setState(() {
+      _selectedMode = mode;
+      // A size valid in the previous mode may not exist in the new one.
+      _selectedGridSize = AppConstants.clampGridSizeForMode(
+        mode,
+        _selectedGridSize,
+      );
+    });
+    Hive.box(AppConstants.userBox).put(AppConstants.lastSelectedModeKey, mode);
+  }
+
   Widget _buildGridSizePicker(
-      AppLocalizations l10n, bool isFixedMode, int effectiveGridSize, bool isPremium) {
+    AppLocalizations l10n,
+    bool isFixedMode,
+    int effectiveGridSize,
+  ) {
     if (isFixedMode) {
       return Column(
         children: [
@@ -296,7 +329,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           _GridSizeChip(
             size: effectiveGridSize,
             isSelected: true,
-            isLocked: false,
             onTap: () {},
           ),
         ],
@@ -316,20 +348,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: (_selectedMode == 'gorbov'
-                ? AppConstants.gorbovGridSizes
-                : AppConstants.pickerGridSizes)
-            .map((size) {
-            final isLocked =
-                !isPremium && AppConstants.premiumGridSizes.contains(size);
+          children: AppConstants.gridSizesForMode(_selectedMode).map((size) {
             final isSelected = _selectedGridSize == size;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: _GridSizeChip(
                 size: size,
                 isSelected: isSelected,
-                isLocked: isLocked,
-                onTap: () => _onGridSizeTap(size, isLocked, l10n),
+                onTap: () => _onGridSizeTap(size),
               ),
             );
           }).toList(),
@@ -338,20 +364,64 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  void _onGridSizeTap(int size, bool isLocked, AppLocalizations l10n) {
-    if (isLocked) {
-      showPremiumBottomSheet(
-        context,
-        feature: '$size×$size',
-        benefit: l10n.onboardingPaywallBenefit1,
-      );
-      return;
-    }
+  /// Adaptive difficulty: once recent games at this size meet the target,
+  /// offer the next size. Only in the parent's "auto" mode.
+  Widget _buildSuggestion(
+    AppLocalizations l10n,
+    List<GameSession> sessions,
+    int currentSize,
+  ) {
+    final next = suggestNextGridSize(
+      mode: _selectedMode,
+      currentSize: currentSize,
+      sessions: sessions,
+    );
+    if (next == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: GestureDetector(
+        key: const Key('adaptiveSuggestion'),
+        onTap: () => _onGridSizeTap(next),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.success.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.trending_up_rounded,
+                size: 18,
+                color: AppColors.success,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  l10n.homeSuggestNextSize(next),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.success,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onGridSizeTap(int size) {
     setState(() => _selectedGridSize = size);
     ref.read(userProgressProvider.notifier).setSelectedGridSize(size);
   }
 
-  Widget _buildPlayButton(AppLocalizations l10n, int effectiveGridSize, bool isPremium) {
+  Widget _buildPlayButton(AppLocalizations l10n, int effectiveGridSize) {
     return SizedBox(
       width: double.infinity,
       height: 64,
@@ -365,14 +435,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: () {
-              if (!isPremium && AppConstants.premiumGridSizes.contains(effectiveGridSize)) {
-                showPremiumBottomSheet(
-                  context,
-                  feature: '$effectiveGridSize×$effectiveGridSize',
-                  benefit: l10n.onboardingPaywallBenefit1,
-                );
-                return;
-              }
               context.go('/game?size=$effectiveGridSize&mode=$_selectedMode');
             },
             child: Center(
@@ -392,7 +454,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildLastResult(List sessions, AppLocalizations l10n) {
+  Widget _buildLastResult(List<GameSession> sessions, AppLocalizations l10n) {
     if (sessions.isEmpty) {
       return Text(
         l10n.noSessionsYet,
@@ -405,11 +467,61 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
     final last = sessions.first;
     return Text(
-      l10n.lastResult(last.gridSize, last.durationSeconds),
+      '${_modeLabel(last.mode, l10n)} · '
+      '${l10n.lastResult(last.gridSize, last.durationSeconds)}',
       style: const TextStyle(
         fontFamily: 'Nunito',
         fontSize: 14,
         color: AppColors.textSecondary,
+      ),
+    );
+  }
+}
+
+/// Today's play time against the daily goal (set in onboarding, editable by
+/// the parent).
+class _DailyGoalBar extends StatelessWidget {
+  final int playedSeconds;
+  final int goalMinutes;
+  const _DailyGoalBar({required this.playedSeconds, required this.goalMinutes});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final goalSeconds = goalMinutes * 60;
+    final progress = goalSeconds == 0
+        ? 1.0
+        : (playedSeconds / goalSeconds).clamp(0.0, 1.0);
+    final done = progress >= 1.0;
+    return SizedBox(
+      width: 220,
+      child: Column(
+        children: [
+          Text(
+            done
+                ? l10n.homeDailyGoalDone
+                : l10n.homeDailyGoal(playedSeconds ~/ 60, goalMinutes),
+            key: const Key('dailyGoalLabel'),
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: done ? AppColors.success : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: AppColors.surface,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                done ? AppColors.success : AppColors.primary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -473,13 +585,17 @@ class _StreakDisplay extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Nunito',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: streak > 0 ? Colors.orange : AppColors.textSecondary,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: streak > 0 ? Colors.orange : AppColors.textSecondary,
+              ),
             ),
           ),
         ],
@@ -491,13 +607,11 @@ class _StreakDisplay extends StatelessWidget {
 class _GridSizeChip extends StatelessWidget {
   final int size;
   final bool isSelected;
-  final bool isLocked;
   final VoidCallback onTap;
 
   const _GridSizeChip({
     required this.size,
     required this.isSelected,
-    required this.isLocked,
     required this.onTap,
   });
 
@@ -510,11 +624,7 @@ class _GridSizeChip extends StatelessWidget {
         width: 48,
         height: 48,
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : isLocked
-                  ? AppColors.surface.withValues(alpha: 0.5)
-                  : AppColors.surface,
+          color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.transparent,
@@ -522,37 +632,17 @@ class _GridSizeChip extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: isLocked
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      '$size×$size',
-                      style: const TextStyle(
-                        fontFamily: 'Nunito',
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    const Icon(
-                      Icons.lock_rounded,
-                      size: 12,
-                      color: AppColors.textSecondary,
-                    ),
-                  ],
-                )
-              : Text(
-                  '$size×$size',
-                  style: TextStyle(
-                    fontFamily: 'Nunito',
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected
-                        ? AppColors.textPrimary
-                        : AppColors.textSecondary,
-                  ),
-                ),
+          child: Text(
+            '$size×$size',
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: isSelected
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
+            ),
+          ),
         ),
       ),
     );

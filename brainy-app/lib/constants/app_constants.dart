@@ -1,11 +1,9 @@
+import 'game_modes.dart';
+
 class AppConstants {
   AppConstants._();
 
-  static const String appName = 'Brainy';
-
   // Grid sizes
-  static const List<int> freeGridSizes = [3, 4, 5];
-  static const List<int> premiumGridSizes = [6, 7, 9];
   static const List<int> allGridSizes = [3, 4, 5, 6, 7, 9];
 
   // Target times (seconds) for adaptive difficulty
@@ -27,6 +25,24 @@ class AppConstants {
     7: [45, 75],
     9: [80, 130],
   };
+
+  /// Letters mode is materially slower than digits — recognising a letter is a
+  /// different lookup, and children read digits faster. Reusing the digit
+  /// thresholds would put three stars out of reach. Deliberately loose; tighten
+  /// once real play data exists.
+  static const Map<int, List<int>> starThresholdsLetters = {
+    3: [12, 22],
+    4: [21, 38],
+    5: [33, 57],
+  };
+
+  /// Star thresholds for [mode] at [gridSize], or null if unrated.
+  /// Reverse is the same visual search as classic with a different traversal,
+  /// so it reuses the classic thresholds.
+  static List<int>? starThresholdsFor(String mode, int gridSize) =>
+      mode == GameModes.letters
+          ? starThresholdsLetters[gridSize]
+          : starThresholds[gridSize];
 
   // Penalty
   static const int mistakePenaltySeconds = 2;
@@ -61,17 +77,34 @@ class AppConstants {
     20: 6000,
   };
 
-  // Streak
+  // Adaptive difficulty: suggest the next size once the average of the last
+  // [sessionsForAdaptive] games at the current size and mode meets the target.
   static const int sessionsForAdaptive = 5;
+
+  /// Target time for adaptive difficulty. Letters and Gorbov are slower
+  /// searches than digits (recognising a letter; alternating two sequences),
+  /// so their targets are deliberately loose multiples of the digit target.
+  static int? adaptiveTargetSeconds(String mode, int gridSize) {
+    final base = targetTimes[gridSize];
+    if (base == null) return null;
+    return switch (mode) {
+      GameModes.letters => (base * 3) ~/ 2,
+      GameModes.gorbov => base * 2,
+      _ => base,
+    };
+  }
 
   // Parent PIN
   static const int parentPinLength = 4;
   static const int parentMaxPinAttempts = 3;
   static const int parentLockoutSeconds = 30;
   static const String parentPinHashKey = 'parentPinHash';
+  static const String parentPinFailedAttemptsKey = 'parentPinFailedAttempts';
+  static const String parentPinLockedUntilKey = 'parentPinLockedUntil';
   static const String parentGridSizeModeKey = 'parentGridSizeMode';
   static const String parentFixedGridSizeKey = 'parentFixedGridSize';
-  static const String parentMaxSessionTimeKey = 'parentMaxSessionTime';
+  static const String gridSizeModeAuto = 'auto';
+  static const String gridSizeModeFixed = 'fixed';
   static const String notificationsEnabledKey = 'notificationsEnabled';
 
   // Onboarding Hive keys
@@ -90,37 +123,7 @@ class AppConstants {
   ];
   static const List<int> frequencyOptions = [5, 10, 15];
   static const int recommendedFrequencyMinutes = 10;
-  static const int onboardingPageCount = 7;
-
-  // RevenueCat (commented out — using YooKassa for Russian market)
-  // static const String revenueCatApiKey = String.fromEnvironment(
-  //   'REVENUECAT_API_KEY',
-  //   defaultValue: 'appl_UoxUlnvJRWlCsjkQJkJIeoYxxJZ',
-  // );
-  // static const String revenueCatEntitlement = 'brainy_pro';
-  // static const String revenueCatOfferingId = 'default';
-  // static const String productIdMonthly = 'brainy_pro_monthly';
-  // static const String productIdYearly = 'brainy_pro_yearly';
-  // static const String productIdFamily = 'brainy_pro_family';
-
-  // YooKassa
-  static const String yookassaClientKey = String.fromEnvironment(
-    'YOOKASSA_CLIENT_KEY',
-    defaultValue: 'test_...',
-  );
-  static const String yookassaShopId = String.fromEnvironment(
-    'YOOKASSA_SHOP_ID',
-    defaultValue: '...',
-  );
-
-  // Subscription plans (RUB)
-  static const double monthlyPriceRub = 299.0;
-  static const double yearlyPriceRub = 1990.0;
-
-  // Hive keys for subscription cache
-  static const String subscriptionStatusKey = 'subscriptionStatus';
-  static const String subscriptionExpiresAtKey = 'subscriptionExpiresAt';
-  static const String subscriptionPlanKey = 'subscriptionPlan';
+  static const int onboardingPageCount = 6;
 
   // Hive box names
   static const String sessionsBox = 'sessions';
@@ -129,6 +132,9 @@ class AppConstants {
   static const String characterBox = 'character';
   static const String progressBox = 'progress';
   static const String progressDataKey = 'data';
+
+  // Last mode picked on the home screen
+  static const String lastSelectedModeKey = 'lastSelectedMode';
 
   // Custom player name
   static const String customPlayerNameKey = 'customPlayerName';
@@ -144,21 +150,66 @@ class AppConstants {
   static const int defaultReminderHour = 20;
   static const int defaultReminderMinute = 0;
 
+  /// Above this streak a reminder warns the streak is at risk instead of
+  /// motivating a fresh start.
+  static const int streakWarningThreshold = 2;
+
+  /// Reminders are scheduled as one-off notifications this many days ahead,
+  /// so they keep coming when the app is not opened, and today can be skipped
+  /// once the child has played.
+  static const int reminderDaysAhead = 7;
+
   // Grid sizes for home screen picker
   static const List<int> pickerGridSizes = [3, 4, 5, 6, 7, 9];
 
   // Grid sizes available in Gorbov-Schulte mode (5x5 and above)
   static const List<int> gorbovGridSizes = [5, 6, 7, 9];
 
-  // Premium waitlist (coming soon)
-  static const String premiumWaitlistUrl = 'https://t.me/+O7pPZ6DJ3Vo4MDJi';
+  // Letters mode: bounded by the SHORTEST supported alphabet, not the active
+  // one, so the sizes on offer do not change when the user switches language.
+  // Latin has 26 usable letters, so 5x5 (25 cells) is the ceiling.
+  static const List<int> lettersGridSizes = [3, 4, 5];
 
-  // Legal URLs
-  static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
-  static const String privacyPolicyUrlRu =
-      '$legalBaseUrl/privacy-policy-ru.html';
-  static const String privacyPolicyUrlEn =
-      '$legalBaseUrl/privacy-policy-en.html';
-  static const String termsUrlRu = '$legalBaseUrl/terms-ru.html';
-  static const String termsUrlEn = '$legalBaseUrl/terms-en.html';
+  static const List<int> reverseGridSizes = allGridSizes;
+
+  /// Russian alphabet without «Ё» and «Й»: at grid cell sizes they differ from
+  /// «Е» and «И» by a few pixels, which would make a mistap a matter of
+  /// eyesight rather than sequencing.
+  static const List<String> alphabetRu = [
+    'А','Б','В','Г','Д','Е','Ж','З','И','К','Л','М','Н','О','П','Р',
+    'С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я',
+  ];
+
+  static const List<String> alphabetEn = [
+    'A','B','C','D','E','F','G','H','I','J','K','L','M',
+    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
+  ];
+
+  /// Supported UI languages. The first is the fallback for any other device
+  /// language — English is the widest-understood choice.
+  static const List<String> supportedLanguages = ['en', 'ru'];
+
+  /// Map a device language to a supported one ('ru' or 'en').
+  static String resolveLanguage(String? languageCode) =>
+      supportedLanguages.contains(languageCode)
+          ? languageCode!
+          : supportedLanguages.first;
+
+  static List<String> alphabetFor(String locale) =>
+      locale == 'ru' ? alphabetRu : alphabetEn;
+
+  /// Grid sizes available in a given mode.
+  static List<int> gridSizesForMode(String mode) => switch (mode) {
+        GameModes.gorbov => gorbovGridSizes,
+        GameModes.letters => lettersGridSizes,
+        GameModes.reverse => reverseGridSizes,
+        _ => pickerGridSizes,
+      };
+
+  /// Clamp [size] into the range [mode] allows, picking the nearest option.
+  static int clampGridSizeForMode(String mode, int size) {
+    final sizes = gridSizesForMode(mode);
+    if (sizes.contains(size)) return size;
+    return sizes.reduce((a, b) => (a - size).abs() <= (b - size).abs() ? a : b);
+  }
 }

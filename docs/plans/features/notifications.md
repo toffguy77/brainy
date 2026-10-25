@@ -11,23 +11,41 @@ tags: [notifications, reminders, schedule, permissions]
 
 ## Логика пересчёта
 
-Единый метод `NotificationService.reschedule()` вызывается:
+Единая точка входа `NotificationService.rescheduleFromStorage()` сама читает настройки, стрик и
+сегодняшние сессии из Hive и язык устройства. Вызывается:
 1. При старте приложения (`main.dart`)
-2. После завершения игры (`game_screen.dart`)
-3. При изменении настроек уведомлений (`parent_provider.dart`)
+2. После завершения игры (`SessionCompleter` в `session_completion_provider.dart`)
+3. После онбординга, если разрешение получено (`onboarding_provider.dart`)
+4. При изменении настроек уведомлений (`parent_provider.dart`)
 
-Алгоритм:
-1. `notificationsEnabled` выключены -> `cancel()`, выход
-2. Ребёнок уже играл сегодня (`hasPlayedToday`) -> `cancel()`, выход
-3. Не играл сегодня -> планируем уведомление
+Решение принимает чистая функция `NotificationService.planReminders(...)` (покрыта тестами) и
+возвращает разовые напоминания (`ReminderSlot`) на `AppConstants.reminderDaysAhead` (7) дней вперёд
+в одно и то же время:
+1. `notificationsEnabled` выключены -> пустой список
+2. Сегодняшний слот пропускается, если ребёнок уже играл (`hasPlayedOn(sessions, now)`) или время
+   уже прошло — напоминания продолжаются с завтрашнего дня
+3. «Стрик горит» — только у первого слота и только при `currentStreak >
+   AppConstants.streakWarningThreshold` (2); если его пропустить, стрик всё равно сгорит, поэтому
+   дальше идёт пул «мотивация»
+4. Вариант текста — по дате слота (`variantIndexFor`), у каждого дня свой
 
-Параметры:
-- Время: `customReminderTime` если задано, иначе 20:00 (`AppConstants.defaultReminderHour/Minute`)
-- Текст: если `currentStreak > 2` -> из пула «стрик горит», иначе -> из пула «мотивация»
+Время: кастомное, если `hasCustomReminderTime`, иначе `AppConstants.defaultReminderHour/Minute` (20:00).
+
+Перед планированием отменяются все id `100..106` (id = 100 + смещение дня). Разовые уведомления,
+а не одно повторяющееся: так напоминания приходят, даже если приложение не открывали несколько
+дней, сегодняшнее можно пропустить после игры, а число дней стрика не «застывает» в тексте.
+
+## Часовой пояс и язык
+
+- При инициализации `flutter_timezone` задаёт `tz.local` по поясу устройства — иначе `timezone`
+  остаётся в UTC и напоминание на 20:00 срабатывало бы в 20:00 UTC.
+- Язык текста — язык устройства через `AppConstants.resolveLanguage`: `ru` -> русский, любой
+  другой -> английский (то же правило, что `localeResolutionCallback` в `main.dart`).
+- Заголовок — `l10n.appName`.
 
 ## Текст уведомлений
 
-Один notification ID: `_notificationId = 100`.
+ID: `100 + день` (0..6), см. «Логика пересчёта».
 
 ### Мотивация (стрик <= 2, 7 вариантов)
 
@@ -39,7 +57,8 @@ EN: «Time to train your brain!», «Brainy is waiting for you!», «Zap is call
 RU: «Стрик {N} дней сгорит сегодня!», «Не потеряй свой стрик {N} дней!» и др.
 EN: «Your {N}-day streak expires today!», «Don't lose your {N}-day streak!» и др.
 
-Выбор варианта: `dayOfYear % count` (детерминированный, меняется каждый день).
+Выбор варианта: число дней с 2024-01-01 по UTC-датам `% 7` (`variantIndexFor`) — детерминированно,
+меняется каждый день, не сбивается переходом на летнее время.
 
 ## Настройки (Hive)
 
@@ -60,12 +79,16 @@ EN: «Your {N}-day streak expires today!», «Don't lose your {N}-day streak!» 
 
 ## Разрешения
 
-Запрос разрешения через `permission_handler` на последней странице онбординга (страница 7, notifications). При получении разрешения `notificationsEnabled = true` и вызывается `reschedule` с дефолтными параметрами.
+- Онбординг: запрос через `permission_handler` в `completeOnboarding()` (последняя страница). При
+  согласии `notificationsEnabled = true` и вызывается `rescheduleFromStorage()`.
+- Родительские настройки: включение тоггла сначала запрашивает разрешение. При отказе настройка
+  остаётся выключенной и показывается подсказка открыть настройки iOS — тоггл не обещает того,
+  чего iOS не доставит.
 
-## Приоритет уведомлений
+## Приоритет уведомлений (iOS)
 
-- Стрик-предупреждения: `Importance.high`, `Priority.high`
-- Мотивационные: `Importance.defaultImportance`, `Priority.defaultPriority`
+- Стрик-предупреждения: `InterruptionLevel.timeSensitive`
+- Мотивационные: `InterruptionLevel.active`
 
 ## Ключевые файлы
 

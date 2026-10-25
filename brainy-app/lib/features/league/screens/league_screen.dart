@@ -104,12 +104,66 @@ class LeagueScreen extends ConsumerWidget {
 
 void _showEditNameDialog(
     BuildContext context, WidgetRef ref, AppLocalizations l10n) {
-  final currentName = ref.read(playerNameProvider);
-  final controller = TextEditingController(text: currentName ?? '');
-
-  showDialog(
+  showDialog<void>(
     context: context,
-    builder: (ctx) => AlertDialog(
+    builder: (ctx) => _EditNameDialog(ref: ref, l10n: l10n),
+  );
+}
+
+/// Stateful so the dialog itself owns the [TextEditingController] and disposes
+/// it in [dispose] — after the exit transition has finished. Disposing it from
+/// `showDialog(...).whenComplete` instead throws "used after being disposed",
+/// because the TextField still rebuilds while the route animates out.
+class _EditNameDialog extends StatefulWidget {
+  final WidgetRef ref;
+  final AppLocalizations l10n;
+
+  const _EditNameDialog({required this.ref, required this.l10n});
+
+  @override
+  State<_EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<_EditNameDialog> {
+  late final TextEditingController _controller;
+  bool _saving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final currentName = widget.ref.read(playerNameProvider);
+    _controller = TextEditingController(text: currentName ?? '');
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    // A second tap during the write would pop the route under the dialog.
+    if (_saving) return;
+    _saving = true;
+    final newName = _controller.text.trim();
+    final navigator = Navigator.of(context);
+    // Read the notifier before the await: the screen owning the ref may be
+    // gone by the time the write completes.
+    final playerName = widget.ref.read(playerNameProvider.notifier);
+    if (newName.isNotEmpty) {
+      HapticFeedback.lightImpact();
+      final box = Hive.box(AppConstants.userBox);
+      // Await the write: firing it off unawaited races the next read.
+      await box.put(AppConstants.customPlayerNameKey, newName);
+      playerName.state = newName;
+    }
+    if (mounted) navigator.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = widget.l10n;
+    return AlertDialog(
       backgroundColor: AppColors.surface,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Text(
@@ -121,8 +175,11 @@ void _showEditNameDialog(
         ),
       ),
       content: TextField(
-        controller: controller,
-        autofocus: true,
+        controller: _controller,
+        // No autofocus. It was removed while chasing a widget-test deadlock;
+        // the deadlock turned out unrelated (fixed by splitting the dialog
+        // tests into separate files — see test-suite-stabilization), so this
+        // is a UX choice only: the user tapped deliberately to get here.
         maxLength: 20,
         style: const TextStyle(
           fontFamily: 'Nunito',
@@ -145,7 +202,7 @@ void _showEditNameDialog(
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(ctx),
+          onPressed: () => Navigator.pop(context),
           child: Text(
             l10n.leagueEditNameCancel,
             style: const TextStyle(
@@ -155,16 +212,7 @@ void _showEditNameDialog(
           ),
         ),
         TextButton(
-          onPressed: () {
-            final newName = controller.text.trim();
-            if (newName.isNotEmpty) {
-              HapticFeedback.lightImpact();
-              final box = Hive.box(AppConstants.userBox);
-              box.put(AppConstants.customPlayerNameKey, newName);
-              ref.read(playerNameProvider.notifier).state = newName;
-            }
-            Navigator.pop(ctx);
-          },
+          onPressed: _save,
           child: Text(
             l10n.leagueEditNameSave,
             style: const TextStyle(
@@ -175,8 +223,8 @@ void _showEditNameDialog(
           ),
         ),
       ],
-    ),
-  );
+    );
+  }
 }
 
 class _ConnectCard extends StatelessWidget {

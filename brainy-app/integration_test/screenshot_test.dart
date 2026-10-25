@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:purchases_flutter/purchases_flutter.dart';
 
 import 'package:brainy/constants/app_constants.dart';
 import 'package:brainy/features/game/widgets/schulte_grid.dart';
@@ -18,7 +17,6 @@ import 'package:brainy/models/character.dart';
 import 'package:brainy/models/achievement.dart';
 import 'package:brainy/features/character/data/characters_data.dart';
 import 'package:brainy/features/parent/providers/parent_provider.dart';
-import 'package:brainy/shared/services/subscription_service.dart';
 import 'package:brainy/features/home/screens/home_screen.dart';
 import 'package:brainy/features/game/screens/game_screen.dart';
 import 'package:brainy/features/game/screens/result_screen.dart';
@@ -29,7 +27,6 @@ import 'package:brainy/features/parent/screens/parent_pin_screen.dart';
 import 'package:brainy/features/parent/screens/parent_settings_screen.dart';
 import 'package:brainy/features/onboarding/screens/onboarding_screen.dart';
 import 'package:brainy/features/league/screens/league_screen.dart';
-import 'package:brainy/features/subscription/screens/paywall_screen.dart';
 import 'package:brainy/features/character/screens/accessories_screen.dart';
 import 'package:brainy/features/progress/screens/grid_detail_screen.dart';
 import 'package:brainy/app/main_shell.dart';
@@ -64,7 +61,7 @@ Future<void> _takeScreenshot(
   await binding.takeScreenshot('raw/$_deviceName/$_locale/$name');
 }
 
-/// Create a test GoRouter without FirebaseAnalyticsObserver
+/// Create a test GoRouter mirroring the app routes, without redirects
 GoRouter _createTestRouter() {
   return GoRouter(
     initialLocation: '/home',
@@ -152,10 +149,6 @@ GoRouter _createTestRouter() {
         path: '/parent/settings',
         builder: (context, state) => const ParentSettingsScreen(),
       ),
-      GoRoute(
-        path: '/paywall',
-        builder: (context, state) => const PaywallScreen(),
-      ),
     ],
   );
 }
@@ -214,8 +207,8 @@ Future<void> _seedMockData() async {
   for (final info in defaultCharacters) {
     final data = CharacterData(
       id: info.id,
-      nameRu: info.nameRu,
-      nameEn: info.nameEn,
+      nameRu: info.id,
+      nameEn: info.id,
       isUnlocked: info.id == 'brainy' || info.id == 'zap',
     );
     await characterBox.put(info.id, data);
@@ -234,12 +227,6 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    // Init RevenueCat so native SDK doesn't crash when CharacterScreen
-    // calls SubscriptionService.isPremium() in initState.
-    await Purchases.configure(
-      PurchasesConfiguration(AppConstants.revenueCatApiKey),
-    );
-
     // Init Hive for testing
     await Hive.initFlutter();
     Hive.registerAdapter(GameSessionAdapter());
@@ -271,10 +258,6 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          // Override isPremiumProvider to avoid RevenueCat crash in tests
-          isPremiumProvider.overrideWith((ref) async => false),
-        ],
         child: MaterialApp.router(
           title: 'Brainy',
           debugShowCheckedModeBanner: false,

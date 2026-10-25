@@ -21,12 +21,25 @@ build/
 # Superpowers brainstorming sessions
 .superpowers/
 
-# Firebase Cloud Functions
-functions/node_modules/
-functions/lib/
+# Signing secrets and credentials — never commit
+secrets/
+.secrets/
+*.p12
+*.p8
+*.mobileprovision
+*.cer
+*.keystore
+*.jks
+
+# Fastlane build artifacts
+brainy-app/ios/fastlane/README.md
+brainy-app/ios/fastlane/report.xml
 
 # Miscellaneous
 *.log
 *.tmp
 *.bak
 .playwright-mcp/
+
+# App Review evidence of the removed paywall — kept locally, not versioned
+brainy-app/screenshots/review_*.png

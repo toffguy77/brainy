@@ -2,23 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/game_provider.dart';
-import '../providers/records_provider.dart';
-import '../providers/sessions_provider.dart';
+import '../providers/session_completion_provider.dart';
 import '../providers/user_progress_provider.dart';
-import '../../progress/providers/achievements_provider.dart';
 import '../widgets/schulte_grid.dart';
 import '../widgets/game_header.dart';
 import '../widgets/countdown_overlay.dart';
 import '../../../models/game_state.dart';
 import '../../../constants/app_colors.dart';
-import '../../../constants/app_constants.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/services/haptic_service.dart';
-import '../../../shared/services/notification_service.dart';
-import '../../league/providers/game_services_provider.dart';
-import '../../league/providers/league_provider.dart';
-import '../../parent/providers/parent_provider.dart';
 import '../../../shared/services/sound_service.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
+import '../../../constants/game_modes.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final int gridSize;
@@ -27,34 +21,48 @@ class GameScreen extends ConsumerStatefulWidget {
   const GameScreen({
     super.key,
     this.gridSize = 5,
-    this.mode = 'classic',
+    this.mode = GameModes.classic,
   });
 
   @override
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen>
+    with WidgetsBindingObserver {
   bool _finished = false;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Guard: premium grid sizes require subscription
-      if (AppConstants.premiumGridSizes.contains(widget.gridSize)) {
-        final hasPremium = await ref.read(isPremiumProvider.future);
-        if (!hasPremium && mounted) {
-          context.go('/paywall');
-          return;
-        }
-      }
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gameProvider.notifier).initGame(
             gridSize: widget.gridSize,
             mode: widget.mode,
+            locale: Localizations.localeOf(context).languageCode,
           );
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// iOS suspends timers in the background, which would undercount the time
+  /// and allow a free look at the grid. Leaving the app pauses the game; the
+  /// player resumes with the pause button.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      if (ref.read(gameProvider).status == GameStatus.playing) {
+        ref.read(gameProvider.notifier).togglePause();
+      }
+    }
   }
 
   @override
@@ -84,20 +92,59 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildProgressBar(gameState),
+                _buildProgressBar(context, gameState),
                 const SizedBox(height: 24),
               ],
             ),
             if (gameState.status == GameStatus.countdown)
               CountdownOverlay(value: gameState.countdownValue ?? 3),
+            // The grid stays hidden while paused, so a pause cannot be used
+            // to study it with the clock stopped.
+            if (gameState.status == GameStatus.paused)
+              Positioned.fill(
+                child: GestureDetector(
+                  key: const Key('pauseOverlay'),
+                  onTap: () => ref.read(gameProvider.notifier).togglePause(),
+                  child: Container(
+                    color: AppColors.background,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.pause_circle_filled_rounded,
+                            size: 72, color: AppColors.primary),
+                        const SizedBox(height: 12),
+                        Text(
+                          AppLocalizations.of(context)!.gamePaused,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.gameTapToResume,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProgressBar(GameState gameState) {
-    final found = gameState.mode == 'gorbov'
+  Widget _buildProgressBar(BuildContext context, GameState gameState) {
+    final found = gameState.mode == GameModes.gorbov
         ? (gameState.nextWhiteNumber - 1) + (gameState.redCount - gameState.nextRedNumber)
         : gameState.nextNumber - 1;
     final total = gameState.totalNumbers;
@@ -111,7 +158,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Найдено: $found / $total',
+                AppLocalizations.of(context)!.gameFoundProgress(found, total),
                 style: const TextStyle(
                   color: AppColors.textSecondary,
                   fontSize: 13,
@@ -143,82 +190,29 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   Future<void> _handleGameFinished(GameState gameState) async {
-    // Sound & haptic for game completion
     HapticService.gameComplete();
-    if (gameState.mistakesCount == 0) {
-      SoundService.play(SoundEffect.gameComplete);
-    }
+    final outcome =
+        await ref.read(sessionCompleterProvider).complete(gameState);
 
-    final records = ref.read(recordsProvider.notifier);
-    final isRecord = records.isPersonalRecord(
-      gameState.gridSize,
-      gameState.totalSeconds,
-      mode: gameState.mode,
-    );
-
-    if (isRecord) {
-      records.saveRecord(gameState.gridSize, gameState.totalSeconds, mode: gameState.mode);
+    if (outcome.isRecord) {
       HapticService.recordBroken();
       SoundService.play(SoundEffect.recordBroken);
     } else {
       SoundService.play(SoundEffect.gameComplete);
     }
-
-    final session = ref
-        .read(gameProvider.notifier)
-        .buildSession(isPersonalRecord: isRecord);
-
-    ref.read(sessionsProvider.notifier).saveSession(session);
-
-    final progress = ref.read(userProgressProvider.notifier);
-    final levelBefore = ref.read(userProgressProvider).level;
-    await progress.updateStreak();
-    await progress.addCoins(session.coinsEarned);
     SoundService.play(SoundEffect.coins);
-    await progress.addXp(session.xpEarned);
-
-    // Submit scores to Game Center / Play Games
-    final gameServices = ref.read(gameServicesProvider);
-    if (gameServices.isSignedIn) {
-      final weeklyXp = ref.read(weeklyXpProvider);
-      gameServices.submitWeeklyXp(weeklyXp);
-      if (isRecord) {
-        gameServices.submitBestTime(
-          gridSize: session.gridSize,
-          timeMs: session.durationSeconds * 1000,
-        );
-      }
-    }
-
-    final levelAfter = ref.read(userProgressProvider).level;
-    if (levelAfter > levelBefore) {
-      SoundService.play(SoundEffect.levelUp);
-    }
-
-    // Reschedule notification — hasPlayedToday=true will cancel it
-    final parentSettings = ref.read(parentProvider);
-    final progressData = ref.read(userProgressProvider);
-    NotificationService.reschedule(
-      enabled: parentSettings.notificationsEnabled,
-      hasCustomTime: parentSettings.hasCustomReminderTime,
-      hour: parentSettings.customReminderHour,
-      minute: parentSettings.customReminderMinute,
-      currentStreak: progressData.currentStreak,
-      hasPlayedToday: true,
-    );
-
-    // Check achievements
-    final newAchievements = await checkAchievements(session: session, ref: ref);
+    if (outcome.leveledUp) SoundService.play(SoundEffect.levelUp);
 
     if (!mounted) return;
     final progressAfter = ref.read(userProgressProvider);
     context.go('/result', extra: {
-      'session': session,
-      'isRecord': isRecord,
-      'xpEarned': session.xpEarned,
+      'session': outcome.session,
+      'isRecord': outcome.isRecord,
+      'xpEarned': outcome.session.xpEarned,
       'totalXp': progressAfter.xp,
       'level': progressAfter.level,
-      'newAchievements': newAchievements,
+      'newAchievements': outcome.newAchievements,
+      'unlockedCharacters': outcome.unlockedCharacters,
     });
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../constants/app_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -14,10 +15,10 @@ class GoalsPage extends ConsumerWidget {
     final state = ref.watch(onboardingProvider);
 
     final options = [
-      ('concentration', l10n.onboardingGoalConcentration, Icons.center_focus_strong_rounded),
-      ('reading', l10n.onboardingGoalReading, Icons.menu_book_rounded),
-      ('exams', l10n.onboardingGoalExams, Icons.school_rounded),
-      ('fun', l10n.onboardingGoalFun, Icons.sports_esports_rounded),
+      (AppConstants.goalOptions[0], l10n.onboardingGoalConcentration, Icons.center_focus_strong_rounded),
+      (AppConstants.goalOptions[1], l10n.onboardingGoalReading, Icons.menu_book_rounded),
+      (AppConstants.goalOptions[2], l10n.onboardingGoalExams, Icons.school_rounded),
+      (AppConstants.goalOptions[3], l10n.onboardingGoalFun, Icons.sports_esports_rounded),
     ];
 
     return Column(

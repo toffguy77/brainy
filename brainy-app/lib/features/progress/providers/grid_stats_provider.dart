@@ -6,7 +6,11 @@ import '../../../models/session.dart';
 
 enum TimePeriod { week, month, threeMonths, year, allTime }
 
+/// Which table the stats are for: a mode and a grid size.
+typedef GridStatsKey = ({String mode, int gridSize});
+
 class GridStatsState {
+  final String mode;
   final int gridSize;
   final TimePeriod period;
   final List<FlSpot> dailyBestSpots;
@@ -17,6 +21,7 @@ class GridStatsState {
   final int bestTimeAllTime;
 
   const GridStatsState({
+    required this.mode,
     required this.gridSize,
     required this.period,
     required this.dailyBestSpots,
@@ -30,14 +35,14 @@ class GridStatsState {
   bool get isEmpty => totalGames == 0;
 }
 
-class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
+class GridStatsNotifier extends FamilyNotifier<GridStatsState, GridStatsKey> {
   TimePeriod _period = TimePeriod.week;
 
   @override
-  GridStatsState build(int gridSize) {
+  GridStatsState build(GridStatsKey key) {
     final sessions = ref.watch(sessionsProvider);
     final records = ref.watch(recordsProvider);
-    return _compute(gridSize, sessions, records);
+    return _compute(key.mode, key.gridSize, sessions, records);
   }
 
   void setPeriod(TimePeriod period) {
@@ -46,15 +51,15 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
   }
 
   GridStatsState _compute(
+    String mode,
     int gridSize,
     List<GameSession> allSessions,
     Map<String, int> records,
   ) {
-    final bestTimeAllTime = records[recordKey('classic', gridSize)] ?? 0;
+    final bestTimeAllTime = records[recordKey(mode, gridSize)] ?? 0;
 
-    // Filter by gridSize and classic mode
     final gridSessions = allSessions
-        .where((s) => s.gridSize == gridSize && s.mode == 'classic')
+        .where((s) => s.gridSize == gridSize && s.mode == mode)
         .toList();
 
     // Determine period and check if week has data
@@ -74,6 +79,7 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
 
     if (filtered.isEmpty) {
       return GridStatsState(
+        mode: mode,
         gridSize: gridSize,
         period: period,
         dailyBestSpots: [],
@@ -116,6 +122,7 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
             filtered.length;
 
     return GridStatsState(
+      mode: mode,
       gridSize: gridSize,
       period: period,
       dailyBestSpots: dailyBestSpots,
@@ -144,5 +151,5 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
 }
 
 final gridStatsProvider =
-    NotifierProvider.family<GridStatsNotifier, GridStatsState, int>(
+    NotifierProvider.family<GridStatsNotifier, GridStatsState, GridStatsKey>(
         GridStatsNotifier.new);

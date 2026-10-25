@@ -8,7 +8,7 @@ class GameSession extends HiveObject {
   final int durationSeconds;
   final int mistakesCount;
   final bool isPersonalRecord;
-  final String mode; // 'classic' | 'gorbov'
+  final String mode; // one of GameModes.all
   final int coinsEarned;
 
   GameSession({
@@ -25,7 +25,7 @@ class GameSession extends HiveObject {
   int get xpEarned => gridSize * gridSize;
 
   int get stars {
-    final thresholds = AppConstants.starThresholds[gridSize];
+    final thresholds = AppConstants.starThresholdsFor(mode, gridSize);
     if (thresholds == null) return 1;
     if (durationSeconds <= thresholds[0]) return 3;
     if (durationSeconds <= thresholds[1]) return 2;

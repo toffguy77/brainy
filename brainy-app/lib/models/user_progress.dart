@@ -33,7 +33,7 @@ class UserProgress extends HiveObject {
         unlockedAchievements = unlockedAchievements ?? [];
 }
 
-// Field indices 0-11 are permanent. Future fields must start at 12+.
+// Field indices 0-12 are permanent. Future fields must start at 13+.
 class UserProgressAdapter extends TypeAdapter<UserProgress> {
   @override
   final int typeId = 1;

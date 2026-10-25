@@ -1,7 +1,28 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_timezone/flutter_timezone.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import '../../constants/app_constants.dart';
+import '../../l10n/app_localizations.dart';
+import '../../models/session.dart';
+import '../../models/user_progress.dart';
+
+/// One scheduled reminder: when it fires (device wall-clock time) and which
+/// message pool and variant it uses.
+class ReminderSlot {
+  final DateTime at;
+  final bool isStreakWarning;
+  final int variantIndex;
+
+  const ReminderSlot({
+    required this.at,
+    required this.isStreakWarning,
+    required this.variantIndex,
+  });
+}
 
 class NotificationService {
   NotificationService._();
@@ -9,67 +30,27 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
-  static const _channelId = 'brainy_reminders';
-  static const _channelName = 'Training Reminders';
-  static const _notificationId = 100;
-
-  // Motivational messages (streak <= 2 or no streak)
-  static const _motivationMessagesRu = [
-    'Время потренировать мозг!',
-    'Брейни ждёт тебя! Зайди на тренировку',
-    'Несколько минут — и мозг станет быстрее!',
-    'Зэп зовёт на тренировку!',
-    'Сегодня ещё не тренировались. Начнём?',
-    'Мозг любит тренировки. Не пропусти!',
-    'Пора размять мозг! Таблица Шульте ждёт',
-  ];
-
-  static const _motivationMessagesEn = [
-    'Time to train your brain!',
-    'Brainy is waiting for you! Start training',
-    'A few minutes and your brain gets faster!',
-    'Zap is calling you to practice!',
-    "Haven't trained today yet. Shall we start?",
-    "Your brain loves training. Don't skip it!",
-    'Time to exercise your brain! Schulte table awaits',
-  ];
-
-  // Streak warning messages (streak > 2, hasn't played today)
-  static const _streakMessagesRu = [
-    'Стрик {N} дней сгорит сегодня!',
-    'Не потеряй свой стрик {N} дней!',
-    '{N} дней подряд — не останавливайся!',
-    'Стрик в опасности! Сыграй сегодня',
-    'Осталось немного до конца дня. Сохрани стрик!',
-    'Твой стрик {N} дней на волоске!',
-    'Брейни переживает за стрик {N} дней!',
-  ];
-
-  static const _streakMessagesEn = [
-    'Your {N}-day streak expires today!',
-    "Don't lose your {N}-day streak!",
-    "{N} days in a row — don't stop now!",
-    'Streak in danger! Play today',
-    'Day is almost over. Save your streak!',
-    'Your {N}-day streak is hanging by a thread!',
-    'Brainy is worried about your {N}-day streak!',
-  ];
+  /// Reminder ids are [_firstNotificationId] + day offset.
+  static const _firstNotificationId = 100;
 
   static Future<void> initialize() async {
     tz.initializeTimeZones();
+    // Without this tz.local stays UTC and a 20:00 reminder fires at 20:00 UTC.
+    try {
+      final zone = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(zone.identifier));
+    } catch (_) {
+      // Unknown zone identifier: keep UTC rather than fail app start.
+    }
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
-    const settings = InitializationSettings(
-      android: androidSettings,
-      iOS: iosSettings,
+    await _plugin.initialize(
+      settings: const InitializationSettings(iOS: iosSettings),
     );
-    await _plugin.initialize(settings: settings);
   }
 
   static Future<bool> requestPermission() async {
@@ -77,77 +58,138 @@ class NotificationService {
     return status.isGranted;
   }
 
-  /// Single entry point for all notification scheduling.
-  /// Called on app start, after game completion, and on settings change.
-  static Future<void> reschedule({
+  /// Pure scheduling decision: one-off reminders for the next
+  /// [AppConstants.reminderDaysAhead] days at the reminder time. Today is
+  /// skipped when the child already played or the time has passed. Only the
+  /// first reminder can warn about the streak — if it is missed the streak is
+  /// gone, so later days fall back to motivation.
+  static List<ReminderSlot> planReminders({
     required bool enabled,
     required bool hasCustomTime,
     required int hour,
     required int minute,
     required int currentStreak,
     required bool hasPlayedToday,
-    String locale = 'en',
-  }) async {
-    await _plugin.cancel(id: _notificationId);
+    required DateTime now,
+  }) {
+    if (!enabled) return const [];
+    final h = hasCustomTime ? hour : AppConstants.defaultReminderHour;
+    final m = hasCustomTime ? minute : AppConstants.defaultReminderMinute;
+    final streakAtRisk = currentStreak > AppConstants.streakWarningThreshold;
 
-    if (!enabled || hasPlayedToday) return;
+    final slots = <ReminderSlot>[];
+    for (var d = 0; d < AppConstants.reminderDaysAhead; d++) {
+      final at = DateTime(now.year, now.month, now.day + d, h, m);
+      if (d == 0 && (hasPlayedToday || !at.isAfter(now))) continue;
+      slots.add(ReminderSlot(
+        at: at,
+        isStreakWarning: streakAtRisk && slots.isEmpty,
+        variantIndex: variantIndexFor(at),
+      ));
+    }
+    return slots;
+  }
 
-    final effectiveHour = hasCustomTime ? hour : 20;
-    final effectiveMinute = hasCustomTime ? minute : 0;
+  /// Whether any of [playedAt] falls on the same calendar day as [now].
+  static bool hasPlayedOn(Iterable<DateTime> playedAt, DateTime now) =>
+      playedAt.any((d) =>
+          d.year == now.year && d.month == now.month && d.day == now.day);
 
-    final isStreakWarning = currentStreak > 2;
-    final message = isStreakWarning
-        ? _pickStreakMessage(currentStreak, locale)
-        : _pickMotivationMessage(locale);
+  /// Single entry point for all notification scheduling: reads settings,
+  /// streak and today's sessions from Hive and the language from the device.
+  /// Called on app start, after a game, after onboarding and on settings change.
+  static Future<void> rescheduleFromStorage() async {
+    final box = Hive.box(AppConstants.userBox);
+    final progress = Hive.box<UserProgress>(AppConstants.progressBox)
+        .get(AppConstants.progressDataKey);
+    final sessions = Hive.box<GameSession>(AppConstants.sessionsBox);
+    final now = DateTime.now();
 
-    await _plugin.zonedSchedule(
-      id: _notificationId,
-      title: 'Brainy',
-      body: message,
-      scheduledDate: _nextInstanceOfTime(effectiveHour, effectiveMinute),
-      notificationDetails: NotificationDetails(
-        android: AndroidNotificationDetails(
-          _channelId,
-          _channelName,
-          importance:
-              isStreakWarning ? Importance.high : Importance.defaultImportance,
-          priority:
-              isStreakWarning ? Priority.high : Priority.defaultPriority,
-        ),
-        iOS: const DarwinNotificationDetails(),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
+    final streak = progress?.currentStreak ?? 0;
+    final slots = planReminders(
+      enabled: box.get(AppConstants.notificationsEnabledKey) as bool? ?? false,
+      hasCustomTime:
+          box.get(AppConstants.hasCustomReminderTimeKey) as bool? ?? false,
+      hour: box.get(AppConstants.customReminderHourKey) as int? ??
+          AppConstants.defaultReminderHour,
+      minute: box.get(AppConstants.customReminderMinuteKey) as int? ??
+          AppConstants.defaultReminderMinute,
+      currentStreak: streak,
+      hasPlayedToday: hasPlayedOn(sessions.values.map((s) => s.playedAt), now),
+      now: now,
     );
+
+    for (var d = 0; d < AppConstants.reminderDaysAhead; d++) {
+      await _plugin.cancel(id: _firstNotificationId + d);
+    }
+    if (slots.isEmpty) return;
+
+    final language = AppConstants.resolveLanguage(
+      WidgetsBinding.instance.platformDispatcher.locale.languageCode,
+    );
+    final l10n = await AppLocalizations.delegate.load(Locale(language));
+    final today = DateTime(now.year, now.month, now.day);
+
+    for (final slot in slots) {
+      final dayOffset =
+          DateTime(slot.at.year, slot.at.month, slot.at.day)
+              .difference(today)
+              .inDays;
+      await _plugin.zonedSchedule(
+        id: _firstNotificationId + dayOffset,
+        title: l10n.appName,
+        body: slot.isStreakWarning
+            ? streakVariant(l10n, slot.variantIndex, streak)
+            : motivationVariant(l10n, slot.variantIndex),
+        scheduledDate: tz.TZDateTime(tz.local, slot.at.year, slot.at.month,
+            slot.at.day, slot.at.hour, slot.at.minute),
+        notificationDetails: NotificationDetails(
+          iOS: DarwinNotificationDetails(
+            interruptionLevel: slot.isStreakWarning
+                ? InterruptionLevel.timeSensitive
+                : InterruptionLevel.active,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    }
   }
 
   static Future<void> cancelAll() async {
     await _plugin.cancelAll();
   }
 
-  static String _pickMotivationMessage(String locale) {
-    final messages =
-        locale == 'ru' ? _motivationMessagesRu : _motivationMessagesEn;
-    final index =
-        DateTime.now().difference(DateTime(2024)).inDays % messages.length;
-    return messages[index];
-  }
+  /// Number of variants in each pool. Both locales must define the same count,
+  /// because the index is computed once and used for whichever locale is active.
+  static const int variantCount = 7;
 
-  static String _pickStreakMessage(int streakDays, String locale) {
-    final messages =
-        locale == 'ru' ? _streakMessagesRu : _streakMessagesEn;
-    final index =
-        DateTime.now().difference(DateTime(2024)).inDays % messages.length;
-    return messages[index].replaceAll('{N}', '$streakDays');
-  }
+  /// Deterministic per-day choice, so the text changes daily but not per call.
+  /// Computed on UTC calendar dates so a DST shift cannot make a day 23 hours.
+  static int variantIndexFor(DateTime day) =>
+      DateTime.utc(day.year, day.month, day.day)
+          .difference(DateTime.utc(2024))
+          .inDays %
+      variantCount;
 
-  static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-    return scheduled;
-  }
+  static String motivationVariant(AppLocalizations l10n, int index) =>
+      switch (index % variantCount) {
+        0 => l10n.notificationMotivation1,
+        1 => l10n.notificationMotivation2,
+        2 => l10n.notificationMotivation3,
+        3 => l10n.notificationMotivation4,
+        4 => l10n.notificationMotivation5,
+        5 => l10n.notificationMotivation6,
+        _ => l10n.notificationMotivation7,
+      };
+
+  static String streakVariant(AppLocalizations l10n, int index, int days) =>
+      switch (index % variantCount) {
+        0 => l10n.notificationStreak1(days),
+        1 => l10n.notificationStreak2(days),
+        2 => l10n.notificationStreak3(days),
+        3 => l10n.notificationStreak4(days),
+        4 => l10n.notificationStreak5(days),
+        5 => l10n.notificationStreak6(days),
+        _ => l10n.notificationStreak7(days),
+      };
 }

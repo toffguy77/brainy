@@ -41,7 +41,6 @@ platform :ios do
       sh("flutter", "build", "ios",
         "--release",
         "--no-codesign",
-        "--dart-define=REVENUECAT_API_KEY=#{ENV['REVENUECAT_API_KEY']}",
       )
     end
 
@@ -115,67 +114,85 @@ platform :ios do
       is_key_content_base64: true,
     )
 
-    import_certificate(
-      certificate_path: "fastlane/certificate.p12",
-      certificate_password: ENV["DISTRIBUTION_CERTIFICATE_PASSWORD"],
-      keychain_name: "fastlane_tmp_keychain",
-      keychain_password: "",
-    )
+    # The live version cannot be edited: name the new App Store version and
+    # the exact build explicitly, from pubspec.yaml ("1.2.0+16").
+    app_version, build_number = File.read(File.expand_path("../../pubspec.yaml", __dir__))
+      .match(/^version:\s*([\d.]+)\+(\d+)/).captures
 
-    profile_path = install_provisioning_profile(path: "fastlane/profile.mobileprovision")
-    profile_uuid = File.basename(profile_path, ".mobileprovision")
+    # Pushing to main already uploads this build via deploy_testflight. When it
+    # is in TestFlight, skip straight to review instead of failing on a
+    # duplicate upload.
+    uploaded = latest_testflight_build_number(
+      api_key: api_key,
+      app_identifier: "com.brainyapp.brainy",
+      version: app_version,
+      initial_build_number: 0,
+    ).to_i >= build_number.to_i
 
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: "Runner.xcodeproj",
-      team_id: "3GWRDGA8B7",
-      code_sign_identity: "Apple Distribution",
-      profile_uuid: profile_uuid,
-      bundle_identifier: "com.brainyapp.brainy",
-    )
+    unless uploaded
+      import_certificate(
+        certificate_path: "fastlane/certificate.p12",
+        certificate_password: ENV["DISTRIBUTION_CERTIFICATE_PASSWORD"],
+        keychain_name: "fastlane_tmp_keychain",
+        keychain_password: "",
+      )
 
-    Dir.chdir("../..") do
-      sh("flutter", "build", "ios",
-        "--release",
-        "--no-codesign",
-        "--dart-define=REVENUECAT_API_KEY=#{ENV['REVENUECAT_API_KEY']}",
+      profile_path = install_provisioning_profile(path: "fastlane/profile.mobileprovision")
+      profile_uuid = File.basename(profile_path, ".mobileprovision")
+
+      update_code_signing_settings(
+        use_automatic_signing: false,
+        path: "Runner.xcodeproj",
+        team_id: "3GWRDGA8B7",
+        code_sign_identity: "Apple Distribution",
+        profile_uuid: profile_uuid,
+        bundle_identifier: "com.brainyapp.brainy",
+      )
+
+      Dir.chdir("../..") do
+        sh("flutter", "build", "ios",
+          "--release",
+          "--no-codesign",
+        )
+      end
+
+      installed_profile = File.join(
+        Dir.home, "Library/Developer/Xcode/UserData/Provisioning Profiles",
+        "#{profile_uuid}.mobileprovision"
+      )
+      profile_plist = sh("security", "cms", "-D", "-i", installed_profile, log: false)
+      match_result = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)
+      UI.user_error!("Could not extract profile name from provisioning profile") unless match_result
+      profile_name = match_result[1]
+
+      build_app(
+        workspace: "Runner.xcworkspace",
+        scheme: "Runner",
+        export_method: "app-store",
+        export_options: {
+          provisioningProfiles: {
+            "com.brainyapp.brainy" => profile_name,
+          },
+        },
+        output_directory: "../../build/ios/ipa",
+        output_name: "brainy.ipa",
+      )
+
+      upload_to_testflight(
+        api_key: api_key,
+        ipa: "../../build/ios/ipa/brainy.ipa",
+        skip_waiting_for_build_processing: false,
+        wait_for_uploaded_build: true,
+        distribute_external: false,
+        changelog: ENV["CHANGELOG"] || "New build",
       )
     end
-
-    installed_profile = File.join(
-      Dir.home, "Library/Developer/Xcode/UserData/Provisioning Profiles",
-      "#{profile_uuid}.mobileprovision"
-    )
-    profile_plist = sh("security", "cms", "-D", "-i", installed_profile, log: false)
-    match_result = profile_plist.match(/<key>Name<\/key>\s*<string>(.*?)<\/string>/m)
-    UI.user_error!("Could not extract profile name from provisioning profile") unless match_result
-    profile_name = match_result[1]
-
-    build_app(
-      workspace: "Runner.xcworkspace",
-      scheme: "Runner",
-      export_method: "app-store",
-      export_options: {
-        provisioningProfiles: {
-          "com.brainyapp.brainy" => profile_name,
-        },
-      },
-      output_directory: "../../build/ios/ipa",
-      output_name: "brainy.ipa",
-    )
-
-    upload_to_testflight(
-      api_key: api_key,
-      ipa: "../../build/ios/ipa/brainy.ipa",
-      skip_waiting_for_build_processing: false,
-      wait_for_uploaded_build: true,
-      distribute_external: false,
-      changelog: ENV["CHANGELOG"] || "New build",
-    )
 
     deliver(
       api_key: api_key,
       app_identifier: "com.brainyapp.brainy",
+      app_version: app_version,
+      build_number: build_number,
       submit_for_review: true,
       automatic_release: true,
       force: true,

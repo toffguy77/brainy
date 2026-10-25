@@ -9,6 +9,15 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  exclude:
+    # An iOS build drops third-party Swift Package Manager checkouts here.
+    # Without this, `flutter analyze` reports thousands of issues from other
+    # people's code after any local build, and CI fails on a clean tree.
+    - build/**
+    - android/**
+    - ios/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

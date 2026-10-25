@@ -21,24 +21,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get progress => 'Прогресс';
 
   @override
-  String get settings => 'Настройки';
-
-  @override
-  String get continue_ => 'Продолжить';
-
-  @override
-  String get skip => 'Пропустить';
-
-  @override
-  String get back => 'Назад';
-
-  @override
-  String get comingSoon => 'Скоро';
-
-  @override
-  String get result => 'Результат';
-
-  @override
   String get newRecord => 'Новый рекорд!';
 
   @override
@@ -149,27 +131,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingRecommended => 'Рекомендуем';
 
   @override
-  String get onboardingPaywallTitle => 'Попробуй Premium бесплатно';
-
-  @override
-  String get onboardingPaywallBenefit1 => 'Все размеры таблиц (6×6, 7×7, 9×9)';
-
-  @override
-  String get onboardingPaywallBenefit2 => 'Эксклюзивный персонаж';
-
-  @override
-  String get onboardingPaywallBenefit3 => 'Полная статистика прогресса';
-
-  @override
-  String get onboardingPaywallBenefit4 => 'Без рекламы';
-
-  @override
-  String get onboardingTryFree => 'Начать 7 дней бесплатно';
-
-  @override
-  String get onboardingSkipPaywall => 'Продолжить без подписки';
-
-  @override
   String get onboardingSchulteTitle => 'Таблицы Шульте — тренажёр для мозга';
 
   @override
@@ -217,19 +178,10 @@ class AppLocalizationsRu extends AppLocalizations {
       'достаточно для результата — не перегружает ребёнка';
 
   @override
-  String get onboardingAlreadySubscribed => 'Вы уже подписаны!';
-
-  @override
-  String get onboardingLetsGo => 'Поехали!';
-
-  @override
   String get playNow => 'Играть';
 
   @override
   String get selectGridSize => 'Размер таблицы';
-
-  @override
-  String get premiumGridLocked => 'Доступно в Premium';
 
   @override
   String lastResult(int gridSize, int seconds) {
@@ -241,7 +193,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String streakDays(int count) {
-    return 'Серия $count дней';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Серия $count дней',
+      few: 'Серия $count дня',
+      one: 'Серия $count день',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -259,9 +218,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get characterSelected => 'Выбран';
 
   @override
-  String get characterUnlockPremium => 'Открыть Premium';
-
-  @override
   String get accessoriesTitle => 'Кастомизация';
 
   @override
@@ -277,26 +233,24 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accessoriesTabCapes => 'Плащи';
 
   @override
-  String get accessoriesBuy => 'Купить';
-
-  @override
   String get accessoriesEquip => 'Надеть';
 
   @override
-  String get accessoriesEquipped => 'Надето';
-
-  @override
   String get accessoriesRemove => 'Снять';
-
-  @override
-  String get accessoriesPremiumOnly => 'Premium';
 
   @override
   String get accessoriesNotEnoughCoins => 'Не хватает монет';
 
   @override
   String accessoriesNotEnoughCoinsMessage(int price, int balance) {
-    return 'Нужно $price монет, а у тебя $balance';
+    String _temp0 = intl.Intl.pluralLogic(
+      price,
+      locale: localeName,
+      other: '$price монет',
+      few: '$price монеты',
+      one: '$price монета',
+    );
+    return 'Нужно $_temp0, а у тебя $balance';
   }
 
   @override
@@ -365,19 +319,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentNoRecord => '—';
 
   @override
-  String get parentPremiumOnly => 'Premium';
-
-  @override
   String get parentRecentSessions => 'Последние сессии';
 
   @override
   String get parentNoSessions => 'Нет сессий';
-
-  @override
-  String get parentShare => 'Поделиться';
-
-  @override
-  String get parentSettings => 'Настройки';
 
   @override
   String get parentSettingsTitle => 'Настройки родителя';
@@ -392,113 +337,62 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentGridSizeFixed => 'Фиксированный';
 
   @override
-  String get parentMaxSessionTime => 'Макс. время сессии';
-
-  @override
-  String get parentNoLimit => 'Без ограничений';
-
-  @override
-  String parentMinutes(int min) {
-    return '$min мин';
-  }
-
-  @override
   String get parentNotifications => 'Уведомления';
 
   @override
   String get parentChangePin => 'Сменить PIN';
 
   @override
-  String get parentManageSubscription => 'Управление подпиской';
+  String get settingsPrivacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get settingsDailyGoal => 'Дневная цель';
+
+  @override
+  String settingsMinutes(int minutes) {
+    return '$minutes мин';
+  }
+
+  @override
+  String get settingsTerms => 'Условия использования';
+
+  @override
+  String get privacyPolicyUrl =>
+      'https://toffguy77.github.io/brainy-legal/privacy-policy-ru.html';
+
+  @override
+  String get termsUrl =>
+      'https://toffguy77.github.io/brainy-legal/terms-ru.html';
+
+  @override
+  String get settingsLinkFailed => 'Не удалось открыть ссылку';
 
   @override
   String parentShareCardTitle(int days) {
-    return 'тренируется уже $days дней!';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days дней тренировок подряд!',
+      few: '$days дня тренировок подряд!',
+      one: '$days день тренировок подряд!',
+      zero: 'Начинаем тренировки!',
+    );
+    return '$_temp0';
   }
 
   @override
   String get parentShareBest5x5 => 'Лучший результат 5×5';
 
   @override
-  String get parentShareDownload => 'Скачай Brainy: brainyapp.io';
-
-  @override
-  String get parentStars => 'Звёзды';
-
-  @override
-  String get paywallTitle => 'Brainy Premium';
-
-  @override
-  String get paywallSubtitle => 'Открой всё и тренируйся без ограничений';
-
-  @override
-  String get paywallBenefit1 => 'Все размеры таблиц — до 9×9';
-
-  @override
-  String get paywallBenefit2 => 'Эксклюзивный персонаж';
-
-  @override
-  String get paywallBenefit3 => 'Панель прогресса для родителей';
-
-  @override
-  String get paywallBenefit4 => 'Без рекламы';
-
-  @override
-  String get paywallBenefit5 => 'Режим Горбова-Шульте';
-
-  @override
-  String get paywallPlanYear => 'Год';
-
-  @override
-  String get paywallPlanMonth => 'Месяц';
-
-  @override
-  String get paywallPlanFamily => 'Семейная';
-
-  @override
-  String get paywallBestPrice => 'Лучшая цена';
-
-  @override
-  String paywallPerMonth(String price) {
-    return '~$price/мес';
+  String shareSeconds(int seconds) {
+    return '$seconds с';
   }
 
   @override
-  String get paywallTryFree => 'Начать 7 дней бесплатно';
+  String get shareFailed => 'Не удалось поделиться. Попробуйте ещё раз.';
 
   @override
-  String get paywallDisclaimer =>
-      'Отмена в любое время. Управление подпиской в App Store.';
-
-  @override
-  String get paywallRestore => 'Восстановить покупки';
-
-  @override
-  String get paywallTerms => 'Условия';
-
-  @override
-  String get paywallPrivacy => 'Конфиденциальность';
-
-  @override
-  String get paywallWelcome => 'Добро пожаловать в Premium!';
-
-  @override
-  String get paywallErrorTitle => 'Ошибка покупки';
-
-  @override
-  String get paywallErrorMessage => 'Что-то пошло не так. Попробуйте ещё раз.';
-
-  @override
-  String get paywallLoading => 'Загрузка планов...';
-
-  @override
-  String get premiumFeatureLocked => 'Это Premium фича';
-
-  @override
-  String get premiumUnlock => 'Открыть Premium';
-
-  @override
-  String get premiumTryFree => 'Попробовать бесплатно 7 дней';
+  String get parentShareDownload => 'Скачай Brainy: brainyapp.io';
 
   @override
   String get settingsSounds => 'Звуки';
@@ -545,7 +439,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String progressGoalStreak(int days) {
-    return 'Стрик $days дней';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Стрик $days дней',
+      few: 'Стрик $days дня',
+      one: 'Стрик $days день',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -558,9 +459,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get progressNoRecords => 'Играй, чтобы установить рекорды!';
-
-  @override
-  String get progressStartPlaying => 'Начни играть, чтобы видеть прогресс!';
 
   @override
   String starHintNext(int seconds, int stars) {
@@ -745,9 +643,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueError => 'Не удалось загрузить рейтинг';
 
   @override
-  String get leagueNotConnected => 'Game Center не подключён';
-
-  @override
   String get leagueEditName => 'Изменить имя';
 
   @override
@@ -760,7 +655,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueEditNameCancel => 'Отмена';
 
   @override
-  String appVersionLabel(Object buildNumber, Object version) {
+  String appVersionLabel(Object version, Object buildNumber) {
     return 'Версия $version ($buildNumber)';
   }
 
@@ -784,18 +679,264 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get gorbovModeBadge => 'Горбов-Шульте';
+  String get gameModeReverse => 'Обратный';
 
   @override
-  String get parentPremiumGateTitle => 'Панель прогресса для родителей';
+  String get gameModeLetters => 'Буквенный';
 
   @override
-  String get parentPremiumGateSubtitle =>
-      'Следите за прогрессом ребёнка с подробной статистикой';
+  String get gameModeReverseHint => 'Нажимай числа по убыванию';
 
   @override
-  String get parentPremiumGateUnlock => 'Открыть с Premium';
+  String get gameModeLettersHint => 'Нажимай буквы по алфавиту';
 
   @override
-  String get parentPremiumGateSettings => 'Настройки';
+  String get gameFind => 'Найди';
+
+  @override
+  String gameFoundProgress(int found, int total) {
+    return 'Найдено: $found / $total';
+  }
+
+  @override
+  String get gameModeClassicHint => 'Нажимай числа по возрастанию';
+
+  @override
+  String get gameModeGorbovHint =>
+      'Чередуй: белые по возрастанию, красные по убыванию';
+
+  @override
+  String get gameModeReverseBadge => 'Обр';
+
+  @override
+  String get gameModeGorbovBadge => 'Горб';
+
+  @override
+  String get gameModeLettersBadge => 'Букв';
+
+  @override
+  String homeDailyGoal(int played, int goal) {
+    return 'Сегодня: $played из $goal мин';
+  }
+
+  @override
+  String get homeDailyGoalDone => 'Цель дня выполнена!';
+
+  @override
+  String homeSuggestNextSize(int size) {
+    return 'Готов к $size×$size? Попробуй!';
+  }
+
+  @override
+  String resultNewCharacter(String name) {
+    return 'Новый персонаж: $name!';
+  }
+
+  @override
+  String get gamePaused => 'Пауза';
+
+  @override
+  String get gameTapToResume => 'Нажми, чтобы продолжить';
+
+  @override
+  String get characterBrainyName => 'Брейни';
+
+  @override
+  String get characterBrainyDescription =>
+      'Мозг с характером. Стартовый герой!';
+
+  @override
+  String get characterBrainyUnlock => 'Доступен бесплатно';
+
+  @override
+  String get characterZapName => 'Зэп';
+
+  @override
+  String get characterZapDescription =>
+      'Электрический роботёнок. Быстрый как молния!';
+
+  @override
+  String get characterZapUnlock => 'Достигни уровня 10';
+
+  @override
+  String get characterVortexName => 'Вортекс';
+
+  @override
+  String get characterVortexDescription =>
+      'Загадочный и странный. Любит вихри.';
+
+  @override
+  String get characterVortexUnlock => 'Стрик 30 дней';
+
+  @override
+  String get characterPixelName => 'Пиксель';
+
+  @override
+  String get characterPixelDescription => '8-битный герой из прошлого.';
+
+  @override
+  String get characterPixelUnlock => 'Стрик 14 дней';
+
+  @override
+  String get characterGlitchName => 'Глитч';
+
+  @override
+  String get characterGlitchDescription => 'Сломан, но не сломлен.';
+
+  @override
+  String get characterGlitchUnlock => 'Стрик 60 дней';
+
+  @override
+  String get accessoryHatScientistName => 'Колпак учёного';
+
+  @override
+  String get accessoryHatCrownName => 'Корона';
+
+  @override
+  String get accessoryHatCapName => 'Кепка';
+
+  @override
+  String get accessoryHatHelmetName => 'Шлем';
+
+  @override
+  String get accessoryHatTophatName => 'Цилиндр';
+
+  @override
+  String get accessoryGlassesSmartName => 'Умные очки';
+
+  @override
+  String get accessoryGlassesSunName => 'Солнцезащитные';
+
+  @override
+  String get accessoryGlassesPixelName => 'Пиксельные';
+
+  @override
+  String get accessoryGlassesVrName => 'VR-шлем';
+
+  @override
+  String get accessoryEffectStarsName => 'Звёзды';
+
+  @override
+  String get accessoryEffectFireName => 'Огонь';
+
+  @override
+  String get accessoryEffectElectricName => 'Электричество';
+
+  @override
+  String get accessoryCapeMantleName => 'Мантия';
+
+  @override
+  String get accessoryCapeNinjaName => 'Плащ ниндзя';
+
+  @override
+  String get accessoryCapeWingsName => 'Крылья';
+
+  @override
+  String get notificationMotivation1 => 'Время потренировать мозг!';
+
+  @override
+  String notificationStreak1(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Стрик $count дней сгорит сегодня!',
+      few: 'Стрик $count дня сгорит сегодня!',
+      one: 'Стрик $count день сгорит сегодня!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMotivation2 => 'Брейни ждёт тебя! Зайди на тренировку';
+
+  @override
+  String notificationStreak2(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Не потеряй свой стрик $count дней!',
+      few: 'Не потеряй свой стрик $count дня!',
+      one: 'Не потеряй свой стрик $count день!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMotivation3 =>
+      'Несколько минут — и мозг станет быстрее!';
+
+  @override
+  String notificationStreak3(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дней подряд — не останавливайся!',
+      few: '$count дня подряд — не останавливайся!',
+      one: '$count день подряд — не останавливайся!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMotivation4 => 'Зэп зовёт на тренировку!';
+
+  @override
+  String notificationStreak4(int count) {
+    return 'Стрик в опасности! Сыграй сегодня';
+  }
+
+  @override
+  String get notificationMotivation5 => 'Сегодня ещё не тренировались. Начнём?';
+
+  @override
+  String notificationStreak5(int count) {
+    return 'Осталось немного до конца дня. Сохрани стрик!';
+  }
+
+  @override
+  String get notificationMotivation6 => 'Мозг любит тренировки. Не пропусти!';
+
+  @override
+  String notificationStreak6(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Твой стрик $count дней на волоске!',
+      few: 'Твой стрик $count дня на волоске!',
+      one: 'Твой стрик $count день на волоске!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get notificationMotivation7 =>
+      'Пора размять мозг! Таблица Шульте ждёт';
+
+  @override
+  String notificationStreak7(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Брейни переживает за стрик $count дней!',
+      few: 'Брейни переживает за стрик $count дня!',
+      one: 'Брейни переживает за стрик $count день!',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingsNotificationsDenied =>
+      'Уведомления запрещены. Разрешите их в Настройках iOS.';
+
+  @override
+  String progressStreakProgress(int current, int required) {
+    String _temp0 = intl.Intl.pluralLogic(
+      required,
+      locale: localeName,
+      other: '$required дней',
+      few: '$required дня',
+      one: '$required день',
+    );
+    return '$current / $_temp0';
+  }
 }

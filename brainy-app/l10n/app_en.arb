@@ -4,12 +4,6 @@
   "play": "Play",
   "character": "Character",
   "progress": "Progress",
-  "settings": "Settings",
-  "continue_": "Continue",
-  "skip": "Skip",
-  "back": "Back",
-  "comingSoon": "Coming soon",
-  "result": "Result",
   "newRecord": "New Record!",
   "greatResult": "Great Result!",
   "goodResult": "Good Result!",
@@ -17,14 +11,20 @@
   "timeSec": "{seconds} sec",
   "@timeSec": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "timeMinSec": "{minutes}:{seconds}",
   "@timeMinSec": {
     "placeholders": {
-      "minutes": {"type": "int"},
-      "seconds": {"type": "String"}
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
     }
   },
   "coinsEarned": "Coins",
@@ -32,7 +32,6 @@
   "personalRecord": "Record",
   "playAgain": "Play Again",
   "home": "Home",
-
   "onboardingWelcomeTitle": "Train your brain playfully",
   "onboardingWelcomeSubtitle": "Schulte tables for kids 6–14",
   "onboardingStart": "Start",
@@ -57,13 +56,6 @@
   "onboardingFreq15min": "15+ minutes",
   "onboardingFreq15minDesc": "Intensive",
   "onboardingRecommended": "Recommended",
-  "onboardingPaywallTitle": "Try Premium for free",
-  "onboardingPaywallBenefit1": "All table sizes (6×6, 7×7, 9×9)",
-  "onboardingPaywallBenefit2": "Exclusive character",
-  "onboardingPaywallBenefit3": "Full progress statistics",
-  "onboardingPaywallBenefit4": "No ads",
-  "onboardingTryFree": "Start 7-day free trial",
-  "onboardingSkipPaywall": "Continue without subscription",
   "onboardingSchulteTitle": "Schulte Tables — Brain Trainer",
   "onboardingSchulteSubtitle": "Find the numbers in order as fast as you can. Bigger grid — harder challenge!",
   "onboardingSchulteHint": "Find the numbers in order: 1, 2, 3...",
@@ -78,59 +70,60 @@
   "onboardingScienceFact2Label": "to noticeably improve reading speed with daily practice",
   "onboardingScienceFact3Value": "5 min/day",
   "onboardingScienceFact3Label": "enough for results — won't overwhelm your child",
-  "onboardingAlreadySubscribed": "You're already subscribed!",
-  "onboardingLetsGo": "Let's go!",
-
   "playNow": "Play Now",
   "selectGridSize": "Select table size",
-  "premiumGridLocked": "Unlock with Premium",
   "lastResult": "Last: {gridSize}×{gridSize} in {seconds}s",
   "@lastResult": {
     "placeholders": {
-      "gridSize": {"type": "int"},
-      "seconds": {"type": "int"}
+      "gridSize": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "noSessionsYet": "No games yet — let's start!",
-  "streakDays": "{count} day streak",
+  "streakDays": "{count, plural, =1{1 day streak} other{{count} day streak}}",
   "@streakDays": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "levelLabel": "Level {level}",
   "@levelLabel": {
     "placeholders": {
-      "level": {"type": "int"}
+      "level": {
+        "type": "int"
+      }
     }
   },
-
   "characterScreenTitle": "My Characters",
   "characterSelect": "Select",
   "characterSelected": "Selected",
-  "characterUnlockPremium": "Unlock with Premium",
-
   "accessoriesTitle": "Customization",
   "accessoriesTabHats": "Hats",
   "accessoriesTabGlasses": "Glasses",
   "accessoriesTabEffects": "Effects",
   "accessoriesTabCapes": "Capes",
-  "accessoriesBuy": "Buy",
   "accessoriesEquip": "Equip",
-  "accessoriesEquipped": "Equipped",
   "accessoriesRemove": "Remove",
-  "accessoriesPremiumOnly": "Premium",
   "accessoriesNotEnoughCoins": "Not enough coins",
   "accessoriesNotEnoughCoinsMessage": "You need {price} coins, but you have {balance}",
   "@accessoriesNotEnoughCoinsMessage": {
     "placeholders": {
-      "price": {"type": "int"},
-      "balance": {"type": "int"}
+      "price": {
+        "type": "int"
+      },
+      "balance": {
+        "type": "int"
+      }
     }
   },
   "accessoriesCustomize": "Customize",
   "accessoriesPurchased": "Purchased!",
-
   "parentTitle": "Child's Progress",
   "parentSetPin": "Set PIN",
   "parentEnterPin": "Enter PIN",
@@ -140,7 +133,9 @@
   "parentLockedOut": "Too many attempts. Try again in {seconds}s",
   "@parentLockedOut": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "parentThisWeek": "This Week",
@@ -155,77 +150,58 @@
   "parentBestTime": "Best: {seconds}s",
   "@parentBestTime": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "parentNoRecord": "—",
-  "parentPremiumOnly": "Premium",
   "parentRecentSessions": "Recent Sessions",
   "parentNoSessions": "No sessions yet",
-  "parentShare": "Share",
-  "parentSettings": "Settings",
   "parentSettingsTitle": "Parent Settings",
   "parentGridSizeMode": "Grid Size",
   "parentGridSizeAuto": "Auto",
   "parentGridSizeFixed": "Fixed",
-  "parentMaxSessionTime": "Max Session Time",
-  "parentNoLimit": "No limit",
-  "parentMinutes": "{min} min",
-  "@parentMinutes": {
-    "placeholders": {
-      "min": {"type": "int"}
-    }
-  },
   "parentNotifications": "Notifications",
   "parentChangePin": "Change PIN",
-  "parentManageSubscription": "Manage Subscription",
-  "parentShareCardTitle": "has been training for {days} days!",
+  "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsDailyGoal": "Daily goal",
+  "settingsMinutes": "{minutes} min",
+  "@settingsMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTerms": "Terms of Use",
+  "privacyPolicyUrl": "https://toffguy77.github.io/brainy-legal/privacy-policy-en.html",
+  "termsUrl": "https://toffguy77.github.io/brainy-legal/terms-en.html",
+  "settingsLinkFailed": "Couldn't open the link",
+  "parentShareCardTitle": "{days, plural, =0{Just getting started!} =1{1 day of training in a row!} other{{days} days of training in a row!}}",
   "@parentShareCardTitle": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "parentShareBest5x5": "Best 5×5 result",
-  "parentShareDownload": "Download Brainy: brainyapp.io",
-  "parentStars": "Stars",
-
-  "paywallTitle": "Brainy Premium",
-  "paywallSubtitle": "Unlock everything and train without limits",
-  "paywallBenefit1": "All table sizes — up to 9×9",
-  "paywallBenefit2": "Exclusive character",
-  "paywallBenefit3": "Parent progress panel",
-  "paywallBenefit4": "No ads",
-  "paywallBenefit5": "Gorbov-Schulte mode",
-  "paywallPlanYear": "Year",
-  "paywallPlanMonth": "Month",
-  "paywallPlanFamily": "Family",
-  "paywallBestPrice": "Best price",
-  "paywallPerMonth": "~{price}/mo",
-  "@paywallPerMonth": {
+  "shareSeconds": "{seconds}s",
+  "@shareSeconds": {
     "placeholders": {
-      "price": {"type": "String"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
-  "paywallTryFree": "Start 7-day free trial",
-
-  "paywallDisclaimer": "Cancel anytime. Manage subscription in App Store.",
-  "paywallRestore": "Restore purchases",
-  "paywallTerms": "Terms",
-  "paywallPrivacy": "Privacy",
-  "paywallWelcome": "Welcome to Premium!",
-  "paywallErrorTitle": "Purchase failed",
-  "paywallErrorMessage": "Something went wrong. Please try again.",
-  "paywallLoading": "Loading plans...",
-  "premiumFeatureLocked": "This is a Premium feature",
-  "premiumUnlock": "Unlock Premium",
-  "premiumTryFree": "Try free for 7 days",
-
+  "shareFailed": "Couldn't share. Please try again.",
+  "parentShareDownload": "Download Brainy: brainyapp.io",
   "settingsSounds": "Sounds",
   "settingsHaptic": "Vibration",
   "settingsReminderTime": "Reminder time",
   "settingsDefaultTime": "default",
   "settingsResetTime": "Reset to 20:00",
-
   "progressTitle": "My Progress",
   "progressTotalGames": "Games",
   "progressTotalXp": "XP",
@@ -233,8 +209,12 @@
   "progressXpToNextLevel": "{xp} XP to level {level}",
   "@progressXpToNextLevel": {
     "placeholders": {
-      "xp": {"type": "int"},
-      "level": {"type": "int"}
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
     }
   },
   "progressMaxLevel": "Max level reached!",
@@ -242,36 +222,46 @@
   "progressGoalReachLevel": "Reach level {level}",
   "@progressGoalReachLevel": {
     "placeholders": {
-      "level": {"type": "int"}
+      "level": {
+        "type": "int"
+      }
     }
   },
   "progressGoalStreak": "{days}-day streak",
   "@progressGoalStreak": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "progressGoalUnlock": "Unlock {name}",
   "@progressGoalUnlock": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "progressRecords": "Best Times",
   "progressNoRecords": "Play to set records!",
-  "progressStartPlaying": "Start playing to track progress!",
   "starHintNext": "Finish in {seconds}s for {stars}★",
   "@starHintNext": {
     "placeholders": {
-      "seconds": {"type": "int"},
-      "stars": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      },
+      "stars": {
+        "type": "int"
+      }
     }
   },
-
   "gridDetailTitle": "Table {size}×{size}",
   "@gridDetailTitle": {
     "placeholders": {
-      "size": {"type": "int"}
+      "size": {
+        "type": "int"
+      }
     }
   },
   "periodWeek": "Week",
@@ -286,20 +276,25 @@
   "gridDetailNoData": "No data yet for {size}×{size}",
   "@gridDetailNoData": {
     "placeholders": {
-      "size": {"type": "int"}
+      "size": {
+        "type": "int"
+      }
     }
   },
   "gridDetailPlayMore": "Play a few games to see progress",
   "legendDailyBest": "Daily best",
   "legendAllAttempts": "All attempts",
   "legendRecord": "Record",
-
   "achievementsTitle": "Achievements",
   "achievementsCount": "{unlocked} / {total}",
   "@achievementsCount": {
     "placeholders": {
-      "unlocked": {"type": "int"},
-      "total": {"type": "int"}
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "achievementUnlocked": "Achievement Unlocked!",
@@ -323,7 +318,6 @@
   "achievementNightOwlDesc": "Play a session after 10 PM",
   "achievementCoinHoarder": "Coin Hoarder",
   "achievementCoinHoarderDesc": "Accumulate 500 coins",
-
   "league": "League",
   "leagueTitle": "Weekly League",
   "leagueBronze": "Bronze",
@@ -333,14 +327,20 @@
   "leagueWeeklyXp": "{xp} XP this week",
   "@leagueWeeklyXp": {
     "placeholders": {
-      "xp": {"type": "int"}
+      "xp": {
+        "type": "int"
+      }
     }
   },
   "leagueNextTier": "{xp} XP to {tier}",
   "@leagueNextTier": {
     "placeholders": {
-      "xp": {"type": "int"},
-      "tier": {"type": "String"}
+      "xp": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
     }
   },
   "leagueMaxTier": "Highest league reached!",
@@ -352,17 +352,19 @@
   "leagueFullRanking": "Full Ranking",
   "leagueLoading": "Loading leaderboard...",
   "leagueError": "Could not load leaderboard",
-  "leagueNotConnected": "Game Center not connected",
   "leagueEditName": "Edit name",
   "leagueEditNameHint": "Enter your name",
   "leagueEditNameSave": "Save",
   "leagueEditNameCancel": "Cancel",
-
   "appVersionLabel": "Version {version} ({buildNumber})",
   "@appVersionLabel": {
     "placeholders": {
-      "version": {"type": "Object"},
-      "buildNumber": {"type": "Object"}
+      "version": {
+        "type": "Object"
+      },
+      "buildNumber": {
+        "type": "Object"
+      }
     }
   },
   "versionCopied": "Version copied",
@@ -371,18 +373,173 @@
   "gorbovHintWhite": "Find: white {number}",
   "@gorbovHintWhite": {
     "placeholders": {
-      "number": {"type": "int"}
+      "number": {
+        "type": "int"
+      }
     }
   },
   "gorbovHintRed": "Find: red {number}",
   "@gorbovHintRed": {
     "placeholders": {
-      "number": {"type": "int"}
+      "number": {
+        "type": "int"
+      }
     }
   },
-  "gorbovModeBadge": "Gorbov-Schulte",
-  "parentPremiumGateTitle": "Parent Progress Panel",
-  "parentPremiumGateSubtitle": "Track your child's progress with detailed statistics",
-  "parentPremiumGateUnlock": "Unlock with Premium",
-  "parentPremiumGateSettings": "Settings"
+  "gameModeReverse": "Reverse",
+  "gameModeLetters": "Letters",
+  "gameModeReverseHint": "Tap numbers in descending order",
+  "gameModeLettersHint": "Tap letters in alphabetical order",
+  "gameFind": "Find",
+  "gameFoundProgress": "Found: {found} / {total}",
+  "@gameFoundProgress": {
+    "placeholders": {
+      "found": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gameModeClassicHint": "Tap numbers in ascending order",
+  "gameModeGorbovHint": "Alternate: white ascending, red descending",
+  "gameModeReverseBadge": "Rev",
+  "gameModeGorbovBadge": "Gorb",
+  "gameModeLettersBadge": "ABC",
+  "homeDailyGoal": "Today: {played} of {goal} min",
+  "@homeDailyGoal": {
+    "placeholders": {
+      "played": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyGoalDone": "Daily goal reached!",
+  "homeSuggestNextSize": "Ready for {size}×{size}? Give it a go!",
+  "@homeSuggestNextSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "resultNewCharacter": "New character: {name}!",
+  "@resultNewCharacter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gamePaused": "Paused",
+  "gameTapToResume": "Tap to continue",
+  "characterBrainyName": "Brainy",
+  "characterBrainyDescription": "A brain with personality. Starter hero!",
+  "characterBrainyUnlock": "Available for free",
+  "characterZapName": "Zap",
+  "characterZapDescription": "Electric little robot. Fast as lightning!",
+  "characterZapUnlock": "Reach level 10",
+  "characterVortexName": "Vortex",
+  "characterVortexDescription": "Mysterious and strange. Loves whirlwinds.",
+  "characterVortexUnlock": "30-day streak",
+  "characterPixelName": "Pixel",
+  "characterPixelDescription": "8-bit hero from the past.",
+  "characterPixelUnlock": "14-day streak",
+  "characterGlitchName": "Glitch",
+  "characterGlitchDescription": "Broken, but not defeated.",
+  "characterGlitchUnlock": "60-day streak",
+  "accessoryHatScientistName": "Scientist Cap",
+  "accessoryHatCrownName": "Crown",
+  "accessoryHatCapName": "Baseball Cap",
+  "accessoryHatHelmetName": "Helmet",
+  "accessoryHatTophatName": "Top Hat",
+  "accessoryGlassesSmartName": "Smart Glasses",
+  "accessoryGlassesSunName": "Sunglasses",
+  "accessoryGlassesPixelName": "Pixel Glasses",
+  "accessoryGlassesVrName": "VR Headset",
+  "accessoryEffectStarsName": "Stars",
+  "accessoryEffectFireName": "Fire",
+  "accessoryEffectElectricName": "Electricity",
+  "accessoryCapeMantleName": "Mantle",
+  "accessoryCapeNinjaName": "Ninja Cloak",
+  "accessoryCapeWingsName": "Wings",
+  "notificationMotivation1": "Time to train your brain!",
+  "notificationStreak1": "Your {count}-day streak expires today!",
+  "@notificationStreak1": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation2": "Brainy is waiting for you! Start training",
+  "notificationStreak2": "Don't lose your {count}-day streak!",
+  "@notificationStreak2": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation3": "A few minutes and your brain gets faster!",
+  "notificationStreak3": "{count} days in a row — don't stop now!",
+  "@notificationStreak3": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation4": "Zap is calling you to practice!",
+  "notificationStreak4": "Streak in danger! Play today",
+  "@notificationStreak4": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation5": "Haven't trained today yet. Shall we start?",
+  "notificationStreak5": "Day is almost over. Save your streak!",
+  "@notificationStreak5": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation6": "Your brain loves training. Don't skip it!",
+  "notificationStreak6": "Your {count}-day streak is hanging by a thread!",
+  "@notificationStreak6": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation7": "Time to exercise your brain! Schulte table awaits",
+  "notificationStreak7": "Brainy is worried about your {count}-day streak!",
+  "@notificationStreak7": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsNotificationsDenied": "Notifications are blocked. Allow them in iOS Settings.",
+  "progressStreakProgress": "{current} / {required, plural, =1{1 day} other{{required} days}}",
+  "@progressStreakProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "required": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/accessory.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../game/providers/user_progress_provider.dart';
 import '../data/accessories_data.dart';
 import '../data/characters_data.dart';
 import '../providers/character_provider.dart';
-import 'character_screen.dart';
+import '../../../shared/services/haptic_service.dart';
+import '../widgets/dressed_avatar.dart';
 
 class AccessoriesScreen extends ConsumerStatefulWidget {
-  const AccessoriesScreen({super.key});
+  /// The character to dress; defaults to the active one.
+  final String? characterId;
+
+  const AccessoriesScreen({super.key, this.characterId});
 
   @override
   ConsumerState<AccessoriesScreen> createState() => _AccessoriesScreenState();
@@ -50,7 +52,7 @@ class _AccessoriesScreenState extends ConsumerState<AccessoriesScreen>
     final l10n = AppLocalizations.of(context)!;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = widget.characterId ?? progress.activeCharacterId;
     final activeCharacter = characters.firstWhere(
       (c) => c.id == activeId,
       orElse: () => characters.first,
@@ -119,6 +121,7 @@ class _AccessoriesScreenState extends ConsumerState<AccessoriesScreen>
                 return _AccessoryGrid(
                   accessories: _accessoriesForSlot(slot),
                   slot: slot,
+                  characterId: activeCharacter.id,
                 );
               }).toList(),
             ),
@@ -183,7 +186,7 @@ class _CharacterPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     final hat = _findAccessory(equippedHat);
     final glasses = _findAccessory(equippedGlasses);
     final effect = _findAccessory(equippedEffect);
@@ -193,8 +196,8 @@ class _CharacterPreview extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 120,
-          height: 120,
+          width: 132,
+          height: 132,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -204,12 +207,12 @@ class _CharacterPreview extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(60),
+            borderRadius: BorderRadius.circular(66),
             border: Border.all(color: characterInfo.color, width: 3),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: characterAvatar(characterInfo.id, size: 60),
+            padding: const EdgeInsets.all(26),
+            child: DressedAvatar(characterId: characterInfo.id, size: 80),
           ),
         ),
         if (equipped.isNotEmpty) ...[
@@ -225,7 +228,7 @@ class _CharacterPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  a.name(locale),
+                  a.name(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 11,
@@ -245,10 +248,12 @@ class _CharacterPreview extends StatelessWidget {
 class _AccessoryGrid extends ConsumerWidget {
   final List<AccessoryInfo> accessories;
   final AccessorySlot slot;
+  final String characterId;
 
   const _AccessoryGrid({
     required this.accessories,
     required this.slot,
+    required this.characterId,
   });
 
   @override
@@ -263,7 +268,10 @@ class _AccessoryGrid extends ConsumerWidget {
       ),
       itemCount: accessories.length,
       itemBuilder: (context, index) {
-        return _AccessoryCard(accessory: accessories[index]);
+        return _AccessoryCard(
+          accessory: accessories[index],
+          characterId: characterId,
+        );
       },
     );
   }
@@ -271,16 +279,16 @@ class _AccessoryGrid extends ConsumerWidget {
 
 class _AccessoryCard extends ConsumerWidget {
   final AccessoryInfo accessory;
+  final String characterId;
 
-  const _AccessoryCard({required this.accessory});
+  const _AccessoryCard({required this.accessory, required this.characterId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = characterId;
     final activeCharacter = characters.firstWhere(
       (c) => c.id == activeId,
       orElse: () => characters.first,
@@ -322,7 +330,7 @@ class _AccessoryCard extends ConsumerWidget {
                 _buildIcon(isOwned),
                 const SizedBox(height: 10),
                 Text(
-                  accessory.name(locale),
+                  accessory.name(l10n),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -346,13 +354,6 @@ class _AccessoryCard extends ConsumerWidget {
   }
 
   Widget _buildIcon(bool isOwned) {
-    final iconData = switch (accessory.slot) {
-      AccessorySlot.hat => Icons.checkroom_rounded,
-      AccessorySlot.glasses => Icons.visibility_rounded,
-      AccessorySlot.effect => Icons.auto_awesome_rounded,
-      AccessorySlot.cape => Icons.shield_rounded,
-    };
-
     return Container(
       width: 56,
       height: 56,
@@ -362,10 +363,11 @@ class _AccessoryCard extends ConsumerWidget {
             : AppColors.background,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Icon(
-        iconData,
-        size: 28,
-        color: isOwned ? AppColors.primary : AppColors.textSecondary,
+      child: Center(
+        child: Opacity(
+          opacity: isOwned ? 1 : 0.6,
+          child: AccessoryGlyph(accessory: accessory, size: 32),
+        ),
       ),
     );
   }
@@ -385,7 +387,8 @@ class _AccessoryCard extends ConsumerWidget {
             const Icon(Icons.check_rounded, size: 14, color: AppColors.success),
             const SizedBox(width: 4),
             Text(
-              l10n.accessoriesEquipped,
+              // Equipped: the action a tap performs is taking it off.
+              l10n.accessoriesRemove,
               style: const TextStyle(
                 fontFamily: 'Nunito',
                 fontSize: 12,
@@ -417,31 +420,6 @@ class _AccessoryCard extends ConsumerWidget {
       );
     }
 
-    if (accessory.isPremium) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.accent.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.lock_rounded, size: 14, color: AppColors.accent),
-            const SizedBox(width: 4),
-            Text(
-              l10n.accessoriesPremiumOnly,
-              style: const TextStyle(
-                fontFamily: 'Nunito',
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppColors.accent,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -476,8 +454,7 @@ class _AccessoryCard extends ConsumerWidget {
     bool isEquipped,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final progress = ref.read(userProgressProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = characterId;
 
     if (isEquipped) {
       // Unequip
@@ -498,36 +475,6 @@ class _AccessoryCard extends ConsumerWidget {
     }
 
     // Not owned — attempt purchase
-    if (accessory.isPremium) {
-      final hasPremium = await ref.read(isPremiumProvider.future);
-      if (!hasPremium) {
-        if (context.mounted) {
-          _showPremiumDialog(context, l10n);
-        }
-        return;
-      }
-      // Premium subscriber gets it free
-      await ref
-          .read(userProgressProvider.notifier)
-          .purchaseAccessory(accessory.id, 0);
-      HapticFeedback.mediumImpact();
-      await ref
-          .read(characterProvider.notifier)
-          .equipAccessory(activeId, accessory.id, accessory.slot);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.accessoriesPurchased,
-              style: const TextStyle(fontFamily: 'Nunito'),
-            ),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-      return;
-    }
 
     // Purchase with coins
     final success = await ref
@@ -535,7 +482,7 @@ class _AccessoryCard extends ConsumerWidget {
         .purchaseAccessory(accessory.id, accessory.price);
 
     if (success) {
-      HapticFeedback.mediumImpact();
+      HapticService.purchase();
       await ref
           .read(characterProvider.notifier)
           .equipAccessory(activeId, accessory.id, accessory.slot);
@@ -616,81 +563,4 @@ class _AccessoryCard extends ConsumerWidget {
     );
   }
 
-  void _showPremiumDialog(BuildContext context, AppLocalizations l10n) {
-    HapticFeedback.heavyImpact();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.textSecondary.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Icon(
-                Icons.lock_rounded,
-                size: 48,
-                color: AppColors.accent,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.accessoriesPremiumOnly,
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        Navigator.pop(sheetContext);
-                        if (context.mounted) context.go('/paywall');
-                      },
-                      child: Center(
-                        child: Text(
-                          l10n.characterUnlockPremium,
-                          style: const TextStyle(
-                            fontFamily: 'Nunito',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }

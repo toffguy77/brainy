@@ -20,8 +20,9 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
     for (final info in defaultCharacters) {
       final data = CharacterData(
         id: info.id,
-        nameRu: info.nameRu,
-        nameEn: info.nameEn,
+        // Legacy Hive fields, never read: names come from ARB via the id.
+        nameRu: info.id,
+        nameEn: info.id,
         isUnlocked: info.unlockType == UnlockType.free,
       );
       _box.put(info.id, data);
@@ -105,6 +106,20 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
     };
   }
 
+  /// Unlock every character whose level or streak requirement [progress]
+  /// now meets. Returns the ids unlocked by this call.
+  Future<List<String>> unlockEligible(UserProgress progress) async {
+    final unlocked = <String>[];
+    for (final info in defaultCharacters) {
+      final character = getById(info.id);
+      if (character == null || character.isUnlocked) continue;
+      if (!checkUnlockEligibility(info, progress)) continue;
+      await unlockCharacter(info.id);
+      unlocked.add(info.id);
+    }
+    return unlocked;
+  }
+
   bool checkUnlockEligibility(CharacterInfo info, UserProgress progress) {
     switch (info.unlockType) {
       case UnlockType.free:
@@ -113,8 +128,6 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
         return progress.level >= (info.requiredLevel ?? 0);
       case UnlockType.streak:
         return progress.longestStreak >= (info.requiredStreak ?? 0);
-      case UnlockType.premium:
-        return false; // handled by subscription check
     }
   }
 }

@@ -16,7 +16,6 @@ import 'models/session.dart';
 import 'models/user_progress.dart';
 import 'features/league/providers/game_services_provider.dart';
 import 'shared/services/notification_service.dart';
-import 'shared/services/subscription_service.dart';
 
 void main() async {
   runZonedGuarded<Future<void>>(() async {
@@ -38,7 +37,6 @@ void main() async {
     await Hive.openBox(AppConstants.userBox);
     await Hive.openBox<CharacterData>(AppConstants.characterBox);
     await Hive.openBox<UserProgress>(AppConstants.progressBox);
-    await SubscriptionService.initialize();
     await NotificationService.initialize();
     runApp(
       const ProviderScope(
@@ -58,7 +56,7 @@ class BrainyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return _NotificationRescheduler(
       child: MaterialApp.router(
-        title: 'Brainy',
+        onGenerateTitle: (context) => AppLocalizations.of(context)!.appName,
         theme: AppTheme.darkTheme,
         routerConfig: router,
         localizationsDelegates: const [
@@ -67,10 +65,13 @@ class BrainyApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('ru'),
-          Locale('en'),
+        supportedLocales: [
+          for (final code in AppConstants.supportedLanguages) Locale(code),
         ],
+        // Any device language other than ru/en falls back to English, the
+        // same rule notifications use outside the widget tree.
+        localeResolutionCallback: (locale, _) =>
+            Locale(AppConstants.resolveLanguage(locale?.languageCode)),
       ),
     );
   }
@@ -97,40 +98,7 @@ class _NotificationReschedulerState
   }
 
   void _reschedule() {
-    final box = Hive.box(AppConstants.userBox);
-    final enabled =
-        box.get(AppConstants.notificationsEnabledKey) as bool? ?? false;
-    if (!enabled) return;
-
-    final hasCustomTime =
-        box.get(AppConstants.hasCustomReminderTimeKey) as bool? ?? false;
-    final hour = box.get(AppConstants.customReminderHourKey) as int? ??
-        AppConstants.defaultReminderHour;
-    final minute = box.get(AppConstants.customReminderMinuteKey) as int? ??
-        AppConstants.defaultReminderMinute;
-
-    final progressBox = Hive.box<UserProgress>(AppConstants.progressBox);
-    final progress = progressBox.get(AppConstants.progressDataKey);
-    final currentStreak = progress?.currentStreak ?? 0;
-
-    final sessionsBox = Hive.box<GameSession>(AppConstants.sessionsBox);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final hasPlayedToday = sessionsBox.values.any((s) {
-      final d = s.playedAt;
-      return d.year == today.year &&
-          d.month == today.month &&
-          d.day == today.day;
-    });
-
-    NotificationService.reschedule(
-      enabled: true,
-      hasCustomTime: hasCustomTime,
-      hour: hour,
-      minute: minute,
-      currentStreak: currentStreak,
-      hasPlayedToday: hasPlayedToday,
-    );
+    NotificationService.rescheduleFromStorage();
   }
 
   void _signInToGameServices() {

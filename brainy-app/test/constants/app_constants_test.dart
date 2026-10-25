@@ -1,20 +1,20 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brainy/l10n/app_localizations.dart';
 import 'package:brainy/constants/app_constants.dart';
 
 void main() {
   group('AppConstants', () {
     group('grid sizes', () {
-      test('free grid sizes are 3, 4, 5', () {
-        expect(AppConstants.freeGridSizes, [3, 4, 5]);
+      test('every documented grid size is playable', () {
+        expect(AppConstants.allGridSizes, containsAll([3, 4, 5, 6, 7, 9]));
       });
 
-      test('premium grid sizes are 6, 7, 9', () {
-        expect(AppConstants.premiumGridSizes, [6, 7, 9]);
-      });
-
-      test('allGridSizes contains all sizes', () {
-        expect(AppConstants.allGridSizes,
-            containsAll([...AppConstants.freeGridSizes, ...AppConstants.premiumGridSizes]));
+      test('every playable size is offered in the picker — nothing is gated', () {
+        for (final size in AppConstants.allGridSizes) {
+          expect(AppConstants.pickerGridSizes, contains(size),
+              reason: '$size is playable but not offered');
+        }
       });
 
       test('picker grid sizes include all playable sizes', () {
@@ -105,24 +105,17 @@ void main() {
       });
     });
 
-    group('RevenueCat', () {
-      test('product IDs are defined', () {
-        expect(AppConstants.productIdMonthly, 'brainy_pro_monthly');
-        expect(AppConstants.productIdYearly, 'brainy_pro_yearly');
-        expect(AppConstants.productIdFamily, 'brainy_pro_family');
-      });
-
-      test('entitlement is brainy_pro', () {
-        expect(AppConstants.revenueCatEntitlement, 'brainy_pro');
-      });
-    });
-
     group('legal URLs', () {
-      test('all legal URLs use the same base', () {
-        expect(AppConstants.privacyPolicyUrlRu, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.privacyPolicyUrlEn, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.termsUrlRu, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.termsUrlEn, startsWith(AppConstants.legalBaseUrl));
+      test('each locale links to its own https legal pages', () async {
+        final ru = await AppLocalizations.delegate.load(const Locale('ru'));
+        final en = await AppLocalizations.delegate.load(const Locale('en'));
+        for (final url in [ru.privacyPolicyUrl, ru.termsUrl, en.privacyPolicyUrl, en.termsUrl]) {
+          expect(Uri.parse(url).scheme, 'https');
+        }
+        expect(ru.privacyPolicyUrl, endsWith('-ru.html'));
+        expect(en.privacyPolicyUrl, endsWith('-en.html'));
+        expect(ru.termsUrl, endsWith('-ru.html'));
+        expect(en.termsUrl, endsWith('-en.html'));
       });
     });
   });

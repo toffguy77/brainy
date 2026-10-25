@@ -7,7 +7,9 @@ import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import '../providers/parent_provider.dart';
+import '../providers/pin_lockout.dart';
 
 class ParentPinScreen extends ConsumerStatefulWidget {
   const ParentPinScreen({super.key});
@@ -19,9 +21,9 @@ class ParentPinScreen extends ConsumerStatefulWidget {
 class _ParentPinScreenState extends ConsumerState<ParentPinScreen> {
   String _enteredPin = '';
   String? _firstPin; // for setup: store first entry to confirm
-  int _failedAttempts = 0;
-  int _lockoutRemaining = 0;
-  Timer? _lockoutTimer;
+  late final PinLockout _lockout =
+      PinLockout(Hive.box(AppConstants.userBox));
+  Timer? _lockoutTicker;
   bool _showError = false;
   bool _settingNewPin = false; // change-mode: old PIN verified, entering new
 
@@ -34,11 +36,18 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen> {
   }
 
   bool get _isConfirming => _inSetupPhase && _firstPin != null;
-  bool get _isLockedOut => _lockoutRemaining > 0;
+  bool get _isLockedOut => _lockout.isLocked;
+
+  @override
+  void initState() {
+    super.initState();
+    // A lockout started earlier — even before an app restart — still holds.
+    if (_lockout.isLocked) _startLockoutTicker();
+  }
 
   @override
   void dispose() {
-    _lockoutTimer?.cancel();
+    _lockoutTicker?.cancel();
     super.dispose();
   }
 
@@ -85,14 +94,15 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen> {
             context.go('/parent/dashboard');
           }
         } else {
-          _handleWrongPin();
+          // A mismatched confirmation is a typo, not a guess: no lockout.
+          _showWrongPin();
           setState(() => _firstPin = null);
         }
       }
     } else {
       // Verification
       if (ref.read(parentProvider.notifier).verifyPin(_enteredPin)) {
-        setState(() => _failedAttempts = 0);
+        _lockout.recordSuccess();
         if (_isChangeMode) {
           // Old PIN verified — switch to setting new PIN
           setState(() {
@@ -111,32 +121,29 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen> {
     }
   }
 
-  void _handleWrongPin() {
+  void _showWrongPin() {
     HapticFeedback.heavyImpact();
     setState(() {
       _enteredPin = '';
       _showError = true;
-      _failedAttempts++;
     });
-
-    if (_failedAttempts >= AppConstants.parentMaxPinAttempts) {
-      _startLockout();
-    }
   }
 
-  void _startLockout() {
-    setState(() {
-      _lockoutRemaining = AppConstants.parentLockoutSeconds;
-      _failedAttempts = 0;
+  Future<void> _handleWrongPin() async {
+    _showWrongPin();
+    await _lockout.recordFailure();
+    if (_lockout.isLocked) _startLockoutTicker();
+  }
+
+  /// Repaint once a second so the countdown shown to the parent stays live.
+  void _startLockoutTicker() {
+    _lockoutTicker?.cancel();
+    _lockoutTicker = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return timer.cancel();
+      setState(() {});
+      if (!_lockout.isLocked) timer.cancel();
     });
-    _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        _lockoutRemaining--;
-        if (_lockoutRemaining <= 0) {
-          timer.cancel();
-        }
-      });
-    });
+    if (mounted) setState(() {});
   }
 
   @override
@@ -210,7 +217,7 @@ class _ParentPinScreenState extends ConsumerState<ParentPinScreen> {
               ),
             if (_isLockedOut)
               Text(
-                l10n.parentLockedOut(_lockoutRemaining),
+                l10n.parentLockedOut(_lockout.remainingSeconds),
                 style: const TextStyle(
                   fontFamily: 'Nunito',
                   fontSize: 14,

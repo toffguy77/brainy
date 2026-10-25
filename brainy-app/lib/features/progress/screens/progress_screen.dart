@@ -5,12 +5,12 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/user_progress.dart';
-import '../../../shared/services/subscription_service.dart';
 import '../../character/data/characters_data.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../providers/achievements_provider.dart';
+import '../widgets/mode_filter.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -361,7 +361,7 @@ class _NextGoalsSection extends StatelessWidget {
         String description = l10n.progressGoalReachLevel(entry.key);
         if (charAtLevel.isNotEmpty) {
           description +=
-              ' → ${l10n.progressGoalUnlock(charAtLevel.first.name(locale))}';
+              ' → ${l10n.progressGoalUnlock(charAtLevel.first.name(l10n))}';
         }
 
         goals.add(_GoalTile(
@@ -387,10 +387,11 @@ class _NextGoalsSection extends StatelessWidget {
           icon: Icons.local_fire_department_rounded,
           iconColor: Colors.orange,
           title:
-              '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(locale))}',
+              '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(l10n))}',
           progress: streakProgress,
           progressLabel:
-              '${progress.longestStreak} / ${char.requiredStreak} ${l10n.parentDays}',
+              l10n.progressStreakProgress(
+                  progress.longestStreak, char.requiredStreak!),
         ));
         break; // Only show the nearest streak goal
       }
@@ -691,8 +692,9 @@ class _RecordsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPremium = ref.watch(isPremiumProvider).value ?? false;
-
+    final mode = ref.watch(statsModeProvider);
+    final hasRecords = AppConstants.gridSizesForMode(mode)
+        .any((size) => records.containsKey(recordKey(mode, size)));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -706,7 +708,9 @@ class _RecordsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (records.isEmpty)
+        const ModeFilterChips(),
+        const SizedBox(height: 12),
+        if (!hasRecords)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -729,17 +733,12 @@ class _RecordsSection extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              for (final size in [3, 4, 5, 6, 7, 9])
+              for (final size in AppConstants.gridSizesForMode(mode))
                 _RecordChip(
                   gridSize: size,
-                  seconds: records[recordKey('classic', size)],
-                  onTap: () {
-                    if (isPremium) {
-                      context.push('/progress/grid-detail?size=$size');
-                    } else {
-                      context.push('/paywall');
-                    }
-                  },
+                  seconds: records[recordKey(mode, size)],
+                  onTap: () => context
+                      .push('/progress/grid-detail?size=$size&mode=$mode'),
                 ),
             ],
           ),
@@ -796,7 +795,9 @@ class _RecordChip extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  hasRecord ? '${seconds}s' : '—',
+                  hasRecord
+                      ? AppLocalizations.of(context)!.shareSeconds(seconds!)
+                      : '—',
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 13,

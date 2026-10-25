@@ -8,6 +8,10 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   check-review-status:
     runs-on: ubuntu-latest
@@ -73,12 +77,15 @@ jobs:
         if: steps.check.outputs.should_create_issue == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          VERSION: ${{ steps.check.outputs.version }}
+          STATE: ${{ steps.check.outputs.state }}
         run: |
-          EXISTING=$(gh issue list --repo ${{ github.repository }} --label "app-store" --search "v${{ steps.check.outputs.version }} ${{ steps.check.outputs.state }}" --json number --jq length)
+          EXISTING=$(gh issue list --repo "$REPO" --label "app-store" --search "v$VERSION $STATE" --json number --jq length)
           if [ "$EXISTING" = "0" ]; then
             gh issue create \
-              --repo ${{ github.repository }} \
-              --title "App Store: v${{ steps.check.outputs.version }} — ${{ steps.check.outputs.state }}" \
-              --body "Version **${{ steps.check.outputs.version }}** status changed to **${{ steps.check.outputs.state }}**. Check App Store Connect for details." \
+              --repo "$REPO" \
+              --title "App Store: v$VERSION — $STATE" \
+              --body "Version **$VERSION** status changed to **$STATE**. Check App Store Connect for details." \
               --label "app-store"
           fi

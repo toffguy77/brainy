@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../providers/parent_provider.dart';
+import '../../game/providers/user_progress_provider.dart';
 
 class ParentSettingsScreen extends ConsumerWidget {
   const ParentSettingsScreen({super.key});
@@ -43,17 +45,17 @@ class ParentSettingsScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               _SegmentedControl(
                 options: [l10n.parentGridSizeAuto, l10n.parentGridSizeFixed],
-                selectedIndex: settings.gridSizeMode == 'auto' ? 0 : 1,
+                selectedIndex: settings.gridSizeMode == AppConstants.gridSizeModeAuto ? 0 : 1,
                 onChanged: (index) {
-                  final mode = index == 0 ? 'auto' : 'fixed';
+                  final mode = index == 0 ? AppConstants.gridSizeModeAuto : AppConstants.gridSizeModeFixed;
                   ref.read(parentProvider.notifier).setGridSizeMode(mode);
                 },
               ),
-              if (settings.gridSizeMode == 'fixed') ...[
+              if (settings.gridSizeMode == AppConstants.gridSizeModeFixed) ...[
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
-                  children: AppConstants.freeGridSizes.map((size) {
+                  children: AppConstants.pickerGridSizes.map((size) {
                     final isSelected = settings.fixedGridSize == size;
                     return ChoiceChip(
                       label: Text(
@@ -84,38 +86,19 @@ class ParentSettingsScreen extends ConsumerWidget {
           const SizedBox(height: 12),
           _SettingsCard(
             children: [
-              _SettingsLabel(l10n.parentMaxSessionTime),
+              _SettingsLabel(l10n.settingsDailyGoal),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [0, 5, 10, 15].map((minutes) {
-                  final isSelected =
-                      settings.maxSessionTimeMinutes == minutes;
-                  final label = minutes == 0
-                      ? l10n.parentNoLimit
-                      : l10n.parentMinutes(minutes);
-                  return ChoiceChip(
-                    label: Text(
-                      label,
-                      style: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w700,
-                        color: isSelected
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.background,
-                    side: BorderSide.none,
-                    onSelected: (_) {
-                      ref
-                          .read(parentProvider.notifier)
-                          .setMaxSessionTime(minutes);
-                    },
-                  );
-                }).toList(),
+              _SegmentedControl(
+                options: [
+                  for (final m in AppConstants.frequencyOptions)
+                    l10n.settingsMinutes(m),
+                ],
+                selectedIndex: AppConstants.frequencyOptions
+                    .indexOf(ref.watch(userProgressProvider).dailyGoalMinutes)
+                    .clamp(0, AppConstants.frequencyOptions.length - 1),
+                onChanged: (index) => ref
+                    .read(userProgressProvider.notifier)
+                    .setDailyGoalMinutes(AppConstants.frequencyOptions[index]),
               ),
             ],
           ),
@@ -166,10 +149,16 @@ class ParentSettingsScreen extends ConsumerWidget {
                   _SettingsLabel(l10n.parentNotifications),
                   Switch(
                     value: settings.notificationsEnabled,
-                    onChanged: (value) {
-                      ref
+                    onChanged: (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final applied = await ref
                           .read(parentProvider.notifier)
                           .setNotificationsEnabled(value);
+                      if (!applied) {
+                        messenger.showSnackBar(SnackBar(
+                          content: Text(l10n.settingsNotificationsDenied),
+                        ));
+                      }
                     },
                     activeTrackColor: AppColors.primary,
                     activeThumbColor: AppColors.textPrimary,
@@ -275,11 +264,20 @@ class ParentSettingsScreen extends ConsumerWidget {
                 label: l10n.parentChangePin,
                 onTap: () => context.go('/parent/pin?mode=change'),
               ),
-              const Divider(color: AppColors.background, height: 1),
+            ],
+          ),
+          const SizedBox(height: 12),
+          _SettingsCard(
+            children: [
               _SettingsButton(
-                icon: Icons.card_membership_rounded,
-                label: l10n.parentManageSubscription,
-                onTap: () => context.go('/paywall'),
+                icon: Icons.privacy_tip_rounded,
+                label: l10n.settingsPrivacyPolicy,
+                onTap: () => _openLink(context, l10n.privacyPolicyUrl),
+              ),
+              _SettingsButton(
+                icon: Icons.description_rounded,
+                label: l10n.settingsTerms,
+                onTap: () => _openLink(context, l10n.termsUrl),
               ),
             ],
           ),
@@ -455,4 +453,19 @@ class _SettingsButton extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Open a legal page in the system browser. The URL is per-language and
+/// comes from ARB.
+Future<void> _openLink(BuildContext context, String url) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final failed = AppLocalizations.of(context)!.settingsLinkFailed;
+  var opened = false;
+  try {
+    opened = await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication);
+  } catch (_) {
+    opened = false;
+  }
+  if (!opened) messenger.showSnackBar(SnackBar(content: Text(failed)));
 }

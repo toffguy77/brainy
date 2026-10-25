@@ -59,10 +59,12 @@ class FrequencyPage extends ConsumerWidget {
                 isSelected: isSelected,
                 isRecommended: isRecommended,
                 recommendedLabel: l10n.onboardingRecommended,
-                onTap: () {
+                onTap: () async {
+                  // Last onboarding page: completing here also requests the
+                  // notification permission, inside completeOnboarding().
                   final notifier = ref.read(onboardingProvider.notifier);
                   notifier.setDailyGoalMinutes(minutes);
-                  notifier.nextPage();
+                  await notifier.completeOnboarding();
                 },
               ),
             );

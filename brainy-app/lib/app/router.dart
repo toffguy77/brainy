@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/app_constants.dart';
@@ -15,14 +14,12 @@ import '../features/parent/screens/parent_pin_screen.dart';
 import '../features/parent/screens/parent_dashboard_screen.dart';
 import '../features/parent/screens/parent_settings_screen.dart';
 import '../features/league/screens/league_screen.dart';
-import '../features/subscription/screens/paywall_screen.dart';
 import 'main_shell.dart';
+import '../constants/game_modes.dart';
 
-final analytics = FirebaseAnalytics.instance;
 
 final router = GoRouter(
   initialLocation: '/onboarding',
-  observers: [FirebaseAnalyticsObserver(analytics: analytics)],
   redirect: (context, state) {
     final box = Hive.box(AppConstants.userBox);
     final completed =
@@ -63,8 +60,12 @@ final router = GoRouter(
           builder: (context, state) {
             final gridSize =
                 int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
-            final mode = state.uri.queryParameters['mode'] ?? 'classic';
-            return GameScreen(gridSize: gridSize, mode: mode);
+            // An unknown mode would be saved into sessions and record keys.
+            final mode = state.uri.queryParameters['mode'];
+            return GameScreen(
+              gridSize: gridSize,
+              mode: GameModes.all.contains(mode) ? mode! : GameModes.classic,
+            );
           },
         ),
         GoRoute(
@@ -80,7 +81,9 @@ final router = GoRouter(
         ),
         GoRoute(
           path: '/accessories',
-          builder: (context, state) => const AccessoriesScreen(),
+          builder: (context, state) => AccessoriesScreen(
+            characterId: state.uri.queryParameters['character'],
+          ),
         ),
         GoRoute(
           path: '/progress',
@@ -95,7 +98,11 @@ final router = GoRouter(
           builder: (context, state) {
             final size =
                 int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
-            return GridDetailScreen(gridSize: size);
+            final mode = state.uri.queryParameters['mode'];
+            return GridDetailScreen(
+              gridSize: size,
+              mode: GameModes.all.contains(mode) ? mode! : GameModes.classic,
+            );
           },
         ),
       ],
@@ -111,10 +118,6 @@ final router = GoRouter(
     GoRoute(
       path: '/parent/settings',
       builder: (context, state) => const ParentSettingsScreen(),
-    ),
-    GoRoute(
-      path: '/paywall',
-      builder: (context, state) => const PaywallScreen(),
     ),
   ],
 );

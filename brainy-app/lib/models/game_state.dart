@@ -1,7 +1,15 @@
+import '../constants/game_modes.dart';
 enum GameStatus { idle, countdown, playing, finished, paused }
 
 class GridCell {
+  /// Position in the tap sequence, always 1..N². Validation compares this, so
+  /// one rule covers classic, reverse and letters — only what is drawn differs.
   final int number;
+
+  /// What the cell shows. Defaults to [number] so classic and Gorbov are
+  /// unchanged; reverse draws the descending value, letters draws a letter.
+  final String? label;
+
   final int row;
   final int col;
   final String color; // 'white' | 'red'
@@ -12,10 +20,13 @@ class GridCell {
     required this.number,
     required this.row,
     required this.col,
+    this.label,
     this.color = 'white',
     this.isFound = false,
     this.isError = false,
   });
+
+  String get display => label ?? '$number';
 }
 
 class GameState {
@@ -43,7 +54,7 @@ class GameState {
     this.elapsedSeconds = 0,
     this.mistakesCount = 0,
     this.penaltySeconds = 0,
-    this.mode = 'classic',
+    this.mode = GameModes.classic,
     this.countdownValue,
     this.nextWhiteNumber = 1,
     this.nextRedNumber = 0,
@@ -53,10 +64,21 @@ class GameState {
   });
 
   int get totalSeconds => elapsedSeconds + penaltySeconds;
+
+  /// What the player must find next, as drawn on the grid: N² first in
+  /// reverse, a letter in letters mode. Gorbov shows its own two-colour hint.
+  String get expectedLabel {
+    for (final row in grid) {
+      for (final cell in row) {
+        if (cell.number == nextNumber) return cell.display;
+      }
+    }
+    return '$nextNumber';
+  }
   int get totalNumbers => gridSize * gridSize;
 
   bool get isCompleted {
-    if (mode == 'gorbov') {
+    if (mode == GameModes.gorbov) {
       return nextWhiteNumber > whiteCount && nextRedNumber < 1;
     }
     return nextNumber > totalNumbers;
