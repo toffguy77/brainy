@@ -16,7 +16,11 @@ tags: [parent, pin, dashboard, settings, share]
 - 4-значный PIN (`AppConstants.parentPinLength`)
 - Первый вход — установка PIN, последующие — проверка
 - PIN хранится в Hive (ключ `parentPinHash`)
-- 3 неудачных попытки -> блокировка на 30 секунд (`parentMaxPinAttempts`, `parentLockoutSeconds`)
+- 3 неудачных попытки -> блокировка на 30 секунд (`parentMaxPinAttempts`, `parentLockoutSeconds`).
+  Счётчик и момент окончания блокировки хранятся в Hive (`parentPinFailedAttempts`,
+  `parentPinLockedUntil`, класс `PinLockout`), поэтому выход с экрана или перезапуск блокировку
+  не снимают. Верный PIN сбрасывает счётчик. Несовпадение при подтверждении нового PIN — опечатка,
+  а не подбор: показывается ошибка, но попытка не считается.
 - Красивый нумпад с индикатором прогресса (4 точки)
 
 ## Дашборд
@@ -40,15 +44,23 @@ AppBar: заголовок «Прогресс ребёнка», кнопки Sha
 
 Настройки:
 - **Размер таблицы**: авто / фиксированный (любой из 3x3..9x9). Ключи Hive: `parentGridSizeModeKey`, `parentFixedGridSizeKey`
-- **Уведомления**: тоггл вкл/выкл + выбор времени через TimePicker. Ключ: `notificationsEnabledKey`
+- **Уведомления**: тоггл вкл/выкл + выбор времени через TimePicker. Ключ: `notificationsEnabledKey`.
+  Включение запрашивает системное разрешение; при отказе тоггл остаётся выключенным и
+  показывается подсказка открыть настройки iOS.
 - **Сменить PIN**
 - **Звук и вибрация**: тогглы. Ключи: `soundEnabledKey`, `hapticEnabledKey`
 
 ## Карточка для соцсетей
 
-Виджет `ShareCard` генерирует PNG-карточку с прогрессом для шаринга:
-- Brainy логотип, стрик, лучший результат 5x5, прогресс за месяц
-- Сохраняется через `screenshot` пакет
+Виджет `ShareCard` рендерит PNG-карточку и открывает системный share sheet:
+- Название приложения (`l10n.appName`), заголовок со стриком (ICU-плюрал, для стрика 0 —
+  «Начинаем тренировки!»), стрик и лучший результат classic 5x5 (единица — `shareSeconds`)
+- Слот рекорда скрыт, если рекорда classic 5x5 нет; рекорды других режимов и размеров его не заменяют
+- `ShareCard.fromState(progress, records, l10n)` — единый путь сборки для приложения и тестов
+- Рендер — пакет `screenshot` (`captureFromLongWidget`), файл во временной директории, отправка —
+  `share_plus` (`SharePlus.instance.share` с `sharePositionOrigin` от контекста кнопки, чтобы на
+  iPad поповер был привязан к кнопке)
+- Ошибка рендера или шаринга показывает SnackBar `shareFailed`
 - Вызывается из AppBar дашборда (кнопка Share)
 
 Файл: `brainy-app/lib/features/parent/widgets/share_card.dart`
@@ -59,3 +71,4 @@ AppBar: заголовок «Прогресс ребёнка», кнопки Sha
 - `brainy-app/lib/features/parent/screens/parent_pin_screen.dart`
 - `brainy-app/lib/features/parent/screens/parent_settings_screen.dart`
 - `brainy-app/lib/features/parent/providers/parent_provider.dart`
+- `brainy-app/lib/features/parent/providers/pin_lockout.dart`

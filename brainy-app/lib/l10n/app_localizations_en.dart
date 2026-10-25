@@ -332,11 +332,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String parentShareCardTitle(int days) {
-    return 'has been training for $days days!';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days of training in a row!',
+      one: '1 day of training in a row!',
+      zero: 'Just getting started!',
+    );
+    return '$_temp0';
   }
 
   @override
   String get parentShareBest5x5 => 'Best 5×5 result';
+
+  @override
+  String shareSeconds(int seconds) {
+    return '${seconds}s';
+  }
+
+  @override
+  String get shareFailed => 'Couldn\'t share. Please try again.';
 
   @override
   String get parentShareDownload => 'Download Brainy: brainyapp.io';

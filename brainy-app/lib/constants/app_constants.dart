@@ -85,6 +85,8 @@ class AppConstants {
   static const int parentMaxPinAttempts = 3;
   static const int parentLockoutSeconds = 30;
   static const String parentPinHashKey = 'parentPinHash';
+  static const String parentPinFailedAttemptsKey = 'parentPinFailedAttempts';
+  static const String parentPinLockedUntilKey = 'parentPinLockedUntil';
   static const String parentGridSizeModeKey = 'parentGridSizeMode';
   static const String parentFixedGridSizeKey = 'parentFixedGridSize';
   static const String gridSizeModeAuto = 'auto';

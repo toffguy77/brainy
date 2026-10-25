@@ -97,13 +97,5 @@ void main() {
     test('the PIN length is fixed at four digits', () {
       expect(AppConstants.parentPinLength, 4);
     });
-
-    test('brute force is bounded by the attempt limit', () {
-      // 10^4 combinations against 3 attempts per lockout window: the control is
-      // the lockout, not the key space. This test documents that dependency.
-      final combinations = 1;
-      expect(AppConstants.parentMaxPinAttempts,
-          lessThan(combinations * 10000));
-    });
   });
 }

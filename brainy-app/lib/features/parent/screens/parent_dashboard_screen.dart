@@ -52,9 +52,14 @@ class ParentDashboardScreen extends ConsumerWidget {
         ),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.share_rounded, color: AppColors.textPrimary),
-            onPressed: () => ShareCard.showAndShare(context, ref),
+          // Builder gives the button its own context, so the iPad share
+          // popover anchors to the button rather than the whole screen.
+          Builder(
+            builder: (buttonContext) => IconButton(
+              icon: const Icon(Icons.share_rounded,
+                  color: AppColors.textPrimary),
+              onPressed: () => ShareCard.showAndShare(buttonContext, ref),
+            ),
           ),
           IconButton(
             icon: const Icon(Icons.settings_rounded,

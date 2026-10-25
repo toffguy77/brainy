@@ -701,7 +701,7 @@ abstract class AppLocalizations {
   /// No description provided for @parentShareCardTitle.
   ///
   /// In ru, this message translates to:
-  /// **'тренируется уже {days} дней!'**
+  /// **'{days, plural, =0{Начинаем тренировки!} one{{days} день тренировок подряд!} few{{days} дня тренировок подряд!} other{{days} дней тренировок подряд!}}'**
   String parentShareCardTitle(int days);
 
   /// No description provided for @parentShareBest5x5.
@@ -709,6 +709,18 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Лучший результат 5×5'**
   String get parentShareBest5x5;
+
+  /// No description provided for @shareSeconds.
+  ///
+  /// In ru, this message translates to:
+  /// **'{seconds} с'**
+  String shareSeconds(int seconds);
+
+  /// No description provided for @shareFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось поделиться. Попробуйте ещё раз.'**
+  String get shareFailed;
 
   /// No description provided for @parentShareDownload.
   ///

@@ -10,6 +10,7 @@ import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
+import '../../../models/user_progress.dart';
 import '../../../constants/game_modes.dart';
 
 class ShareCard extends StatelessWidget {
@@ -24,47 +25,65 @@ class ShareCard extends StatelessWidget {
     required this.l10n,
   });
 
-  static Future<void> showAndShare(
-      BuildContext context, WidgetRef ref) async {
-    final l10n = AppLocalizations.of(context)!;
-    final progress = ref.read(userProgressProvider);
-    final records = ref.read(recordsProvider);
-
-    final box = context.findRenderObject() as RenderBox?;
-    final sharePosition =
-        box != null ? box.localToGlobal(Offset.zero) & box.size : null;
-
-    final controller = ScreenshotController();
-    final widget = ShareCard(
+  /// The card for the current progress. Production and tests both build it
+  /// here, so the record lookup under test is the one that ships.
+  factory ShareCard.fromState({
+    required UserProgress progress,
+    required Map<String, int> records,
+    required AppLocalizations l10n,
+  }) {
+    return ShareCard(
       streakDays: progress.currentStreak,
       best5x5: records[recordKey(GameModes.classic, 5)],
       l10n: l10n,
     );
+  }
 
+  /// Render the card to a PNG and open the share sheet. [buttonContext] is
+  /// the share button's own context: on iPad the sheet is a popover anchored
+  /// to that rect. Failures show a message instead of escaping as an
+  /// unhandled async error.
+  static Future<void> showAndShare(
+    BuildContext buttonContext,
+    WidgetRef ref,
+  ) async {
+    final l10n = AppLocalizations.of(buttonContext)!;
+    final messenger = ScaffoldMessenger.maybeOf(buttonContext);
+    final box = buttonContext.findRenderObject() as RenderBox?;
+    final sharePosition = box != null && box.hasSize
+        ? box.localToGlobal(Offset.zero) & box.size
+        : null;
+
+    final card = ShareCard.fromState(
+      progress: ref.read(userProgressProvider),
+      records: ref.read(recordsProvider),
+      l10n: l10n,
+    );
     final captureWidget = InheritedTheme.captureAll(
-      context,
-      Material(
-        color: Colors.transparent,
-        child: widget,
-      ),
+      buttonContext,
+      Material(color: Colors.transparent, child: card),
     );
 
-    final Uint8List imageBytes = await controller.captureFromLongWidget(
-      captureWidget,
-      pixelRatio: 3.0,
-      delay: const Duration(milliseconds: 100),
-    );
+    try {
+      final Uint8List imageBytes = await ScreenshotController()
+          .captureFromLongWidget(
+            captureWidget,
+            pixelRatio: 3.0,
+            delay: const Duration(milliseconds: 100),
+          );
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/brainy_progress.png');
+      await file.writeAsBytes(imageBytes);
 
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/brainy_progress.png');
-    await file.writeAsBytes(imageBytes);
-
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(file.path)],
-        sharePositionOrigin: sharePosition,
-      ),
-    );
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          sharePositionOrigin: sharePosition,
+        ),
+      );
+    } catch (_) {
+      messenger?.showSnackBar(SnackBar(content: Text(l10n.shareFailed)));
+    }
   }
 
   @override
@@ -104,21 +123,24 @@ class ShareCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'Brainy',
-                style: TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 22,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
+              Flexible(
+                child: Text(
+                  l10n.appName,
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
           Divider(
-              color: AppColors.textSecondary.withValues(alpha: 0.2),
-              height: 1),
+            color: AppColors.textSecondary.withValues(alpha: 0.2),
+            height: 1,
+          ),
           const SizedBox(height: 20),
           // Training days
           Text(
@@ -134,7 +156,7 @@ class ShareCard extends StatelessWidget {
           const SizedBox(height: 20),
           // Stats
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _ShareStatItem(
                 icon: Icons.local_fire_department_rounded,
@@ -146,15 +168,16 @@ class ShareCard extends StatelessWidget {
                 _ShareStatItem(
                   icon: Icons.timer_rounded,
                   iconColor: AppColors.secondary,
-                  value: '${best5x5}s',
+                  value: l10n.shareSeconds(best5x5!),
                   label: l10n.parentShareBest5x5,
                 ),
             ],
           ),
           const SizedBox(height: 20),
           Divider(
-              color: AppColors.textSecondary.withValues(alpha: 0.2),
-              height: 1),
+            color: AppColors.textSecondary.withValues(alpha: 0.2),
+            height: 1,
+          ),
           const SizedBox(height: 12),
           Text(
             l10n.parentShareDownload,
@@ -185,28 +208,38 @@ class _ShareStatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, color: iconColor, size: 28),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: const TextStyle(
-            fontFamily: 'Nunito',
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: AppColors.textPrimary,
+    // Each stat takes an equal share of the row; long values scale down and
+    // labels wrap, so large text or a 4-digit time cannot overflow the card.
+    return Expanded(
+      child: Column(
+        children: [
+          Icon(icon, color: iconColor, size: 28),
+          const SizedBox(height: 6),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textPrimary,
+              ),
+            ),
           ),
-        ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontFamily: 'Nunito',
-            fontSize: 11,
-            color: AppColors.textSecondary,
+          Text(
+            label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 11,
+              color: AppColors.textSecondary,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
