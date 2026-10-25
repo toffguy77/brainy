@@ -47,9 +47,9 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
           child: ShaderMask(
             shaderCallback: (bounds) =>
                 AppColors.primaryGradient.createShader(bounds),
-            child: const Text(
-              'Brainy',
-              style: TextStyle(
+            child: Text(
+              AppLocalizations.of(context)!.appName,
+              style: const TextStyle(
                 fontFamily: 'Nunito',
                 fontSize: 56,
                 fontWeight: FontWeight.w800,

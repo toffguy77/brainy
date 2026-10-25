@@ -84,7 +84,7 @@
     }
   },
   "noSessionsYet": "Нет игр — начнём!",
-  "streakDays": "Серия {count} дней",
+  "streakDays": "{count, plural, one{Серия {count} день} few{Серия {count} дня} other{Серия {count} дней}}",
   "@streakDays": {
     "placeholders": {
       "count": {
@@ -111,7 +111,7 @@
   "accessoriesEquip": "Надеть",
   "accessoriesRemove": "Снять",
   "accessoriesNotEnoughCoins": "Не хватает монет",
-  "accessoriesNotEnoughCoinsMessage": "Нужно {price} монет, а у тебя {balance}",
+  "accessoriesNotEnoughCoinsMessage": "Нужно {price, plural, one{{price} монета} few{{price} монеты} other{{price} монет}}, а у тебя {balance}",
   "@accessoriesNotEnoughCoinsMessage": {
     "placeholders": {
       "price": {
@@ -227,7 +227,7 @@
       }
     }
   },
-  "progressGoalStreak": "Стрик {days} дней",
+  "progressGoalStreak": "{days, plural, one{Стрик {days} день} few{Стрик {days} дня} other{Стрик {days} дней}}",
   "@progressGoalStreak": {
     "placeholders": {
       "days": {
@@ -468,7 +468,7 @@
   "accessoryCapeNinjaName": "Плащ ниндзя",
   "accessoryCapeWingsName": "Крылья",
   "notificationMotivation1": "Время потренировать мозг!",
-  "notificationStreak1": "Стрик {count} дней сгорит сегодня!",
+  "notificationStreak1": "{count, plural, one{Стрик {count} день сгорит сегодня!} few{Стрик {count} дня сгорит сегодня!} other{Стрик {count} дней сгорит сегодня!}}",
   "@notificationStreak1": {
     "placeholders": {
       "count": {
@@ -477,7 +477,7 @@
     }
   },
   "notificationMotivation2": "Брейни ждёт тебя! Зайди на тренировку",
-  "notificationStreak2": "Не потеряй свой стрик {count} дней!",
+  "notificationStreak2": "{count, plural, one{Не потеряй свой стрик {count} день!} few{Не потеряй свой стрик {count} дня!} other{Не потеряй свой стрик {count} дней!}}",
   "@notificationStreak2": {
     "placeholders": {
       "count": {
@@ -486,7 +486,7 @@
     }
   },
   "notificationMotivation3": "Несколько минут — и мозг станет быстрее!",
-  "notificationStreak3": "{count} дней подряд — не останавливайся!",
+  "notificationStreak3": "{count, plural, one{{count} день подряд — не останавливайся!} few{{count} дня подряд — не останавливайся!} other{{count} дней подряд — не останавливайся!}}",
   "@notificationStreak3": {
     "placeholders": {
       "count": {
@@ -513,7 +513,7 @@
     }
   },
   "notificationMotivation6": "Мозг любит тренировки. Не пропусти!",
-  "notificationStreak6": "Твой стрик {count} дней на волоске!",
+  "notificationStreak6": "{count, plural, one{Твой стрик {count} день на волоске!} few{Твой стрик {count} дня на волоске!} other{Твой стрик {count} дней на волоске!}}",
   "@notificationStreak6": {
     "placeholders": {
       "count": {
@@ -522,7 +522,7 @@
     }
   },
   "notificationMotivation7": "Пора размять мозг! Таблица Шульте ждёт",
-  "notificationStreak7": "Брейни переживает за стрик {count} дней!",
+  "notificationStreak7": "{count, plural, one{Брейни переживает за стрик {count} день!} few{Брейни переживает за стрик {count} дня!} other{Брейни переживает за стрик {count} дней!}}",
   "@notificationStreak7": {
     "placeholders": {
       "count": {
@@ -530,5 +530,16 @@
       }
     }
   },
-  "settingsNotificationsDenied": "Уведомления запрещены. Разрешите их в Настройках iOS."
+  "settingsNotificationsDenied": "Уведомления запрещены. Разрешите их в Настройках iOS.",
+  "progressStreakProgress": "{current} / {required, plural, one{{required} день} few{{required} дня} other{{required} дней}}",
+  "@progressStreakProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "required": {
+        "type": "int"
+      }
+    }
+  }
 }

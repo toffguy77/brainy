@@ -192,7 +192,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String streakDays(int count) {
-    return '$count day streak';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count day streak',
+      one: '1 day streak',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -870,4 +876,15 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get settingsNotificationsDenied =>
       'Notifications are blocked. Allow them in iOS Settings.';
+
+  @override
+  String progressStreakProgress(int current, int required) {
+    String _temp0 = intl.Intl.pluralLogic(
+      required,
+      locale: localeName,
+      other: '$required days',
+      one: '1 day',
+    );
+    return '$current / $_temp0';
+  }
 }

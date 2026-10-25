@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// No description provided for @streakDays.
   ///
   /// In ru, this message translates to:
-  /// **'Серия {count} дней'**
+  /// **'{count, plural, one{Серия {count} день} few{Серия {count} дня} other{Серия {count} дней}}'**
   String streakDays(int count);
 
   /// No description provided for @levelLabel.
@@ -521,7 +521,7 @@ abstract class AppLocalizations {
   /// No description provided for @accessoriesNotEnoughCoinsMessage.
   ///
   /// In ru, this message translates to:
-  /// **'Нужно {price} монет, а у тебя {balance}'**
+  /// **'Нужно {price, plural, one{{price} монета} few{{price} монеты} other{{price} монет}}, а у тебя {balance}'**
   String accessoriesNotEnoughCoinsMessage(int price, int balance);
 
   /// No description provided for @accessoriesCustomize.
@@ -845,7 +845,7 @@ abstract class AppLocalizations {
   /// No description provided for @progressGoalStreak.
   ///
   /// In ru, this message translates to:
-  /// **'Стрик {days} дней'**
+  /// **'{days, plural, one{Стрик {days} день} few{Стрик {days} дня} other{Стрик {days} дней}}'**
   String progressGoalStreak(int days);
 
   /// No description provided for @progressGoalUnlock.
@@ -1553,7 +1553,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStreak1.
   ///
   /// In ru, this message translates to:
-  /// **'Стрик {count} дней сгорит сегодня!'**
+  /// **'{count, plural, one{Стрик {count} день сгорит сегодня!} few{Стрик {count} дня сгорит сегодня!} other{Стрик {count} дней сгорит сегодня!}}'**
   String notificationStreak1(int count);
 
   /// No description provided for @notificationMotivation2.
@@ -1565,7 +1565,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStreak2.
   ///
   /// In ru, this message translates to:
-  /// **'Не потеряй свой стрик {count} дней!'**
+  /// **'{count, plural, one{Не потеряй свой стрик {count} день!} few{Не потеряй свой стрик {count} дня!} other{Не потеряй свой стрик {count} дней!}}'**
   String notificationStreak2(int count);
 
   /// No description provided for @notificationMotivation3.
@@ -1577,7 +1577,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStreak3.
   ///
   /// In ru, this message translates to:
-  /// **'{count} дней подряд — не останавливайся!'**
+  /// **'{count, plural, one{{count} день подряд — не останавливайся!} few{{count} дня подряд — не останавливайся!} other{{count} дней подряд — не останавливайся!}}'**
   String notificationStreak3(int count);
 
   /// No description provided for @notificationMotivation4.
@@ -1613,7 +1613,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStreak6.
   ///
   /// In ru, this message translates to:
-  /// **'Твой стрик {count} дней на волоске!'**
+  /// **'{count, plural, one{Твой стрик {count} день на волоске!} few{Твой стрик {count} дня на волоске!} other{Твой стрик {count} дней на волоске!}}'**
   String notificationStreak6(int count);
 
   /// No description provided for @notificationMotivation7.
@@ -1625,7 +1625,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationStreak7.
   ///
   /// In ru, this message translates to:
-  /// **'Брейни переживает за стрик {count} дней!'**
+  /// **'{count, plural, one{Брейни переживает за стрик {count} день!} few{Брейни переживает за стрик {count} дня!} other{Брейни переживает за стрик {count} дней!}}'**
   String notificationStreak7(int count);
 
   /// No description provided for @settingsNotificationsDenied.
@@ -1633,6 +1633,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Уведомления запрещены. Разрешите их в Настройках iOS.'**
   String get settingsNotificationsDenied;
+
+  /// No description provided for @progressStreakProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'{current} / {required, plural, one{{required} день} few{{required} дня} other{{required} дней}}'**
+  String progressStreakProgress(int current, int required);
 }
 
 class _AppLocalizationsDelegate

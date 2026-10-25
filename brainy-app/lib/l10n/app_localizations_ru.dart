@@ -193,7 +193,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String streakDays(int count) {
-    return 'Серия $count дней';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Серия $count дней',
+      few: 'Серия $count дня',
+      one: 'Серия $count день',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -236,7 +243,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String accessoriesNotEnoughCoinsMessage(int price, int balance) {
-    return 'Нужно $price монет, а у тебя $balance';
+    String _temp0 = intl.Intl.pluralLogic(
+      price,
+      locale: localeName,
+      other: '$price монет',
+      few: '$price монеты',
+      one: '$price монета',
+    );
+    return 'Нужно $_temp0, а у тебя $balance';
   }
 
   @override
@@ -425,7 +439,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String progressGoalStreak(int days) {
-    return 'Стрик $days дней';
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'Стрик $days дней',
+      few: 'Стрик $days дня',
+      one: 'Стрик $days день',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -815,7 +836,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String notificationStreak1(int count) {
-    return 'Стрик $count дней сгорит сегодня!';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Стрик $count дней сгорит сегодня!',
+      few: 'Стрик $count дня сгорит сегодня!',
+      one: 'Стрик $count день сгорит сегодня!',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -823,7 +851,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String notificationStreak2(int count) {
-    return 'Не потеряй свой стрик $count дней!';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Не потеряй свой стрик $count дней!',
+      few: 'Не потеряй свой стрик $count дня!',
+      one: 'Не потеряй свой стрик $count день!',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -832,7 +867,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String notificationStreak3(int count) {
-    return '$count дней подряд — не останавливайся!';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count дней подряд — не останавливайся!',
+      few: '$count дня подряд — не останавливайся!',
+      one: '$count день подряд — не останавливайся!',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -856,7 +898,14 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String notificationStreak6(int count) {
-    return 'Твой стрик $count дней на волоске!';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Твой стрик $count дней на волоске!',
+      few: 'Твой стрик $count дня на волоске!',
+      one: 'Твой стрик $count день на волоске!',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -865,10 +914,29 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String notificationStreak7(int count) {
-    return 'Брейни переживает за стрик $count дней!';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Брейни переживает за стрик $count дней!',
+      few: 'Брейни переживает за стрик $count дня!',
+      one: 'Брейни переживает за стрик $count день!',
+    );
+    return '$_temp0';
   }
 
   @override
   String get settingsNotificationsDenied =>
       'Уведомления запрещены. Разрешите их в Настройках iOS.';
+
+  @override
+  String progressStreakProgress(int current, int required) {
+    String _temp0 = intl.Intl.pluralLogic(
+      required,
+      locale: localeName,
+      other: '$required дней',
+      few: '$required дня',
+      one: '$required день',
+    );
+    return '$current / $_temp0';
+  }
 }

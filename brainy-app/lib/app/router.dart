@@ -60,8 +60,12 @@ final router = GoRouter(
           builder: (context, state) {
             final gridSize =
                 int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
-            final mode = state.uri.queryParameters['mode'] ?? GameModes.classic;
-            return GameScreen(gridSize: gridSize, mode: mode);
+            // An unknown mode would be saved into sessions and record keys.
+            final mode = state.uri.queryParameters['mode'];
+            return GameScreen(
+              gridSize: gridSize,
+              mode: GameModes.all.contains(mode) ? mode! : GameModes.classic,
+            );
           },
         ),
         GoRoute(

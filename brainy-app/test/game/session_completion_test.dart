@@ -114,6 +114,13 @@ void main() {
     expect(Hive.box<int>(AppConstants.recordsBox).get('classic_4'), 20);
   });
 
+  test('a faster game replaces an existing record', () async {
+    await complete(_finished(GameModes.classic, 4, 30));
+    final faster = await complete(_finished(GameModes.classic, 4, 25));
+    expect(faster.isRecord, isTrue);
+    expect(Hive.box<int>(AppConstants.recordsBox).get('classic_4'), 25);
+  });
+
   test('reverse and letters records survive an app restart', () async {
     await complete(_finished(GameModes.reverse, 5, 40));
     await complete(_finished(GameModes.letters, 3, 15));

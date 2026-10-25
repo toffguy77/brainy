@@ -84,7 +84,7 @@
     }
   },
   "noSessionsYet": "No games yet — let's start!",
-  "streakDays": "{count} day streak",
+  "streakDays": "{count, plural, =1{1 day streak} other{{count} day streak}}",
   "@streakDays": {
     "placeholders": {
       "count": {
@@ -530,5 +530,16 @@
       }
     }
   },
-  "settingsNotificationsDenied": "Notifications are blocked. Allow them in iOS Settings."
+  "settingsNotificationsDenied": "Notifications are blocked. Allow them in iOS Settings.",
+  "progressStreakProgress": "{current} / {required, plural, =1{1 day} other{{required} days}}",
+  "@progressStreakProgress": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "required": {
+        "type": "int"
+      }
+    }
+  }
 }

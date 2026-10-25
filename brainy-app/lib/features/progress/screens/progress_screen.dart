@@ -390,7 +390,8 @@ class _NextGoalsSection extends StatelessWidget {
               '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(l10n))}',
           progress: streakProgress,
           progressLabel:
-              '${progress.longestStreak} / ${char.requiredStreak} ${l10n.parentDays}',
+              l10n.progressStreakProgress(
+                  progress.longestStreak, char.requiredStreak!),
         ));
         break; // Only show the nearest streak goal
       }
