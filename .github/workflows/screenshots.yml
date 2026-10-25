@@ -68,12 +68,24 @@ jobs:
           capture ipad-13 "iPad Pro 13-inch (M4)" "iPad Pro 13-inch (M5)" "iPad Pro (12.9-inch) (6th generation)"
           find screenshots/raw -name '*.png' | sort
 
+      # Keep the raw captures even if composing fails: capturing takes ~40 min.
+      - name: Upload raw captures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-screenshots
+          path: brainy-app/screenshots/raw
+          if-no-files-found: warn
+
       - name: Compose and arrange for fastlane
         run: |
           set -euo pipefail
-          python3 -m pip install --quiet -r scripts/requirements.txt
-          python3 scripts/compose_screenshots.py
-          python3 - <<'EOF'
+          # Homebrew Python refuses global installs (PEP 668): use a venv.
+          python3 -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --quiet -r scripts/requirements.txt
+          python scripts/compose_screenshots.py
+          python - <<'EOF'
           import shutil
           from pathlib import Path
           screens = ["home", "game", "result", "characters", "progress", "parent"]
