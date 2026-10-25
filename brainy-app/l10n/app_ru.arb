@@ -109,7 +109,6 @@
   "accessoriesTabEffects": "Эффекты",
   "accessoriesTabCapes": "Плащи",
   "accessoriesEquip": "Надеть",
-  "accessoriesEquipped": "Надето",
   "accessoriesRemove": "Снять",
   "accessoriesNotEnoughCoins": "Не хватает монет",
   "accessoriesNotEnoughCoinsMessage": "Нужно {price} монет, а у тебя {balance}",

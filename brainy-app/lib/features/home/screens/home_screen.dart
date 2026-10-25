@@ -9,7 +9,7 @@ import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../character/data/characters_data.dart';
-import '../../character/screens/character_screen.dart';
+import '../../character/widgets/dressed_avatar.dart';
 import '../../../constants/game_modes.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -182,7 +182,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         ),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: characterAvatar(progress.activeCharacterId, size: 120),
+          child: DressedAvatar(
+              characterId: progress.activeCharacterId, size: 112),
         ),
       ),
     );

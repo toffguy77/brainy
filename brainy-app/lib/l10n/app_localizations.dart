@@ -506,12 +506,6 @@ abstract class AppLocalizations {
   /// **'Надеть'**
   String get accessoriesEquip;
 
-  /// No description provided for @accessoriesEquipped.
-  ///
-  /// In ru, this message translates to:
-  /// **'Надето'**
-  String get accessoriesEquipped;
-
   /// No description provided for @accessoriesRemove.
   ///
   /// In ru, this message translates to:

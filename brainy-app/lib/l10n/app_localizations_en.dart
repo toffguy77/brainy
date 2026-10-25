@@ -228,9 +228,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get accessoriesEquip => 'Equip';
 
   @override
-  String get accessoriesEquipped => 'Equipped';
-
-  @override
   String get accessoriesRemove => 'Remove';
 
   @override

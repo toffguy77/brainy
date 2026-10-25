@@ -8,7 +8,8 @@ import '../../game/providers/user_progress_provider.dart';
 import '../data/accessories_data.dart';
 import '../data/characters_data.dart';
 import '../providers/character_provider.dart';
-import 'character_screen.dart';
+import '../../../shared/services/haptic_service.dart';
+import '../widgets/dressed_avatar.dart';
 
 class AccessoriesScreen extends ConsumerStatefulWidget {
   const AccessoriesScreen({super.key});
@@ -191,8 +192,8 @@ class _CharacterPreview extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 120,
-          height: 120,
+          width: 132,
+          height: 132,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -202,12 +203,12 @@ class _CharacterPreview extends StatelessWidget {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(60),
+            borderRadius: BorderRadius.circular(66),
             border: Border.all(color: characterInfo.color, width: 3),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: characterAvatar(characterInfo.id, size: 60),
+            padding: const EdgeInsets.all(26),
+            child: DressedAvatar(characterId: characterInfo.id, size: 80),
           ),
         ),
         if (equipped.isNotEmpty) ...[
@@ -343,13 +344,6 @@ class _AccessoryCard extends ConsumerWidget {
   }
 
   Widget _buildIcon(bool isOwned) {
-    final iconData = switch (accessory.slot) {
-      AccessorySlot.hat => Icons.checkroom_rounded,
-      AccessorySlot.glasses => Icons.visibility_rounded,
-      AccessorySlot.effect => Icons.auto_awesome_rounded,
-      AccessorySlot.cape => Icons.shield_rounded,
-    };
-
     return Container(
       width: 56,
       height: 56,
@@ -359,10 +353,11 @@ class _AccessoryCard extends ConsumerWidget {
             : AppColors.background,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Icon(
-        iconData,
-        size: 28,
-        color: isOwned ? AppColors.primary : AppColors.textSecondary,
+      child: Center(
+        child: Opacity(
+          opacity: isOwned ? 1 : 0.6,
+          child: AccessoryGlyph(accessory: accessory, size: 32),
+        ),
       ),
     );
   }
@@ -382,7 +377,8 @@ class _AccessoryCard extends ConsumerWidget {
             const Icon(Icons.check_rounded, size: 14, color: AppColors.success),
             const SizedBox(width: 4),
             Text(
-              l10n.accessoriesEquipped,
+              // Equipped: the action a tap performs is taking it off.
+              l10n.accessoriesRemove,
               style: const TextStyle(
                 fontFamily: 'Nunito',
                 fontSize: 12,
@@ -477,7 +473,7 @@ class _AccessoryCard extends ConsumerWidget {
         .purchaseAccessory(accessory.id, accessory.price);
 
     if (success) {
-      HapticFeedback.mediumImpact();
+      HapticService.purchase();
       await ref
           .read(characterProvider.notifier)
           .equipAccessory(activeId, accessory.id, accessory.slot);

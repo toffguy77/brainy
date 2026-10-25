@@ -109,7 +109,6 @@
   "accessoriesTabEffects": "Effects",
   "accessoriesTabCapes": "Capes",
   "accessoriesEquip": "Equip",
-  "accessoriesEquipped": "Equipped",
   "accessoriesRemove": "Remove",
   "accessoriesNotEnoughCoins": "Not enough coins",
   "accessoriesNotEnoughCoinsMessage": "You need {price} coins, but you have {balance}",

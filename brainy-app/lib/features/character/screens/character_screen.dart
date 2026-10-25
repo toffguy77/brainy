@@ -8,6 +8,7 @@ import '../../../models/user_progress.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../data/characters_data.dart';
 import '../providers/character_provider.dart';
+import '../widgets/dressed_avatar.dart';
 
 Widget characterAvatar(String id, {required double size, Color? color}) {
   final info = defaultCharacters.firstWhere(
@@ -234,7 +235,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: data.isUnlocked
-              ? characterAvatar(info.id, size: 80)
+              ? DressedAvatar(characterId: info.id, size: 80)
               : ColorFiltered(
                   colorFilter: const ColorFilter.matrix(<double>[
                     0.2126, 0.7152, 0.0722, 0, 0,

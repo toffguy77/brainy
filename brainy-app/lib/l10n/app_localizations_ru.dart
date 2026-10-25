@@ -229,9 +229,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get accessoriesEquip => 'Надеть';
 
   @override
-  String get accessoriesEquipped => 'Надето';
-
-  @override
   String get accessoriesRemove => 'Снять';
 
   @override

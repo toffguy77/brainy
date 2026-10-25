@@ -35,27 +35,38 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 ## Аксессуары
 
-15+ предметов в 4 категориях (enum `AccessorySlot`):
+15 предметов в 4 категориях (enum `AccessorySlot`), каталог — `accessories_data.dart`:
 - **Шляпы (hat):** Колпак учёного, Корона, Кепка, Шлем, Цилиндр
 - **Очки (glasses):** Умные очки, Солнцезащитные, Пиксельные, VR-шлем
 - **Эффекты (effect):** Звёзды, Огонь, Электричество
 - **Плащи (cape):** Мантия, Плащ ниндзя, Крылья
 
-Покупка за игровые монеты. Платных аксессуаров нет.
+Покупка за игровые монеты. Платных аксессуаров нет. Владение — общее для всех персонажей
+(`UserProgress.unlockedAccessories`), а надетое — своё у каждого персонажа (`equipped*` в
+`CharacterData`).
+
+Отрисовка без отдельного арта: у каждого предмета `glyph` (эмодзи или текстовый глиф, например
+пиксельные очки `⌐■-■`) либо `tint` — мантия и плащ ниндзя рисуются `CapePainter` нужного цвета.
+Виджет `DressedAvatar` накладывает слои на аватар: плащ/крылья сзади, очки на лице, шляпа сверху,
+эффект вокруг. Используется на главной, на превью экрана персонажа и в магазине.
 
 ## Экран аксессуаров
 
 Путь: через кнопку на экране персонажа.
 
-- Превью персонажа с надетыми аксессуарами (верхняя треть)
+- Превью персонажа с надетыми аксессуарами (`DressedAvatar`) и чипы с названиями надетого
 - Табы по категориям: Шляпы | Очки | Эффекты | Плащи
-- GridView (2 колонки) с состояниями: куплен+надет, куплен, доступен к покупке
+- GridView (2 колонки), у карточки — глиф предмета и состояние: надет (действие «Снять»),
+  куплен («Надеть»), не куплен (цена)
 
-При покупке: проверка баланса -> списание монет -> автонадевание.
+При покупке: проверка баланса -> списание монет -> автонадевание, вибрация `HapticService.purchase`.
+Не хватает монет — BottomSheet «нужно N, у тебя M», баланс не меняется. Тап по надетому снимает его.
 
 ## Хранение
 
-- Данные персонажа в `CharacterData` (Hive typeId: 2): id, имена, isUnlocked, unlockedAccessories, equippedHat/Glasses/Effect/Cape
+- Данные персонажа в `CharacterData` (Hive typeId: 2): id, isUnlocked, equippedHat/Glasses/Effect/Cape.
+  Поля `nameRu/nameEn` и `unlockedAccessories` — устаревшие, сохраняются ради формата и не читаются;
+  имена персонажей берутся из ARB по id
 - Активный персонаж сохраняется в `UserProgress.activeCharacterId`
 - Hive box: `character`
 
@@ -63,11 +74,13 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 Активный персонаж рендерится в круглом контейнере 160x160 с градиентным фоном цвета персонажа. Idle-анимация: покачивание вверх-вниз (AnimationController, 1800ms, Tween -6..+6).
 
-В текущей реализации персонажи отображаются через функцию `characterAvatar()` из PNG-ассетов `assets/characters/*.png`.
+Персонаж рисуется `DressedAvatar` (PNG из `assets/characters/*.png` через `characterAvatar()` плюс надетые аксессуары).
 
 ## Ключевые файлы
 
 - `brainy-app/lib/features/character/data/characters_data.dart` — CharacterInfo, defaultCharacters
 - `brainy-app/lib/models/character.dart` — CharacterData (Hive)
-- `brainy-app/lib/models/accessory.dart` — Accessory, AccessorySlot
+- `brainy-app/lib/models/accessory.dart` — AccessoryInfo, AccessorySlot
+- `brainy-app/lib/features/character/data/accessories_data.dart` — каталог аксессуаров
+- `brainy-app/lib/features/character/widgets/dressed_avatar.dart` — DressedAvatar, CapePainter
 - `brainy-app/lib/features/character/screens/character_screen.dart`
