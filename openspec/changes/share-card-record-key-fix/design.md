@@ -1,3 +1,27 @@
+## Decision / Outcome (2026-10-25)
+
+- **Lookup:** `ShareCard.fromState` reads `records[recordKey(GameModes.classic, 5)]`
+  (`share_card.dart:37`). No other raw-key lookup of the records map exists in `lib/` or `test/`.
+- **Testability, revised:** instead of a "seeded provider scope", the card is built by a pure
+  factory `ShareCard.fromState(progress, records, l10n)`. `showAndShare` reads the providers and
+  calls it (`share_card.dart:57-61`); the test calls the same factory with plain maps
+  (`test/parent/share_card_test.dart:31`). This closes the audit finding that the earlier test
+  constructed `ShareCard(best5x5: ...)` directly and could not catch a reverted lookup.
+- **Sharing robustness (added in 328de3d):** `sharePositionOrigin` from the Share button's own
+  context (dashboard wraps the button in a `Builder`), `try/catch` around capture/write/share with a
+  `shareFailed` SnackBar.
+- **Copy and layout (added in 328de3d):** `shareSeconds`, `appName`, plural `parentShareCardTitle`
+  from ARB; stat items use `Expanded` + `FittedBox` + 2-line labels so 4-digit times and large text
+  scale do not overflow the 340-px card.
+- **Scope kept:** classic 5x5 only; Gorbov/other sizes remain an open product question.
+- **Not covered by automated tests:** the real share sheet / iPad popover and PNG rendering (fonts,
+  gradient). These remain manual device tasks.
+
+Everything below is the original design, kept for history. Code snippets showing `records[5]`
+describe the pre-fix defect.
+
+---
+
 ## Context
 
 Records were originally keyed by grid size alone (`"5"`). When Gorbov-Schulte mode arrived, the key format became `"{mode}_{gridSize}"` and `RecordsNotifier` gained a `recordKey(mode, gridSize)` helper plus a one-time migration for legacy keys. Every consumer was updated except `ShareCard`, which still does:
@@ -37,7 +61,7 @@ This is a small fix with an outsized lesson: the type system permitted a lookup 
 ## Risks / Trade-offs
 
 - **The card now renders a value where it always rendered blank** → That is the fix. Worth a visual check that the layout accommodates a real number, since it has only ever been exercised empty.
-- **Widget-testing a `ScreenshotController`-based card is awkward** → Test the `ShareCard` widget's rendering directly with a seeded provider scope rather than driving `showAndShare`, which touches `path_provider` and `share_plus`.
+- **Widget-testing a `ScreenshotController`-based card is awkward** → Test the `ShareCard` widget's rendering directly with a seeded provider scope rather than driving `showAndShare`, which touches `path_provider` and `share_plus`. *(Historical: implemented as the `ShareCard.fromState` factory shared by production and tests; see Outcome.)*
 - **Other stale record lookups may exist** → Grep as part of this change; the CI gate catches future ones.
 
 ## Migration Plan

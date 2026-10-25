@@ -1,90 +1,108 @@
 ## ADDED Requirements
 
-### Requirement: A configured time limit ends the session
+### Requirement: The app has no play-time limit
 
-When a parent has configured a maximum session time, a game session SHALL end once that duration of play has elapsed.
+The app SHALL NOT limit how long or how often a child plays. No game session SHALL be ended, blocked or shortened because of elapsed play time.
 
-#### Scenario: The limit is reached
+#### Scenario: A long play streak is never cut off
 
-- **WHEN** the limit is 5 minutes and a session reaches 5 minutes of elapsed play
-- **THEN** the game stops accepting taps and the session ends
+- **WHEN** a child plays session after session for longer than 15 minutes in one day
+- **THEN** every session runs until the child completes or leaves it, and no "time is up" message is shown
 
-#### Scenario: The limit is not reached
+#### Scenario: The daily goal is not a cap
 
-- **WHEN** the limit is 10 minutes and the child completes the table in 40 seconds
-- **THEN** the session completes normally and the limit has no effect
+- **WHEN** today's play time reaches or exceeds the daily goal
+- **THEN** the home screen marks the goal as done and the child can keep starting new sessions
 
-#### Scenario: Unlimited means unlimited
+### Requirement: No session-time control is offered or documented
 
-- **WHEN** the limit is set to unlimited (0)
-- **THEN** no session is ever ended by the limit
+The parent settings screen SHALL NOT offer a maximum session time or play-time limit control. The codebase SHALL NOT keep the constant, provider field, setter or localized strings for one. The feature plans SHALL NOT describe one.
 
-### Requirement: The countdown does not consume the limit
+#### Scenario: The settings screen has no limit control
 
-Elapsed play time SHALL be measured from the start of play, excluding the three-second countdown, so the limit measures playing rather than waiting.
+- **WHEN** a parent opens `/parent/settings`
+- **THEN** no control for maximum session time or play-time limit is shown
 
-#### Scenario: Countdown is excluded
+#### Scenario: No code or strings remain
 
-- **WHEN** a session with a 5-minute limit begins
-- **THEN** the limit is measured from the end of the countdown, not from screen entry
+- **WHEN** `brainy-app/lib`, `brainy-app/test`, `brainy-app/integration_test` and `brainy-app/l10n` are searched for `maxSessionTime`, `parentMaxSessionTime` or `sessionTime`
+- **THEN** there are no matches
 
-### Requirement: The child is told why the session ended
+#### Scenario: The plan matches the code
 
-A session ended by the limit SHALL explain itself in language a 6-to-14-year-old understands. It SHALL NOT simply close or appear to be a crash.
+- **WHEN** the settings section of `docs/plans/features/parent-panel.md` is read
+- **THEN** it lists no session time limit
 
-#### Scenario: An explanation is shown
+#### Scenario: A leftover stored value is inert
 
-- **WHEN** a session ends because the limit was reached
-- **THEN** the child sees a message stating that play time is over for now
+- **WHEN** an upgraded device still has a value stored under the old `parentMaxSessionTime` key
+- **THEN** the app ignores it and behaves exactly as on a fresh install
 
-#### Scenario: The message is localized
+### Requirement: Every parent-settings control changes observable behaviour
 
-- **WHEN** the message is shown
-- **THEN** it comes from the ARB files in the active locale, with no hardcoded text
+Every control on the parent settings screen SHALL have an effect the parent or child can observe. A control that only stores a value nobody reads SHALL NOT ship.
 
-#### Scenario: It is not framed as a failure
+#### Scenario: Grid size auto mode
 
-- **WHEN** the message is shown
-- **THEN** it does not present the outcome as a loss or a mistake by the child
+- **WHEN** the parent selects "auto"
+- **THEN** the child can pick any size valid for the selected mode on the home screen, and the home screen suggests the next size once recent games meet the target
 
-### Requirement: Progress up to the limit is preserved
+#### Scenario: Grid size fixed mode
 
-Ending a session on the limit SHALL NOT discard what the child achieved. The partial session SHALL be recorded on the same terms as any other incomplete session.
+- **WHEN** the parent selects "fixed" and a size such as 9x9
+- **THEN** the home screen shows only that size, offers no size suggestion, and starts the game at that size
 
-#### Scenario: Coins and XP are kept
+#### Scenario: Fixed size is clamped to the mode
 
-- **WHEN** a session ends on the limit after the child has made progress
-- **THEN** the progress earned is retained rather than discarded
+- **WHEN** the fixed size is 9x9 and the child selects the letters mode
+- **THEN** the home screen shows and starts 5x5, the largest size letters supports
 
-#### Scenario: A partial session sets no personal record
+#### Scenario: Daily goal
 
-- **WHEN** a session ends on the limit without the table being completed
-- **THEN** no personal record is written, because no completion time exists
+- **WHEN** the parent changes the daily goal to 5, 10 or 15 minutes
+- **THEN** the home screen bar shows "Today: X of N min" with the new N, and the dashboard uses the same goal
 
-### Requirement: The setting takes effect without a restart
+#### Scenario: Sounds off
 
-A change to the limit SHALL apply to the next session started, with no app restart required.
+- **WHEN** the parent turns sounds off
+- **THEN** no game sound effects play on taps, game start, completion or achievements
 
-#### Scenario: A new limit applies immediately
+#### Scenario: Haptics off
 
-- **WHEN** a parent changes the limit and returns to the game
-- **THEN** the next session uses the new value
+- **WHEN** the parent turns haptics off
+- **THEN** no haptic feedback fires on taps or game completion
 
-#### Scenario: Changing the limit mid-session does not disrupt play
+#### Scenario: Notifications on with permission granted
 
-- **WHEN** the limit is changed while a session is in progress
-- **THEN** the running session is not terminated abruptly by the new value
+- **WHEN** the parent turns notifications on and iOS grants permission
+- **THEN** the toggle stays on and a daily reminder is scheduled, unless the child already played today
 
-### Requirement: The setting is honest about what it does
+#### Scenario: Notifications on with permission denied
 
-The control SHALL either be enforced as described, or be removed. The app SHALL NOT present a parental control that has no effect.
+- **WHEN** the parent turns notifications on and iOS denies permission
+- **THEN** the toggle stays off and a message tells the parent to allow notifications in iOS Settings
 
-#### Scenario: No unenforced control ships
+#### Scenario: Notifications off
 
-- **WHEN** the parent settings screen is reviewed
-- **THEN** every control on it changes observable app behaviour
+- **WHEN** the parent turns notifications off
+- **THEN** any scheduled reminder is cancelled
 
-#### Scenario: The plan matches the behaviour
+#### Scenario: Reminder time
 
-- **WHEN** `docs/plans/features/parent-panel.md` is compared against the implementation
-- **THEN** its description of the session time limit matches what the code does
+- **WHEN** the parent picks a reminder time, or resets it to the default
+- **THEN** the reminder is rescheduled for that time, or for the default time
+
+#### Scenario: Change PIN
+
+- **WHEN** the parent taps "Change PIN"
+- **THEN** the PIN screen opens in change mode and the new PIN replaces the old one
+
+#### Scenario: Legal links
+
+- **WHEN** the parent taps the privacy policy or terms link
+- **THEN** the page for the current language opens in the system browser
+
+#### Scenario: Version label
+
+- **WHEN** the parent taps the app version label
+- **THEN** the version string is copied to the clipboard and a confirmation is shown

@@ -1,3 +1,26 @@
+## Decision / Outcome (2026-10-25)
+
+**Done.** The prerequisite changes landed in `f0e1ec8..1e1e279` on `chore/finish-audit-changes`,
+and the plans were corrected alongside them. A second claim-by-claim audit of every file in
+`docs/plans/features/`, `docs/plans/ops/` and `CLAUDE.md` then fixed the drift those commits
+left behind (see `design.md`, "Outcome"). All ten original discrepancies are resolved:
+
+| # | Resolution |
+|---|------------|
+| 1, 9 | YooKassa, `functions/`, `subscription.md` and `subscription_service.dart` deleted — app is free |
+| 2 | `CLAUDE.md`: Firestore not used; leaderboards via Game Center |
+| 3 | `CLAUDE.md`: hand-written providers and Hive adapters, no code generation |
+| 4 | `ci-cd.md` rewritten for `ci.yml`, `deploy-testflight.yml`, `release.yml`, `monitor.yml` |
+| 5 | Achievement table equals `AchievementId` (10 values) |
+| 6 | Leaderboard IDs `brainy_weekly_xp`, `brainy_best_time_{N}x{N}` |
+| 7, 8 | PNG avatars; `CharacterData` fields incl. `equippedCape` |
+| 10 | Session time limit removed (owner decision), so the plan no longer mentions it |
+
+Owner decisions that shaped the plans: app free; iOS only; no analytics; no session-time limit;
+accessories drawn as glyphs; daily goal and adaptive difficulty implemented; stats per mode.
+
+The table below is the original 2026-08-01 audit, kept as history.
+
 ## Why
 
 `CLAUDE.md` declares that `docs/plans/features/` is the source of truth, that it is living documentation of how the app behaves, and that agents must read the relevant plan before implementing and update it after. The audit found ten places where the plans describe something the code does not do.

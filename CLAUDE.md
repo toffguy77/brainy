@@ -60,12 +60,13 @@ release call it as a required `verify` job, so a red commit never ships.
 ```
 brainy-app/lib/
   app/             # router.dart, main_shell.dart, theme.dart
-  constants/       # AppConstants, AppColors — no magic strings
+  constants/       # AppConstants, AppColors, GameModes — no magic strings
   features/        # feature-first: game, home, character, progress, league,
                    #   onboarding, parent
   models/          # Plain Dart models with Hive adapters (manually written)
   shared/services/ # haptic, sound, notification, Game Center services
-  l10n/            # ARB files + generated app_localizations*.dart
+  l10n/            # generated app_localizations*.dart (do not edit)
+brainy-app/l10n/   # ARB sources app_ru.arb (template), app_en.arb
 docs/plans/features/ # Feature plans (source of truth)
 docs/plans/ops/      # CI/CD, App Store metadata
 ```

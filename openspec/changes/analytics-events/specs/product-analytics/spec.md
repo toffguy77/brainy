@@ -1,112 +1,71 @@
 ## ADDED Requirements
 
-### Requirement: No personal or child-identifying data is collected
+### Requirement: No analytics SDK is bundled
 
-Analytics events SHALL NOT carry personal data. No event or parameter SHALL contain a name, an age, free text entered by a user, a device identifier, or any value that could identify a child.
+The app SHALL NOT depend on any product-analytics SDK. Firebase dependencies MUST be limited to `firebase_core` and `firebase_crashlytics`.
 
-This constraint outranks every measurement goal in this specification. Where the two conflict, the event is dropped.
+#### Scenario: Dependencies contain no analytics package
 
-#### Scenario: The child's custom name is never sent
+- **WHEN** `brainy-app/pubspec.yaml` and `pubspec.lock` are inspected
+- **THEN** neither lists `firebase_analytics` or any other analytics package, and the only Firebase packages are `firebase_core` and `firebase_crashlytics`
 
-- **WHEN** a player sets a custom display name
-- **THEN** no analytics event contains that name
+#### Scenario: No analytics service exists
 
-#### Scenario: Age is sent only as a bucket, if at all
+- **WHEN** `brainy-app/lib/` is searched
+- **THEN** there is no analytics service file and no reference to `FirebaseAnalytics`
 
-- **WHEN** onboarding completion is recorded
-- **THEN** any age information is the coarse bucket already collected (`6-9`, `10-12`, `13-14`) and never a precise age or birth date
+### Requirement: No analytics events or screen views are emitted
 
-#### Scenario: No free text is ever a parameter
+The app SHALL NOT emit custom analytics events or automatic screen-view events in any build.
 
-- **WHEN** the event definitions are reviewed
-- **THEN** every parameter is an enum, a bounded number, or a fixed string from a known set
+#### Scenario: Navigation sends no screen views
 
-#### Scenario: Parameters are audited before release
+- **WHEN** the user navigates between routes
+- **THEN** no screen-view event is sent, because the `GoRouter` in `lib/app/router.dart` installs no analytics observer
 
-- **WHEN** a new event is added
-- **THEN** its parameters are reviewed against this requirement before it ships
+#### Scenario: Gameplay and progression send no events
 
-### Requirement: Events are defined as constants
+- **WHEN** a user finishes onboarding, completes a session, sets a record, reaches a streak, unlocks an achievement, selects a character or buys an accessory
+- **THEN** no analytics event is logged, because no `logEvent` call exists in the codebase
 
-Event and parameter names SHALL be declared as constants in one place. Call sites SHALL NOT pass string literals.
+#### Scenario: Tests and debug builds emit nothing
 
-#### Scenario: No literal event names at call sites
+- **WHEN** the test suite or a debug build runs
+- **THEN** no analytics data is sent, since no analytics SDK is linked
 
-- **WHEN** the codebase is searched for analytics calls
-- **THEN** every call references a declared constant
+### Requirement: Firebase analytics collection is disabled in configuration
 
-#### Scenario: A typo cannot create a silent second event
+The iOS Firebase configuration MUST mark analytics as disabled.
 
-- **WHEN** an event name is misspelled at a call site
-- **THEN** compilation fails rather than silently emitting an unknown event
+#### Scenario: Analytics flag is off
 
-### Requirement: The core engagement funnel is measured
+- **WHEN** `brainy-app/ios/Runner/GoogleService-Info.plist` is read
+- **THEN** `IS_ANALYTICS_ENABLED` is `false`
 
-The app SHALL record the events needed to understand acquisition, activation and retention, given that it is free and has no revenue signal.
+### Requirement: Crash reporting is the only telemetry
 
-#### Scenario: Onboarding completion is recorded
+Firebase SHALL be used only to report crashes through Crashlytics.
 
-- **WHEN** a user finishes onboarding
-- **THEN** an event records completion with the selected goals, frequency and age bucket
+#### Scenario: Uncaught errors go to Crashlytics
 
-#### Scenario: Session completion is recorded
+- **WHEN** an uncaught Flutter framework error or uncaught asynchronous error occurs
+- **THEN** it is recorded as a fatal error in Crashlytics (`FlutterError.onError` and the `runZonedGuarded` handler in `main.dart`)
 
-- **WHEN** a game session finishes
-- **THEN** an event records grid size, mode, duration, mistake count and stars earned
+#### Scenario: Startup initializes Firebase for Crashlytics only
 
-#### Scenario: Personal records are recorded
+- **WHEN** the app starts
+- **THEN** `main.dart` initializes Firebase and wires Crashlytics handlers, and starts no other Firebase data collection
 
-- **WHEN** a session sets a personal record
-- **THEN** an event records the grid size and mode
+### Requirement: The privacy declaration lists only crash diagnostics
 
-#### Scenario: Streak milestones are recorded
+The App Store privacy plan in `docs/plans/ops/appstore-metadata.md` SHALL declare only the data Crashlytics collects, and MUST NOT declare Analytics.
 
-- **WHEN** a streak reaches a milestone
-- **THEN** an event records the streak length
+#### Scenario: Declared categories match Crashlytics
 
-#### Scenario: Achievement unlocks are recorded
+- **WHEN** the privacy labels section of the plan is read
+- **THEN** it lists Diagnostics → Crash Data, Diagnostics → Other Diagnostic Data and Identifiers → Device ID (Crashlytics installation ID), all marked not linked to identity and not used for tracking
 
-- **WHEN** an achievement unlocks
-- **THEN** an event records its identifier
+#### Scenario: Analytics is explicitly not declared
 
-#### Scenario: Character and accessory activity is recorded
-
-- **WHEN** a character is selected or an accessory is purchased
-- **THEN** an event records the identifier and, for a purchase, the coin price
-
-### Requirement: Analytics failures never affect the app
-
-Analytics SHALL be non-blocking and failure-tolerant. A logging error SHALL NOT interrupt gameplay or surface to the user.
-
-#### Scenario: A logging failure is swallowed
-
-- **WHEN** an analytics call throws
-- **THEN** the app continues normally and the user sees nothing
-
-#### Scenario: Analytics never blocks a transition
-
-- **WHEN** an event is logged during a screen transition
-- **THEN** the transition is not delayed waiting for it
-
-### Requirement: Analytics are disabled in tests and debug builds
-
-Test and debug runs SHALL NOT emit analytics, so development traffic does not pollute production data.
-
-#### Scenario: No events during tests
-
-- **WHEN** the test suite runs
-- **THEN** no analytics event reaches Firebase
-
-### Requirement: The privacy declaration matches reality
-
-Published privacy labels SHALL describe what the app actually collects — no more and no less.
-
-#### Scenario: Declaration matches the implemented event set
-
-- **WHEN** the App Store privacy labels are compared against the implemented events
-- **THEN** every declared category corresponds to data actually collected, and nothing collected is undeclared
-
-#### Scenario: Collecting nothing means declaring nothing
-
-- **WHEN** the owner decides not to collect analytics
-- **THEN** the dependency, the router observer and the Analytics privacy declaration are all removed together
+- **WHEN** the privacy labels section of the plan is read
+- **THEN** it states that Analytics is not collected and that the Analytics category must be removed from the App Store Connect declaration

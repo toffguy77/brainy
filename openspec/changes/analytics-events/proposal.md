@@ -1,39 +1,46 @@
 ## Decision (2026-08-01)
 
-Owner decision: **do not collect analytics.** `firebase_analytics`, the router observer and the placeholder service are removed, and the Analytics category is dropped from the App Store privacy declaration. This change is therefore a removal — task 1.2 applies and groups 2 through 5 are dropped.
+Owner decision: **do not collect analytics.** The app is completely free and has no accounts; product analytics in an app used by children is not worth the privacy cost. This change is therefore a **removal**: task 1.2 applies and the build/instrument/verify groups (2 to 4) are dropped.
+
+## Outcome
+
+- `firebase_analytics` removed from `brainy-app/pubspec.yaml` (`f0e1ec8`); only `firebase_core` and `firebase_crashlytics` remain (`pubspec.yaml:24-26`).
+- `FirebaseAnalyticsObserver` removed from the router (`f0e1ec8`); `lib/app/router.dart:21` builds `GoRouter` without observers, so no screen views are sent.
+- Placeholder `lib/shared/services/analytics_service.dart` deleted (`f0e1ec8`); the dead `firebase_service.dart` stub deleted (`faf276b`).
+- `IS_ANALYTICS_ENABLED` set to `false` in `ios/Runner/GoogleService-Info.plist:19-20` (`faf276b`).
+- Firebase remains for Crashlytics only: `main.dart:24-29,48` initializes Firebase and routes Flutter and zone errors to Crashlytics. `CLAUDE.md:26` records the rule.
+- App Store privacy plan rewritten (`faf276b`, `docs/plans/ops/appstore-metadata.md:67-78`): only Crashlytics data is declared (Crash Data, Other Diagnostic Data, Device ID; not linked to identity, no tracking) and Analytics is explicitly not collected.
+- Remaining work is external: un-declare Analytics in App Store Connect and disable Google Analytics in the Firebase console (tasks 6.1, 6.2).
 
 ## Why
 
-`lib/shared/services/analytics_service.dart` contains exactly one line — a comment reading "Analytics service — will be implemented when Firebase is configured". Nothing imports it. There is not a single `logEvent` call in the codebase.
+At the time this change was opened, `analytics_service.dart` was a one-line placeholder comment, nothing called `logEvent`, yet `firebase_analytics` was a dependency, the router installed a `FirebaseAnalyticsObserver` (automatic screen views) and the App Store privacy labels declared Analytics. The declaration did not match the behaviour, and for a children's app over-declaring something half-wired is the wrong state to be in.
 
-Meanwhile `firebase_analytics` is a declared dependency, Firebase is initialized at startup, the router installs a `FirebaseAnalyticsObserver`, and the App Store privacy labels declare that the app collects Analytics data. The app therefore tells Apple and its users that it collects analytics, while collecting nothing beyond automatic screen views.
-
-Two problems follow. The privacy declaration overstates what the app does, which is the wrong direction to be wrong in a children's app. And with the product going fully free, engagement and retention are the only signals left worth measuring — there is no revenue to read instead.
+Two resolutions were possible: implement a small, privacy-safe event set, or remove analytics entirely. The owner chose removal.
 
 ## What Changes
 
-- A real `AnalyticsService` wrapping `FirebaseAnalytics`, with a typed method per event rather than free-form string calls.
-- A small, deliberate event set covering the funnel that matters: onboarding completion, session completion, records, streaks, achievements, character and accessory activity.
-- No personal data, no free-text, no child-identifying values in any event or parameter.
-- Event names and parameters defined as constants, so they cannot drift by typo.
-- App Store privacy labels reviewed against what is actually collected.
+- Remove the analytics SDK, the router observer and the placeholder service.
+- Turn off the analytics flag in the Firebase iOS config.
+- Keep Crashlytics as the sole Firebase data flow.
+- Align the App Store privacy declaration with what is actually collected (crash diagnostics only).
 
-Alternatively, if the owner prefers not to collect analytics at all, the dependency, the observer and the privacy declaration are removed. Declaring collection while collecting nothing is the one option that should not survive.
+*Historical:* the original proposal described an `AnalyticsService` with typed methods, event constants and a funnel event set (onboarding, sessions, records, streaks, achievements, character and accessory activity). None of that was built; it was superseded by the decision above.
 
 ## Capabilities
 
 ### New Capabilities
-- `product-analytics`: what the app measures, what it must never record, and how events are defined.
+- `product-analytics`: the app collects no product analytics; crash reporting is the only telemetry, and the privacy declaration reflects that.
 
 ### Modified Capabilities
 <!-- None: openspec/specs/ has no existing capability for analytics. -->
 
 ## Impact
 
-- `lib/shared/services/analytics_service.dart` — implemented.
-- `lib/constants/app_constants.dart` or a new `analytics_events.dart` — event and parameter name constants.
-- Call sites: `game_screen.dart` and `result_screen.dart` (session, record), `onboarding_screen.dart` (completion), `achievements_provider.dart` (unlock), `character_screen.dart` and `accessories_screen.dart` (selection, purchase), `user_progress_provider.dart` (streak milestones).
-- `docs/plans/ops/appstore-metadata.md` — privacy labels reviewed.
-- `test/services/analytics_service_test.dart` — new.
-
-Sequencing: worth landing after `remove-monetization-go-free`, since the funnel to measure changes substantially once the paywall is gone. Instrumenting the paywall first would produce events for screens about to be deleted.
+- `brainy-app/pubspec.yaml`, `pubspec.lock` — `firebase_analytics` removed.
+- `brainy-app/lib/app/router.dart` — observer removed.
+- `brainy-app/lib/shared/services/analytics_service.dart`, `firebase_service.dart` — deleted.
+- `brainy-app/ios/Runner/GoogleService-Info.plist` — `IS_ANALYTICS_ENABLED=false`.
+- `docs/plans/ops/appstore-metadata.md` — privacy labels section rewritten.
+- `CLAUDE.md` — "Firebase is used for Crashlytics only".
+- External: App Store Connect privacy labels; Firebase console Google Analytics setting.

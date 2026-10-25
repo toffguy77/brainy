@@ -2,56 +2,71 @@
 
 ### Requirement: The analyzer reports no issues
 
-`flutter analyze` SHALL report no errors, warnings, or infos across the entire package, including `test/`, `integration_test/` and any Dart file under `docs/`.
+`flutter analyze --fatal-infos` SHALL report no errors, warnings, or infos across the entire package, including `test/` and `integration_test/`, and CI SHALL fail when it does not.
 
 #### Scenario: Clean analyzer run
 
-- **WHEN** `flutter analyze` is run from `brainy-app/`
+- **WHEN** `flutter analyze --fatal-infos` is run from `brainy-app/`
 - **THEN** it prints `No issues found!` and exits `0`
 
-#### Scenario: Infos are treated as failures in CI
+#### Scenario: CI enforces the analyzer
 
-- **WHEN** `flutter analyze --fatal-infos` is run in CI
-- **THEN** it exits `0`
+- **WHEN** the CI workflow runs on a pull request or a push to `main`
+- **THEN** it runs `flutter analyze --fatal-infos` and fails the job on any reported issue
 
-### Requirement: No source file references a removed dependency
+### Requirement: No code references the removed purchase SDK
 
-No file in the package SHALL import a package absent from `pubspec.yaml`, or reference an identifier that no longer exists.
+No file in the package SHALL import `purchases_flutter` or reference RevenueCat identifiers (`Purchases`, `PurchasesConfiguration`, `revenueCatApiKey`, `revenueCatEntitlement`, `productIdMonthly`, `productIdYearly`, `productIdFamily`). The only permitted occurrence is the guard list in `test/app/free_access_test.dart`.
 
-#### Scenario: No references to the removed purchase SDK
+#### Scenario: Repository search finds no functional reference
 
-- **WHEN** the package is searched for `purchases_flutter`, `Purchases`, `PurchasesConfiguration`
-- **THEN** no matches remain in any Dart file
+- **WHEN** the repository (excluding generated and vendored directories) is searched case-insensitively for `revenuecat`, `purchases_flutter`, `Purchases.` and `revenueCatApiKey`
+- **THEN** the only match is the `purchases_flutter` needle in `test/app/free_access_test.dart`
 
-#### Scenario: No references to deleted constants
+#### Scenario: Reintroduction is caught by a test
 
-- **WHEN** the package is searched for `revenueCatApiKey`, `revenueCatEntitlement`, `productIdMonthly`, `productIdYearly`, `productIdFamily`
-- **THEN** no matches remain outside comments
+- **WHEN** a file under `lib/` contains `purchases_flutter`
+- **THEN** `test/app/free_access_test.dart` fails and names the offending file
+
+#### Scenario: No StoreKit product configuration
+
+- **WHEN** `brainy-app/ios/` is inspected
+- **THEN** no `.storekit` file exists and the `Runner` scheme has no `storeKitConfigurationFileReference`
 
 ### Requirement: Every test file contributes coverage
 
-A test file SHALL compile and execute. A file that fails to load provides no coverage while appearing in the test directory as though it does.
+Every test file SHALL compile and execute. A file that fails at the `loading` stage provides no coverage while appearing as though it does.
 
-#### Scenario: Previously broken test files execute
+#### Scenario: Full test run has no load failures
 
-- **WHEN** `flutter test test/constants/app_constants_test.dart` is run
-- **THEN** it loads and its tests execute and pass
+- **WHEN** `flutter test` is run from `brainy-app/`
+- **THEN** every test file loads and all tests pass
 
 #### Scenario: The integration test compiles
 
 - **WHEN** `flutter analyze` inspects `integration_test/screenshot_test.dart`
-- **THEN** it reports no issues for that file
+- **THEN** it reports no issues and the file configures no purchase SDK in `setUpAll`
 
-### Requirement: No credential is injected into builds for a dependency that no longer exists
+### Requirement: No credential is injected into builds for a removed integration
 
-The build SHALL NOT pass secrets for removed integrations.
+The build pipeline SHALL NOT pass, store, or depend on credentials for RevenueCat.
 
-#### Scenario: Fastlane no longer injects the RevenueCat key
+#### Scenario: Workflows do not read the RevenueCat secret
 
-- **WHEN** `brainy-app/ios/fastlane/Fastfile` is inspected
-- **THEN** it contains no `--dart-define` for `REVENUECAT_API_KEY`
+- **WHEN** `.github/workflows/deploy-testflight.yml` and `.github/workflows/release.yml` are inspected
+- **THEN** neither references `REVENUECAT_API_KEY`
 
-#### Scenario: The unused repository secret is deleted
+#### Scenario: Fastlane does not inject the RevenueCat key
 
-- **WHEN** the repository's GitHub secrets are listed
-- **THEN** `REVENUECAT_API_KEY` is not among them
+- **WHEN** the `deploy_testflight` and `release` lanes in `brainy-app/ios/fastlane/Fastfile` are inspected
+- **THEN** neither passes a `--dart-define` for `REVENUECAT_API_KEY`
+
+#### Scenario: The repository secret is deleted and the key revoked
+
+- **WHEN** the repository's GitHub secrets are listed and the RevenueCat dashboard is checked
+- **THEN** `REVENUECAT_API_KEY` is not among the secrets and the previously committed key is revoked
+
+#### Scenario: Release builds succeed without the secret
+
+- **WHEN** `deploy-testflight.yml` runs on `main`
+- **THEN** the TestFlight build and upload succeed without any RevenueCat credential

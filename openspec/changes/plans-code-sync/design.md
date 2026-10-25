@@ -1,3 +1,42 @@
+## Outcome (2026-10-25)
+
+**Decision:** implemented as designed — this change ran last, after the behaviour-changing
+changes landed in `f0e1ec8..1e1e279`. Corrections were made by reading the code (enums, constants,
+workflow files, metadata files), not from memory.
+
+**Re-audit.** After those commits every plan file and `CLAUDE.md` was checked claim by claim. The
+remaining drift that was fixed in the docs:
+
+| File | Was | Now (per code) |
+|------|-----|----------------|
+| `game-modes.md` | home picker shows all `pickerGridSizes` | picker shows `gridSizesForMode(mode)`; Gorbov colour/completion moved under Gorbov, named `AppColors.gorbovRed` |
+| `character-system.md` | preview of the *active* character; [Select] on cards | preview follows the paged card; tap selects; action button below; shop always dresses the active character |
+| `progress-tracking.md` | "Lv.N"; achievements shown "with date"; popup; stars in `gridStatsProvider` | «Уровень N» (`levelLabel`); no date stored; SnackBar on result screen; stars computed in `GridDetailScreen` |
+| `onboarding.md` | swipe between pages; 7 page files; answers saved per page | swipe disabled; 6 page files; age card auto-advances; Hive written in `completeOnboarding()` |
+| `leaderboards.md` | `GameServicesService.getPlayerName()` | `GameServicesService.playerName`, filled in `signIn()` |
+| `parent-panel.md` | — | "this week" = last 7 days; change-PIN flow; version label |
+| `notifications.md` | — | daily repeat with fixed text; no reminder after a played day until the next reschedule |
+| `localization.md` | all counted words use ICU plural | only `parentShareCardTitle` does; others listed as known debt |
+| `appstore-metadata.md` | 6.5" 1284x2778 | 1242x2688; iPad 2048x2732; category/rating live in App Store Connect; `deliver` in `submit_review` and `release` |
+| `ci-cd.md` | `release` lane summary | adds `automatic_release` and version/build from `pubspec.yaml` |
+| `CLAUDE.md` | ARB files under `lib/l10n/` | ARB in `brainy-app/l10n/`, generated code in `lib/l10n/`; `GameModes` in constants |
+
+**Code findings** (cannot be fixed by editing prose; left for a follow-up change):
+
+- `lib/features/game/screens/result_screen.dart:53` — when `extra` is missing it calls
+  `context.go('/game')`, which starts a default classic 5x5 game; `/home` is the likely intent.
+- `lib/features/progress/screens/progress_screen.dart:21,56,314` — `locale` is computed and passed
+  as a required field but never read.
+- `l10n/app_ru.arb` `streakDays`, `progressGoalStreak`, `notificationStreak1..7`,
+  `accessoriesNotEnoughCoinsMessage` — no ICU plural, so Russian reads «Стрик 3 дней».
+- `lib/features/character/screens/character_screen.dart:88,156` — the accessories button is gated
+  on the *paged* character being unlocked, but `/accessories` edits the *active* character.
+- `lib/shared/services/notification_service.dart` (`rescheduleFromStorage`) — playing today cancels
+  the reminder and nothing is scheduled for tomorrow until the app runs again; the repeating
+  notification also keeps the streak count it was scheduled with.
+- `brainy-app/pubspec.yaml` `flutter_launcher_icons`/`flutter_native_splash` still set
+  `android: true` although the project is iOS only.
+
 ## Context
 
 `docs/plans/` was generated in `2f56a89` from three sources: the archived `brainy-tasks/` specifications, planning notes from earlier sessions, and the code itself. The design document for the agent system (`docs/specs/2026-03-20-agent-system-design.md`) states the governing rule plainly: "Планы = факт — описывают как приложение работает сейчас, а не как планировалось."
@@ -50,8 +89,14 @@ The `feat/yookassa-payment` branch reference is the most actively harmful: it ap
 
 **Rollback:** documentation-only; ordinary reverts with no runtime impact.
 
-## Open Questions
+## Open Questions (answered)
 
-- Should `ci-cd.md` be updated by `ci-quality-gate` when it adds `ci.yml`, rather than here?
-- Are there plans for areas with no documentation at all — the game loop, adaptive difficulty — worth adding once the existing ones are true?
-- Should the `/review` command's checklist gain an explicit "verify identifiers named in touched plans" step?
+- *Should `ci-cd.md` be updated by `ci-quality-gate` when it adds `ci.yml`, rather than here?* —
+  Both: `ci-quality-gate` updated it in `9180bab`; this change re-verified it against the four
+  workflow files and the Fastfile.
+- *Are there plans for undocumented areas — the game loop, adaptive difficulty?* — Covered without
+  new files: the tap logic, pause, session completion and adaptive difficulty are in
+  `game-modes.md`; the daily goal is in `onboarding.md`, `parent-panel.md` and `progress-tracking.md`.
+- *Should `/review` gain an explicit "verify identifiers named in touched plans" step?* — Yes; added to
+  `.claude/commands/review.md` in `faf276b`, together with unreferenced-file and
+  decorative-control checks.

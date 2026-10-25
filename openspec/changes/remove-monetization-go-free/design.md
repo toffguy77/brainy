@@ -1,3 +1,12 @@
+## Decision / Outcome (2026-10-25)
+
+- **Decision:** the app is completely free and iOS-only; no RevenueCat, YooKassa, Cloud Functions, ads or analytics. Gating was deleted, not stubbed.
+- **Outcome:** done in code (f0e1ec8..1e1e279). All four modes are open: classic and reverse on 3-9, Gorbov-Schulte on 5-9, letters on 3-5 (`app_constants.dart:158-168`). A size the mode does not support — e.g. a parent-fixed 9x9 with letters selected — is clamped to the nearest supported size (`AppConstants.clampGridSizeForMode`, `app_constants.dart:205-209`; used at `home_screen.dart:41,70,304`), which fixed a letters 6x6+ crash.
+- **Correction to the notification decision below:** nothing was moved. The permission request was never on the paywall page; it lives in `OnboardingNotifier.completeOnboarding()` (`onboarding_provider.dart:86-101`), which the frequency page now calls (`frequency_page.dart:64-67`).
+- **Firebase config:** instead of editing `firebase.json` and `firestore.indexes.json`, both were deleted together with `firestore.rules` — nothing in the app uses Firestore; Firebase remains for Crashlytics only.
+
+The sections below are the original design, kept as written; the Open Questions are answered in place.
+
 ## Context
 
 Monetization was attempted twice and abandoned twice. RevenueCat came first and was commented out when Apple blocked the Paid Applications Agreement for Russian accounts. YooKassa replaced it (`3b9684a`): four Cloud Functions were written and tested (33 passing tests) but never deployed, and no credentials were ever configured. What shipped is a stub — `SubscriptionService.isPremium()` returns a literal `false`.
@@ -56,6 +65,6 @@ The decision to ship free resolves this by deletion rather than by flipping a fl
 
 ## Open Questions
 
-- What unlock condition should Pixel get? Level 20 (the top of `xpThresholds`) makes it the long-tail reward; a 14-day streak sits between Vortex (30) and the early characters. Needs a product call.
-- Should the two formerly-premium accessories keep their coin prices, or be repriced now that the coin economy has a second sink? Depends on `accessories-shop-completion`, which makes the shop reachable at all.
-- Does the `deploy-testflight.yml` path filter need updating once `functions/` is gone?
+- ~~What unlock condition should Pixel get?~~ **Answered:** a 14-day streak (`characters_data.dart:73-75`), giving the streak ladder Pixel 14 -> Vortex 30 -> Glitch 60. It now actually unlocks: session completion calls `CharacterNotifier.unlockEligible` (`session_completion_provider.dart:73`), which checks `longestStreak` (`character_provider.dart:129-130`). Covered by `test/character/character_unlock_test.dart:25-45`.
+- ~~Should the two formerly-premium accessories keep their coin prices?~~ **Answered:** kept. They are ordinary coin items (e.g. `effect_electric` at 100 coins, `accessories_data.dart:77-79`); `AccessoryInfo` has no premium flag.
+- ~~Does the `deploy-testflight.yml` path filter need updating?~~ **Answered:** no. It only lists `brainy-app/` paths (`deploy-testflight.yml:7-13`) and never referenced `functions/`.

@@ -1,64 +1,73 @@
+## Decision
+
+- **Notification text:** numbered ARB keys (`notificationMotivation1..7`, `notificationStreak1..7`). The title is `appName`. Strings are resolved with `AppLocalizations.delegate.load(Locale(AppConstants.resolveLanguage(deviceLanguage)))`, because scheduling runs outside the widget tree.
+- **Locale rule:** `resolveLanguage`: `ru` → ru, anything else → en (`supportedLanguages = ['en', 'ru']`, fallback `first`). The app's `localeResolutionCallback` (`main.dart:73-74`) and `NotificationService` (`notification_service.dart:112-115`) both use it, so a reminder and the UI never disagree on language.
+- **Variant selection:** `variantIndexFor(day)` = whole UTC calendar days from 2024-01-01 to `day`'s date, mod `variantCount` (7) (`notification_service.dart:144-152`). This replaces the draft's `dayOfYear % count` wording, which never matched the code. The pre-change code used `DateTime.now().difference(DateTime(2024)).inDays % length`: local time, including the time of day, so a DST shift could move it. The new code uses calendar dates in UTC, so a DST shift cannot produce a 23-hour "day".
+- **Character and accessory text: ARB is the single source (reversed).** The draft chose `CharacterInfo`. That was reversed to satisfy CLAUDE.md "all text via ARB": names, descriptions and unlock conditions, plus accessory names, are ARB keys looked up by id.
+- **Key parity: enforced in CI (reversed).** The draft said not to automate parity in this change. A CI step was added (`.github/workflows/ci.yml:37-41`, 9180bab). It diffs the full key lists, `@` metadata included, `@@locale` excluded.
+
+## Outcome
+
+Implemented in 5cbd984, 4111600 and 9180bab. Both ARB files have 291 entries: 255 message keys, 35 metadata entries and `@@locale`. The key sets are identical. The paywall is gone. The only `== 'ru'` branch left in `lib/` is the letters-mode alphabet (`AppConstants.alphabetFor`), which is game data. Tests cover both locales for notification variants (`test/services/notification_text_test.dart`), the UTC index and the language fallback (`test/services/reminder_plan_test.dart`), and character/accessory text (`test/character/*`). One device check is still open (tasks 4.3). Known gaps outside this change, mainly missing Russian plurals, are listed in `proposal.md`.
+
 ## Context
 
-The ARB files are healthy: 244 keys each, verified identical between `app_ru.arb` and `app_en.arb`. The problems are entirely in code that bypasses them.
+At draft time the ARB files were in parity, and the problems were in code that bypassed them.
 
-**Notification strings.** `NotificationService` holds two pools per language — seven motivational variants and seven streak-warning variants — selected by `dayOfYear % count` and switched by a locale parameter. Twenty-eight strings, none in ARB. This is the largest block of untranslated-by-the-system text in the app, and the one that blocks adding a third language most concretely.
+**Notification strings.** `NotificationService` held two pools per language (seven motivational variants and seven streak warnings), picked by a per-day index and switched by a locale parameter. That was 28 strings, none in ARB.
 
-**Paywall locale branching.** Three sites in `paywall_screen.dart` compare `languageCode == 'ru'` inline. `remove-monetization-go-free` deletes this file, so this deviation resolves itself; what remains is confirming the pattern exists nowhere else.
+**Paywall locale branching.** `paywall_screen.dart` compared `languageCode == 'ru'` inline. `remove-monetization-go-free` deleted the file.
 
-**Character name duplication.** Names exist in ARB and in `CharacterInfo.nameRu`/`nameEn`. Two sources for one string means they can silently disagree.
+**Character name duplication.** Names existed in ARB and in `CharacterInfo.nameRu`/`nameEn`.
 
-`docs/plans/features/localization.md` documents all three under "Особенности" — describing them as characteristics of the system rather than as defects. That framing is why they were never fixed.
+`docs/plans/features/localization.md` listed all three under "Особенности" as properties of the system rather than defects.
 
 ## Goals / Non-Goals
 
 **Goals:**
 - One mechanism for user-facing text.
-- Adding a locale means adding an ARB file and nothing else.
+- Adding a locale means adding an ARB file, plus adding its code to `AppConstants.supportedLanguages` (and an alphabet, if the letters mode should support it).
 - The plan describes rules rather than cataloguing exceptions.
 
 **Non-Goals:**
-- Adding a third language. This change makes that possible; it does not do it.
-- Retranslating existing strings. Text moves verbatim.
-- Localizing non-user-facing strings — log messages, analytics event names, Hive keys.
+- Adding a third language.
+- Retranslating existing strings. Text moved verbatim. The one change was the `{N}` token becoming the ICU placeholder `{count}`.
+- Localizing non-user-facing strings: log and exception messages, analytics event names, Hive keys, route paths, Game Center leaderboard ids.
 
-## Decisions
+## Decisions (as drafted, with resolution)
 
-**Indexed ARB keys for the notification pools.** ARB has no array type. The alternatives are numbered keys (`notificationMotivation1` … `notificationMotivation7`) or ICU `select` with a synthetic argument. Numbered keys are chosen: they read clearly in the ARB, translate individually, and keep the selection rule (`dayOfYear % count`) in Dart where it already is and where it is testable.
+**Indexed ARB keys for the notification pools.** ARB has no array type. Numbered keys read clearly, can be translated one at a time, and keep the selection rule in Dart, where it can be tested. *Kept.* A single delimited key was rejected: it defeats per-string translation tooling.
 
-*Alternative considered:* a single ARB key holding a delimited list. Rejected — it defeats per-string translation tooling and turns a translator's job into string surgery.
+**Require equal variant counts across locales.** The index is computed once and used for whichever locale is active. *Kept:* there is one `variantCount = 7`, and each locale's switch covers all seven keys.
 
-**Require equal variant counts across locales.** The index is computed once and used for whichever locale is active. If ru had seven variants and en had five, an index of six would be out of range. Stating this as a requirement makes an implicit coupling explicit.
+**Resolve the character-name duplication toward `CharacterInfo`.** *Reversed → ARB.* The draft argued for keeping the character record whole in Dart. The project rule in CLAUDE.md ("All text localized via ARB files") takes precedence, and keeping text in ARB means a new locale needs no Dart change for character copy. `CharacterInfo` keeps id, unlock rule, asset and colour. Text is looked up by id. The legacy Hive fields `CharacterData.nameRu/nameEn` stay so the stored format remains readable. They are written with the id and never read.
 
-**Resolve the character-name duplication toward `CharacterInfo`, not ARB.** Character names are data belonging to a character definition that already carries id, colour, unlock type and asset path. Splitting one field of that record into ARB while the rest stays in Dart is the awkward option. Removing the duplicate ARB keys and reading names from `CharacterInfo` keeps the record whole.
+**Do not build automated key-parity checking here.** *Reversed → enforced in CI.* The check was only a few lines of `jq`/`diff`, so it was added straight to `ci.yml`.
 
-*Alternative considered:* keep ARB as the source and drop `nameRu`/`nameEn`. Defensible on the "all text in ARB" rule read literally, and would matter more if character names were ever translated by an outside translator. Either resolution satisfies the single-source requirement; this is the one to revisit if translation tooling is ever brought in.
-
-**Do not build automated key-parity checking here.** The check is a few lines of script and belongs with the CI gate; this change requires that parity be verified, and `ci-quality-gate` is the right place to automate it. Stating the requirement without pretending it is enforced keeps the specification honest.
-
-**Let `remove-monetization-go-free` handle the paywall.** Fixing locale branching in a file scheduled for deletion is wasted work.
+**Let `remove-monetization-go-free` handle the paywall.** *Kept;* the file is gone.
 
 ## Risks / Trade-offs
 
-- **Twenty-eight new ARB keys is a large, mechanical diff** → Unavoidable; the strings must live somewhere. Move them verbatim so the diff is pure relocation and easy to review.
-- **Numbered keys are ugly** → Accepted. ARB has no arrays, and the alternatives are worse.
-- **Removing duplicate character-name keys breaks a caller** → The compiler catches every one.
-- **Notification tests may assert on literal strings** → Update them to assert against the localizations, which is a better test anyway.
+- **Large mechanical ARB diff.** Accepted. Strings moved verbatim.
+- **Numbered keys are ugly.** Accepted.
+- **Removing character text fields breaks callers.** The compiler caught them. Callers now use `.name(l10n)` / `.description(l10n)` / `.unlockCondition(l10n)`.
+- **Notification tests asserting on literals.** They now load `AppLocalizations` for each locale.
+- **Verbatim move kept grammar bugs.** The Russian streak variants say `{count} дней` with no ICU plural ("Стрик 3 дней"). Recorded as a known gap in `proposal.md`; this change does not fix it.
 
 ## Migration Plan
 
-1. Land `remove-monetization-go-free`, removing the paywall branching.
-2. Move the 28 notification strings into both ARB files as numbered keys; regenerate localizations.
-3. Update `NotificationService` to resolve strings through localizations, keeping `dayOfYear % count`.
-4. Verify a notification renders correctly in both locales.
-5. Resolve the character-name duplication in one direction; update callers.
-6. Verify ru/en key parity.
-7. Rewrite `localization.md`.
+1. Land `remove-monetization-go-free`. Done.
+2. Move the 28 notification strings into both ARB files; regenerate. Done.
+3. Resolve notification strings through localizations with the UTC day index. Done.
+4. Check a notification on a device in each locale. Open, manual (tasks 4.3).
+5. Move character/accessory text to ARB; update callers. Done.
+6. Check ru/en key parity, enforced in CI. Done.
+7. Rewrite `localization.md`. Done.
 
-**Rollback:** each step is an independent revert. Nothing touches persisted user data.
+**Rollback:** each step can be reverted on its own. No persisted user data changes; the Hive `CharacterData` layout is unchanged.
 
-## Open Questions
+## Open Questions (resolved)
 
-- Should `NotificationService` receive a `AppLocalizations` instance, or resolve one from a stored locale? It runs outside a widget tree when scheduling from a background context, which may constrain the answer.
-- Should key parity be enforced in CI as part of `ci-quality-gate`?
-- Is a third language actually planned? It affects how much the character-name decision matters.
+- *How does `NotificationService` get localizations?* `AppLocalizations.delegate.load()` with the device language from `platformDispatcher.locale`, mapped through `resolveLanguage`.
+- *Enforce parity in CI?* Yes, `ci.yml` step "ARB key parity (ru vs en)".
+- *Is a third language planned?* The repository shows no plan for one. It no longer affects the character decision, since text is in ARB.

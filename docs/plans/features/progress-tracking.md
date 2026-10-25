@@ -31,7 +31,7 @@ XP за каждую сессию = количество клеток в таб�
 Пороги уровней определены в `AppConstants.xpThresholds` (20 уровней):
 - Уровень 1: 0 XP, Уровень 2: 50, Уровень 5: 300, Уровень 10: 1100, Уровень 20: 6000
 
-Уровень отображается на главном экране под персонажем: "Lv.N".
+Уровень отображается на главном экране под персонажем: «Уровень N» (`levelLabel`).
 
 ## Стрик
 
@@ -76,9 +76,9 @@ Vortex — 30, Glitch — 60 (`longestStreak`, поэтому прерванны
 Источник истины — enum `AchievementId` в `lib/models/achievement.dart`. Ключ хранения
 (`idString`) — snake_case от имени варианта; путь к бейджу — `assets/badges/{idString}.png`.
 
-Проверяются после каждой сессии. При получении — popup-уведомление.
+Проверяются после каждой сессии. Новые достижения объявляются на экране результата снекбаром «Новое достижение!».
 
-Экран достижений: `/progress` (таб в нижней навигации). Разблокированные цветные с датой, заблокированные серые.
+Экран достижений: `/progress` (таб в нижней навигации). Разблокированные цветные, заблокированные серые. Дата получения не хранится (`unlockedAchievements` — список id).
 
 ## Детальная статистика по размеру
 
@@ -93,7 +93,8 @@ Vortex — 30, Glitch — 60 (`longestStreak`, поэтому прерванны
 Доступна всем пользователям.
 
 Провайдер: `gridStatsProvider((mode:, gridSize:))` — семейство по паре режим/размер; сессии и
-рекорд берутся только этого режима, звёзды — `starThresholdsFor(mode, size)`.
+рекорд берутся только этого режима. Звёзды на карточке лучшего времени считает экран через
+`starThresholdsFor(mode, size)`.
 
 ## Модель UserProgress
 
@@ -108,3 +109,5 @@ Hive typeId: 1. Поля (индексы 0–12 постоянны): coins, xp, 
 - `brainy-app/lib/features/progress/providers/grid_stats_provider.dart`
 - `brainy-app/lib/features/progress/screens/progress_screen.dart`
 - `brainy-app/lib/features/progress/screens/grid_detail_screen.dart`
+- `brainy-app/lib/features/progress/widgets/mode_filter.dart` — ModeFilterChips, statsModeProvider
+- `brainy-app/lib/models/achievement.dart` — AchievementId, allAchievements

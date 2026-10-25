@@ -1,63 +1,137 @@
+## Decision / Outcome (2026-10-25)
+
+Implemented on `chore/finish-audit-changes` (commits `f0e1ec8..HEAD`). The suite went from 126 tests
+(8.7 s) to 267 (~5 s locally, maintainer-reported). CI has not yet run on GitHub.
+
+**Time control — one mechanism per seam:**
+
+| Seam | Mechanism | Where |
+|------|-----------|-------|
+| `GameNotifier` countdown, 1 s ticker, 500 ms error flash | `fakeAsync` + `async.elapse` | `test/game/game_notifier_test.dart` |
+| `PinLockout` attempt limit and 30 s lockout | injected clock: `PinLockout(box, now: () => ...)` | `lib/features/parent/providers/pin_lockout.dart`, `test/parent/pin_lockout_test.dart` |
+| Reminder scheduling | injected `now` on pure `NotificationService.planReminder(...)` | `lib/shared/services/notification_service.dart`, `test/services/reminder_plan_test.dart` |
+| Session timestamp | optional `playedAt` on `buildSessionFrom` | `test/game/ordinal_tap_test.dart` |
+
+**Refactors made for testability** (each kept to a seam; the game loop itself was not restructured):
+
+- `processOrdinalTap` — pure tap rule shared by classic, reverse and letters (validates the cell's
+  ordinal against `nextNumber`; only the label differs). Replaces private `GameNotifier` methods.
+- `coinsForSession`, `buildSessionFrom` — pure, read the constants instead of hard-coded values.
+- `SessionCompleter` (`features/game/providers/session_completion_provider.dart`) — record, session,
+  streak, coins, XP, character unlocks, achievements, Game Center and reminder, moved out of the
+  `GameScreen` widget so the whole chain runs in a `ProviderContainer`. The reminder call is
+  injectable so tests avoid the notification plugin.
+- `achievementsToUnlock` — pure unlock rules; `checkAchievements` now takes a plain `Ref` and only
+  persists what the rules return.
+- `NotificationService.planReminder` (+ `hasPlayedOn`, `variantIndexFor`) — pure decision split from
+  `rescheduleFromStorage`, which keeps the Hive reads and platform calls.
+- `PinLockout` — attempt count and lockout deadline persisted in Hive (survives screen re-entry and
+  restart), clock injectable. `ParentPinScreen` delegates to it.
+- `GameNotifier` cancels its timers in `ref.onDispose`.
+
+**Revised decision.** The original plan said "test the notifier, not just the pure functions". What
+shipped is more pure extraction plus a thin notifier test: rules are covered as pure functions, and
+`game_notifier_test.dart` covers only what lives in the notifier — countdown, ticking, pause/resume,
+stop on finish, error flash, size clamping, timer disposal. Persistence is covered through
+`SessionCompleter`, not through `GameScreen`. The cost is that the wiring between layers is not
+asserted (see Known gaps).
+
+**Coverage report:** produced in CI for visibility as an `lcov.info` artifact, with no threshold
+(`.github/workflows/ci.yml:57-65`).
+
+**Known gaps** (tested neither directly nor through a caller):
+
+- `GameScreen` → `SessionCompleter.complete` wiring and its `_finished` guard
+  (`features/game/screens/game_screen.dart:72-76, 195`) — a silent no-op here is the bug class this
+  change was written about.
+- `GameNotifier.tapCell` Gorbov dispatch (`game_provider.dart:347-349`); Gorbov completion is not
+  asserted to be false one tap early, so `&&` → `||` in `GameState.isCompleted`
+  (`models/game_state.dart:82`) would pass.
+- Beating an *existing* record (`records_provider.dart:52`); only first records and slower/equal
+  times are tested.
+- `rescheduleFromStorage` key reads and defaults (`notification_service.dart:89-110`).
+- `ParentPinScreen` has no widget test: setup/confirm flow, wrong-PIN wiring, numpad disabled while
+  locked (`parent_pin_screen.dart:55, 80-100, 132, 284, 296`); router PIN guard (`app/router.dart:37-41`).
+
 ## Context
 
-The suite has 118 passing tests across constants, models, pure functions, services and a few widgets. Its shape reveals its history: the easily testable was tested, and the hard parts were left.
+Before this change the suite had 126 passing tests (after `test-suite-stabilization`) across
+constants, models, pure functions, services and a few widgets. The easily testable was tested; the
+hard parts were left.
 
-What is covered: Gorbov grid generation and tap logic (pure functions), record key migration, model serialisation, `LeaderboardEntry`, `DeviceIdService`, several screen smoke tests.
+Covered then: Gorbov grid generation and tap logic (pure functions), record key migration, model
+serialisation, `LeaderboardEntry`, `DeviceIdService`, several screen smoke tests.
 
-What is not: `GameNotifier` — the timer, tap validation, penalty application, completion detection, coin and XP award, session and record persistence, for two modes. `NotificationService.reschedule()` — three branches, custom-time handling, two text pools, three call sites. `AchievementsProvider` — ten unlock conditions evaluated after every session. `ParentPinScreen` — PIN set and verify, three-attempt limit, 30-second lockout.
+Not covered: the game loop for four modes (classic, reverse, letters, Gorbov) — tap validation for
+classic/reverse/letters lived in private `GameNotifier` methods, and session and record persistence
+lived in the `GameScreen` widget. Reminder scheduling decisions were mixed with platform calls.
+Achievement conditions and the PIN lockout were not covered, and the lockout reset whenever the
+screen was left.
 
-The Gorbov helpers are the telling case. They were deliberately extracted as pure functions "for testability" and tested — but the notifier that calls them was not. The intent was right and stopped at the boundary of what is awkward to test.
-
-Two confirmed bugs from the audit lived in these gaps. `ShareCard` looked up `records[5]` on a string-keyed map and always got null. The parent session limit was stored, read into state, and never consulted by the game. Neither is subtle; both survived because nothing asserted the behaviour.
+Two confirmed bugs from the audit lived in these gaps: `ShareCard` looked up a record on a
+string-keyed map with an int key and always got null, and the reverse/letters records were not
+reloaded after restart, so every result counted as a record. Both survived because nothing asserted
+the behaviour. (The parent session time limit, cited in the first draft, has since been removed from
+the product.)
 
 ## Goals / Non-Goals
 
 **Goals:**
 - Cover the behaviours whose failure a user would actually notice.
-- Make silent no-ops — the failure mode that produced both confirmed bugs — detectable.
+- Make silent no-ops — the failure mode behind the confirmed bugs — detectable.
 - Add coverage without reintroducing the suite pathologies just fixed.
 
 **Non-Goals:**
-- A coverage percentage target. It would be satisfied fastest by testing the trivial code that is already implicitly correct, which is how the current shape arose.
-- Testing generated localizations, Hive adapters or constant declarations. `app_constants_test.dart` already tests some constants; that is enough.
-- Golden or screenshot tests. High maintenance, and the existing integration test covers visual output for store screenshots.
+- A coverage percentage target. It is satisfied fastest by testing trivial code.
+- Testing generated localizations, Hive adapters or constant declarations.
+- Golden or screenshot tests.
 - Testing framework behaviour — that GoRouter routes or that Riverpod notifies.
 
 ## Decisions
 
-**Prioritise by cost of silent failure, not by ease.** The four targets are ranked by what breaks if they are wrong: the game loop is the product; notifications drive retention and their logic is branchy and invisible when wrong; achievements are the reward system; the PIN lockout is a security-adjacent control. Each fails silently, which is precisely the class of bug the audit found twice.
+**Prioritise by cost of silent failure, not by ease.** Game loop, reminders, achievements, PIN
+lockout — each fails silently.
 
-**Test the notifier, not just the pure functions.** The pure Gorbov functions are already covered and were never the risk. The risk is in the notifier that wires them to state and persistence — where `ShareCard`-style mistakes live.
+**Extract the rule, test it pure; keep the notifier test thin.** (Revised; see Outcome.) Rules move
+into pure functions or small classes with injected dependencies; the notifier test covers only
+timing and state transitions that exist nowhere else.
 
-**Assert observable behaviour, never internal structure.** Written into the spec with a scenario requiring that deliberately breaking a behaviour fails its test. A test asserting a field is set would have passed for both confirmed bugs; a test asserting the share card shows a record, or that the game ends at the limit, would not.
+**Assert observable behaviour, never internal structure.** A test asserting a field is set would have
+passed for both confirmed bugs. Boundary tests assert both sides of each threshold so that inverting a
+condition fails a test.
 
-**Fake time rather than wait on it.** The game timer, the notification schedule and the PIN lockout are all time-dependent. Real waits make a suite slow and flaky — and `test-suite-stabilization` exists because of a suite that hung. Inject a clock or use `fakeAsync`.
+**Fake time rather than wait on it.** `fakeAsync` where the code owns `Timer`s (`GameNotifier`);
+an injected clock or `now` where the code only reads the time (`PinLockout`, `planReminder`).
 
-**Sequence after stabilization and after the free-release change.** Adding tests to a suite that deadlocks makes the deadlock harder to isolate. Writing tests against premium-gated paths about to be deleted wastes the work.
+**Test decision logic, not platform delivery.** Notification delivery, haptics and sound are not
+exercised; tests disable sound/haptics via the user box and inject the reminder call.
 
-**Do not fold `share_card_test.dart` into this change.** It belongs with the bug fix that motivates it, where it can be verified to fail before the fix and pass after — which is stronger evidence than a test written afterwards.
+**`share_card_test.dart` stays with its bug fix.** It was rewritten in `328de3d` to build the card
+through the production `ShareCard.fromState` factory; it is listed here as context, not claimed by
+this change.
 
 ## Risks / Trade-offs
 
-- **`GameNotifier` may be hard to test as written** → Likely, and informative: if it cannot be tested without a widget tree, that is a design signal. Refactor for testability only as far as needed; do not restructure the game loop under cover of a test change.
-- **Suite runtime grows past its budget** → Prefer unit tests over widget tests where the logic allows; measure after each addition rather than at the end.
-- **Notification tests depend on `timezone` and platform channels** → Test the decision logic — which branch, what time, which pool — rather than the platform delivery.
-- **New tests reintroduce order dependence** → The spec requires each new test to pass alone and in the full suite, the exact check that exposed the league deadlock.
-- **Achievement tests encode conditions rather than verify them** → Derive each test from the condition in code, then confirm it fails when that condition is inverted.
+- **Pure extraction leaves wiring untested** → Accepted for now; the gaps are listed in Outcome. A
+  single `GameScreen` widget test that finishes a grid and checks the saved session would close the
+  largest one.
+- **Suite runtime** → Unit tests preferred over widget tests; 267 tests run in ~5 s against a 3-minute
+  budget.
+- **Order dependence** → Each new file uses its own temp Hive directory, clears boxes in `setUp` and
+  builds a fresh `ProviderContainer` per test.
+- **Achievement tests encode conditions** → Each test checks both sides of the boundary, so inverting
+  a condition fails it.
 
 ## Migration Plan
 
-1. Land `test-suite-stabilization` and `remove-monetization-go-free`.
-2. `GameNotifier` first — highest value, and likely to surface testability problems worth knowing about early.
-3. `NotificationService.reschedule()` — most branches per line of code.
-4. `AchievementsProvider` — one test per condition.
-5. `ParentPinScreen` — including lockout expiry with faked time.
-6. After each, run the full suite and check the wall-clock budget.
+Done: prerequisites landed; game loop, session completion, reminder plan, achievement rules and PIN
+lockout covered in that order. Remaining: CI run on GitHub (External).
 
-**Rollback:** tests are additive; removing them restores the prior state without affecting the app.
+**Rollback:** tests are additive; the refactors are behaviour-preserving extractions.
 
-## Open Questions
+## Open Questions (resolved)
 
-- Does `GameNotifier` need refactoring to be testable, and if so, how much is justified within this change?
-- Should a coverage report be produced for visibility, without becoming a threshold?
-- Does `integration_test/screenshot_test.dart` still serve a purpose after `remove-monetization-go-free` deletes screens it captures?
+- Does `GameNotifier` need refactoring to be testable? — Yes; the extractions are listed in Outcome.
+- Should a coverage report be produced? — Yes, as a CI artifact without a threshold.
+- Does `integration_test/screenshot_test.dart` still serve a purpose? — Out of scope here; not
+  evaluated by this change.

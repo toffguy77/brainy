@@ -84,8 +84,9 @@ provisioning profile и извлечение UUID -> `update_code_signing_settin
 
 ### Lane: release
 
-То же, что `deploy_testflight`, плюс ожидание обработки билда (`wait_for_uploaded_build`) и
-`deliver` с `submit_for_review: true`. Вызывается из `release.yml`.
+То же, что `deploy_testflight`, плюс ожидание обработки билда (`upload_to_testflight` с
+`wait_for_uploaded_build: true`) и `deliver` с `submit_for_review: true`, `automatic_release: true`;
+`app_version` и `build_number` для `deliver` читаются из `version:` в `pubspec.yaml`. Вызывается из `release.yml`.
 
 ### Lane: submit_review
 

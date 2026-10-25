@@ -1,3 +1,12 @@
+## Decision / Outcome (2026-10-25)
+
+- **All decisions were carried out** in `f0e1ec8` and `faf276b`. 8 unused packages were removed: the 6 from the grep audit, plus `flutter_secure_storage` and `device_info_plus` with `DeviceIdService`. The first audit's count of 6 was low by one: `url_launcher` was also unused at the time and is now used by `parent_settings_screen.dart:6`/`:460`.
+- **Device identity:** not needed. No reference to a device id, `flutter_secure_storage` or `device_info_plus` remains in `lib/`, `test/` or `integration_test/`. Player identity comes from Game Center (`lib/shared/services/game_services_service.dart:19`). Nothing was kept, so there is no retention reason to record.
+- **Riverpod codegen:** removed. No `@riverpod` annotation and no `*.g.dart` file exists. `CLAUDE.md:75` describes hand-written providers.
+- **Additions since the first audit, each with a consumer:** `url_launcher` (legal links), `flutter_timezone` (sets `tz.local` in `notification_service.dart:40-41`; without it, reminders fired in UTC) and `fake_async` (dev; `test/game/game_notifier_test.dart:2`).
+- **Outdated packages (105, about 82 now):** left out of scope here, with a separate follow-up change recommended.
+- **Verification:** CI runs `flutter analyze --fatal-infos` and `flutter test` on every push (`.github/workflows/ci.yml:54`, `:57`). CI has no iOS build job: `ci.yml` runs on `ubuntu-latest`, and only the deploy and release workflows use `macos-15`. So the iOS-build step of the plan is still Manual. It also needs to check the stale `ios/Podfile.lock` (`games_services 4.1.0` vs `pubspec.lock:392` `5.0.0`) and the Crashlytics phase at `project.pbxproj:395`, which calls `$PODS_ROOT/FirebaseCrashlytics/upload-symbols` while Firebase appears to come through SPM (no Firebase pods in `Podfile.lock`).
+
 ## Context
 
 A grep for `package:<name>/` across `lib/`, `test/` and `integration_test/` found six declared dependencies with zero imports: `cloud_functions`, `shared_preferences`, `collection`, `riverpod_annotation`, `riverpod_generator`, `build_runner`.
@@ -49,8 +58,9 @@ Two further packages need judgement rather than a grep. `flutter_secure_storage`
 
 **Rollback:** re-add the dependency and run `flutter pub get`. Each step is independently revertible, which is why they are separate commits rather than one sweep.
 
-## Open Questions
+## Open Questions (resolved)
 
-- Does anything still need a stable device identifier once payments are gone?
-- Should the 105 outdated packages be addressed as a follow-up change?
-- Does `integration_test/screenshot_test.dart` survive `remove-monetization-go-free`, and does its fate change any dependency's usage count?
+- *Does anything still need a stable device identifier?* No. The service and both packages were deleted.
+- *Should the outdated packages be addressed?* Yes, but in a separate follow-up change.
+- *Does `integration_test/screenshot_test.dart` survive?* Yes. It is the only user of `integration_test` (`screenshot_test.dart:4`) and changes no other package's usage count.
+- *New (Manual):* do `Podfile.lock` and the Crashlytics `upload-symbols` phase still match an SPM-based Firebase setup? This needs a macOS build.

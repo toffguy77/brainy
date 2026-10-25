@@ -33,12 +33,12 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 ### Страница 4 — Возраст ребёнка (`age_page.dart`)
 - «Сколько лет ребёнку?»
 - 3 карточки: 6-9, 10-12, 13-14
-- Сохранение в Hive по ключу `childAge`
+- Выбор карточки переходит на следующую страницу; в Hive (`childAge`) пишется при завершении онбординга
 
 ### Страница 5 — Главная цель (`goals_page.dart`)
 - «Какая главная цель?»
 - 4 карточки (множественный выбор): concentration, reading, exams, fun
-- Сохранение по ключу `goals`
+- В Hive (`goals`) пишется при завершении онбординга
 
 ### Страница 6 — Частота тренировок (`frequency_page.dart`) — последняя
 - «Как часто заниматься?»
@@ -51,8 +51,9 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 
 ## Навигация
 
-- Кнопка [Далее] или свайп между страницами
-- Кнопка [Назад] на страницах 2+
+- Кнопка [Далее] (на страницах 2, 3, 5); на странице возраста выбор карточки сам переходит дальше.
+  Свайп отключён (`NeverScrollableScrollPhysics`); на странице целей [Далее] активна после выбора хотя бы одной цели
+- Кнопка [Назад] на страницах 2+ (системный жест «назад» тоже листает на страницу назад)
 - Индикатор прогресса: 6 точек
 - После завершения: роутер перенаправляет на `/home`
 
@@ -73,5 +74,5 @@ tags: [onboarding, tutorial, firstlaunch, welcome, age, goals]
 ## Ключевые файлы
 
 - `brainy-app/lib/features/onboarding/screens/onboarding_screen.dart`
-- `brainy-app/lib/features/onboarding/pages/` — 7 файлов страниц
+- `brainy-app/lib/features/onboarding/pages/` — 6 файлов страниц
 - `brainy-app/lib/features/onboarding/providers/onboarding_provider.dart`

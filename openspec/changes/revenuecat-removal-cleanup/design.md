@@ -1,59 +1,72 @@
+## Decision / Outcome
+
+**Decision:** remove RevenueCat completely — code, tests, docs snippet, StoreKit config, CI env and Fastfile plumbing, and the external secret/key. The app is completely free and has no payment provider of any kind; earlier references to YooKassa as a replacement are historical only.
+
+**Outcome:** in-repo removal is complete (`f0e1ec8`, `9180bab`, `faf276b`). Static evidence at HEAD:
+
+| Area | Evidence |
+|------|----------|
+| Setup snippet | `brainy-app/docs/` no longer exists (deleted in `f0e1ec8`) |
+| Integration test | `screenshot_test.dart:229` `setUpAll` only initialises Hive; no SDK import |
+| Constants test | `app_constants_test.dart:7-108` has no `RevenueCat` group |
+| Workflows | no `REVENUECAT_API_KEY` in `.github/workflows/` (removed in `9180bab`) |
+| Fastfile | `build_app` at `Fastfile:59-70` (`deploy_testflight`) and `:152-163` (`release`) has no `--dart-define` |
+| StoreKit | `ios/Runner/Products.storekit` deleted (`9180bab`), scheme ref removed (`faf276b`) |
+| Guard | `test/app/free_access_test.dart:19-38` fails on `purchases_flutter` in `lib/` |
+| CI | `ci.yml:54` runs `flutter analyze --fatal-infos`, `ci.yml:57` runs `flutter test` |
+
+Maintainer reports `flutter analyze --fatal-infos` clean and 267 tests passing locally.
+
+Pending, external: delete the `REVENUECAT_API_KEY` GitHub secret, revoke the key in the RevenueCat dashboard, confirm a TestFlight build on `main` succeeds without it.
+
 ## Context
 
-The RevenueCat → YooKassa migration (`3b9684a`) removed the `purchases_flutter` dependency from `pubspec.yaml` and commented out the RevenueCat constants in `app_constants.dart`, but left three consumers behind:
+The historical RevenueCat → YooKassa migration (`3b9684a`; YooKassa is gone too) removed `purchases_flutter` from `pubspec.yaml` and commented out the RevenueCat constants, but left three consumers behind:
 
 | File | Issues | Nature |
 |------|--------|--------|
 | `docs/setup/revenue_cat/initialize.dart` | 3 errors + 1 info | Setup snippet, never part of the app |
-| `integration_test/screenshot_test.dart` | 4 errors + 1 info | Configures the SDK in `setUpAll` |
-| `test/constants/app_constants_test.dart` | 4 errors | Asserts four deleted constants |
+| `integration_test/screenshot_test.dart` | 4 errors + 1 info | Configured the SDK in `setUpAll` |
+| `test/constants/app_constants_test.dart` | 4 errors | Asserted four deleted constants |
 
-The two test files fail at the `loading` stage, so they have been contributing zero coverage since the migration while still appearing in `test/`. Nobody noticed because no CI job ran the analyzer or the tests.
+The two test files failed at the `loading` stage, contributing zero coverage. The CI deploy and release workflows and both Fastfile lanes still injected `REVENUECAT_API_KEY` into builds.
 
-The third info — `collection_methods_unrelated_type` in `share_card.dart` — is a real bug and belongs to `share-card-record-key-fix`, not here. Both must land before `--fatal-infos` can pass.
+The third info — `collection_methods_unrelated_type` in `share_card.dart` — belonged to `share-card-record-key-fix` and has since been fixed.
 
 ## Goals / Non-Goals
 
 **Goals:**
-- `flutter analyze` clean, including tests and integration tests.
-- The two broken test files execute again.
-- No secret injected for an integration that no longer exists.
+- `flutter analyze --fatal-infos` clean, including tests and integration tests.
+- Every test file loads and executes.
+- No secret injected for an integration that no longer exists; the secret itself deleted and the key revoked.
 
 **Non-Goals:**
-- Removing YooKassa constants or `subscription_constants_test.dart`. That is `remove-monetization-go-free`; doing it here would couple an analyzer fix to a product decision.
-- Fixing the `share_card.dart` info. That is `share-card-record-key-fix`.
-- Rewriting `screenshot_test.dart` beyond removing the SDK call. Its wider fate depends on `remove-monetization-go-free`, which changes the screens it captures.
+- Product-level monetization removal (paywall, subscription feature, YooKassa, Cloud Functions). That is `remove-monetization-go-free`, which has landed.
+- Wider rewrite of `screenshot_test.dart`.
 
 ## Decisions
 
-**Delete the RevenueCat assertions rather than port them to YooKassa.** `subscription_constants_test.dart` already covers the YooKassa constants — prices, Hive keys, uniqueness — more thoroughly than the deleted group did. Porting would duplicate coverage that `remove-monetization-go-free` is about to delete anyway.
+**Delete the RevenueCat assertions rather than port them.** There is no payment provider left to port to; YooKassa and `subscription_constants_test.dart` were removed with the move to a free app.
 
-**Delete `docs/setup/revenue_cat/` rather than move it outside the analyzed tree.** A setup snippet for an abandoned integration has no reader. It also holds the leaked credential, so `secrets-hygiene` deletes it regardless; this change simply owns the analyzer half of that outcome.
+**Delete `docs/setup/revenue_cat/` rather than exclude it from analysis.** A setup snippet for an abandoned integration has no reader and held a leaked credential. Excluding it in `analysis_options.yaml` was rejected: it keeps dead, non-compiling code while hiding it.
 
-*Alternative considered:* add the folder to `analysis_options.yaml` excludes. Rejected — it keeps dead, non-compiling code while hiding it, which is how this situation arose.
+**Remove all build plumbing, not only the Fastfile.** Both the workflow `env:` entries and the `--dart-define` in both lanes were removed so that deleting the GitHub secret cannot break a build.
 
-**Remove the fastlane `--dart-define` in this change, not in `secrets-hygiene`.** The two are related but distinct: `secrets-hygiene` revokes the key, this change removes the plumbing that passes it. Keeping them separate means revoking the key does not depend on an app-side edit landing first.
-
-**Fix the analyzer before touching the test deadlock.** `test-suite-stabilization` needs a clean full-suite signal to tell an order-dependent deadlock from a compile failure. Landing this first removes two confounds.
+**Guard with a test, not just a grep.** `free_access_test.dart` fails if `purchases_flutter` (or other paid-tier identifiers) reappear in `lib/`, so the decision is enforced by CI.
 
 ## Risks / Trade-offs
 
-- **`--fatal-infos` fails on an info this change does not own** → Expected. `share-card-record-key-fix` must land before the CI analyzer job becomes required. Sequenced in `ci-quality-gate`.
-- **`screenshot_test.dart` still does not run in CI** → It needs a device or simulator and is out of scope for the unit CI job. It will at least compile, which is what `flutter analyze` checks.
-- **Removing the GitHub secret breaks a workflow that still reads it** → Grep the workflows before deleting; only the fastlane lane references it.
+- **A workflow still reads the deleted secret** → Mitigated: no workflow or Fastfile references `REVENUECAT_API_KEY` at HEAD. Final confirmation needs a TestFlight run on `main`.
+- **The leaked key remains usable until revoked** → Revocation in the RevenueCat dashboard is an explicit external task.
+- **`screenshot_test.dart` does not run in CI** → It needs a simulator; CI only checks that it compiles via the analyzer.
 
 ## Migration Plan
 
-1. Delete `docs/setup/revenue_cat/`.
-2. Remove the import and `setUpAll` SDK call from `screenshot_test.dart`.
-3. Remove the `RevenueCat` group from `app_constants_test.dart`.
-4. Run `flutter analyze` — expect only the `share_card.dart` info to remain.
-5. Remove the fastlane `--dart-define` and delete the GitHub secret.
-6. Run the two previously broken test files to confirm they execute.
+1. Delete `docs/setup/revenue_cat/`. Done.
+2. Remove the SDK import and `setUpAll` call from `screenshot_test.dart`. Done.
+3. Remove the `RevenueCat` group from `app_constants_test.dart`. Done.
+4. Remove `REVENUECAT_API_KEY` from both workflows and both Fastfile lanes; delete `Products.storekit`. Done.
+5. Run `flutter analyze --fatal-infos` and `flutter test`. Done (maintainer-reported; enforced in CI).
+6. External: delete the GitHub secret, revoke the RevenueCat key, confirm a TestFlight build on `main`. Pending.
 
-**Rollback:** ordinary reverts; deleting a secret is the only non-git action, and it can be re-added from the RevenueCat dashboard if ever needed.
-
-## Open Questions
-
-- Should `analysis_options.yaml` gain stricter lints once the baseline is clean? Better as a follow-up than bundled here.
-- Does `screenshot_test.dart` still serve a purpose once `remove-monetization-go-free` deletes the paywall screens it captures? Revisit there.
+**Rollback:** ordinary git reverts. There is no reason to restore the secret: nothing consumes it.

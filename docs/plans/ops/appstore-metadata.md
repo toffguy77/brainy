@@ -26,6 +26,8 @@ for kids» убраны после отказа по guideline 2.3.8 (комми
 
 ## Категория и рейтинг
 
+Категория и рейтинг задаются в App Store Connect, в `metadata/` файлов для них нет.
+
 - Основная категория: Education
 - Дополнительная: Games > Educational
 - Возрастной рейтинг: 4+
@@ -35,8 +37,11 @@ for kids» убраны после отказа по guideline 2.3.8 (комми
 
 Требуемые размеры:
 - iPhone 6.7" (1290x2796) — обязательно
-- iPhone 6.5" (1284x2778) — рекомендуется
-- iPad 13" — файлы `ipad-13_*`
+- iPhone 6.5" (1242x2688) — рекомендуется
+- iPad 13" (2048x2732) — файлы `ipad-13_*`
+
+Размеры заданы в `DEVICES` скрипта композиции; готовые файлы — `screenshots/<locale>/{6.7,6.5,ipad-13}_NN_<screen>.png`
+(по 18 на язык).
 
 Экраны для скриншотов (6 штук):
 1. Главный экран с персонажем
@@ -90,7 +95,8 @@ Analytics не собирается: Firebase Analytics удалён (решен
 
 ## Fastlane deliver
 
-Автоматическая загрузка метаданных и скриншотов выполняется через lane `submit_review` в Fastfile. Параметры:
+Загрузка метаданных и скриншотов — `deliver` в lane `submit_review` (только метаданные) и в lane
+`release` (после загрузки билда; версия и номер сборки берутся из `pubspec.yaml`). Общие параметры:
 - `overwrite_screenshots: true`
 - `skip_binary_upload: true`
 - `submit_for_review: true`

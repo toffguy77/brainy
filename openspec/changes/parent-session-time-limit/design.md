@@ -1,61 +1,36 @@
+## Decision and Outcome
+
+**Decision (owner, 2026-08-01):** remove the "Maximum session time" control. There is no play-time limit.
+
+**Outcome:** removed in `f0e1ec8`. Verified absent on 2026-10-25 (see `tasks.md` 1.4). Every remaining parent-settings control was verified to have an observable effect (see `tasks.md` 6.3).
+
 ## Context
 
-`ParentSettings.maxSessionTimeMinutes` is loaded from Hive (`parentMaxSessionTimeKey`, default 0 meaning unlimited) and written by `setMaxSessionTime`. Both live in `parent_provider.dart`. A grep for the field and the key across `lib/` returns matches only in that file — no consumer exists.
+Before removal, `ParentSettings.maxSessionTimeMinutes` was loaded from Hive (`parentMaxSessionTimeKey`, default 0 meaning unlimited) and written by `setMaxSessionTime`. Both lived only in `parent_provider.dart`, and no game code read the value. The sibling settings did have consumers: grid size mode was read by the home screen, and the notification settings by the reminder scheduler. The session limit was a UI control whose wiring was never built.
 
-By contrast, the sibling settings work: `gridSizeMode` and `fixedGridSize` are read by `home_screen.dart`, and the notification settings are read by `game_screen.dart` when rescheduling. The session limit is the odd one out, which suggests it was added to the settings UI and its wiring was never finished.
+## Rationale for removal over enforcement
 
-A single Schulte session lasts seconds to a couple of minutes — a 5x5 target time is 25 seconds, a 9x9 is 81. A 5-minute per-session cap would therefore almost never trigger. That mismatch between the option values and the natural session length is the strongest evidence that the intended meaning was daily play time, not per-session duration.
-
-## Goals / Non-Goals
-
-**Goals:**
-- The control does what a parent reasonably believes it does.
-- The child experiences the limit as a clear, kind boundary, not a malfunction.
-- No progress is lost when the limit ends a session.
-
-**Non-Goals:**
-- A full screen-time regime with schedules, weekday rules or bedtime windows. Out of proportion for this app.
-- Enforcing the limit against clock tampering. A child who changes the device clock can defeat any local limit; solving that needs a server and is not worth it here.
-- Blocking access to the rest of the app. The limit is about play sessions, not about the character or progress screens.
+- **The options did not fit the game.** A table takes about 25 seconds (5x5) to 81 seconds (9x9) at target pace. A 5-15 minute per-session cap would almost never trigger.
+- **A daily budget would have been a real feature.** It needs a day-boundary definition, a child-facing "time is up" message, partial-session rules (no record, keep earned coins and XP) and new tests. That is out of proportion for the product.
+- **Product position.** The owner chose not to limit play.
+- **An honest absence beats a dishonest presence.** Removing the control fixes the defect, which was a parental promise the app did not keep, at the lowest cost.
 
 ## Decisions
 
-**Resolve the per-session versus per-day question before writing code.** This is the crux of the change and cannot be settled by looking at the code, because the code has no behaviour. The evidence points to per-day: 5/10/15-minute options against 25-to-81-second target times mean a per-session cap would essentially never fire, making the feature pointless. The onboarding also asks "how often to train" with 5/10/15-minute options and stores `dailyGoalMinutes` — the same numbers, explicitly framed as a daily budget. The two settings are probably the same concept, entered twice.
-
-Recommendation: implement as a **daily** budget, accumulating across sessions, and rename the setting accordingly. Requires an owner decision; recorded as an open question rather than assumed.
-
-*Alternative considered:* implement literally per-session, matching the current label. Cheapest and matches the string, but ships a control that almost never activates — a subtler version of the current defect.
-
-**End the session gracefully, do not kill the screen.** Route through the normal session-completion path with a flag, so coins, XP and session recording all reuse tested code. Abruptly popping the route would bypass persistence and lose the child's progress.
-
-**Do not write a personal record for a partial session.** A record is a completion time; a session cut short has none. Writing one would corrupt the records the parent dashboard and Game Center leaderboards display.
-
-**Exclude the countdown from elapsed time.** Three seconds of a five-minute budget is small, but a limit that counts waiting is wrong on its face and trivially avoidable.
-
-**Do not terminate a running session when the setting changes.** A parent adjusting settings should not yank a game out from under a child mid-play. Apply from the next session.
-
-**If the owner decides the limit is unwanted, remove it.** Deleting the control, the Hive key and the plan section is a legitimate resolution and better than leaving a decorative control. What is not acceptable is shipping it as it stands.
+- **Delete code, constant, strings and plan text together** (`f0e1ec8`), so no layer advertises the setting.
+- **Leave the stored orphan value in place.** The user box may still hold `'parentMaxSessionTime' → int` on upgraded devices. Nothing reads the key. It is a primitive in an untyped box, so no adapter depends on it. Nothing iterates the box. A cleanup migration would add code and risk for no effect the user could see.
+- **Keep the honesty invariant as a requirement.** Every control on the parent settings screen must change observable behaviour. This is now the substance of `specs/session-time-limit/spec.md`.
+- **`dailyGoalMinutes` stays separate and is now used.** The old open question about merging it with the limit is resolved by the removal. The daily goal is a goal, not a cap: it can be edited in parent settings and drives the home "Today: X of N min" bar and the dashboard.
 
 ## Risks / Trade-offs
 
-- **A daily budget needs day-boundary handling** → Reuse the streak logic's existing notion of "today", so both features agree on when a day starts. Do not invent a second definition.
-- **A child mid-table when the budget expires loses their attempt** → Mitigated by preserving earned progress and by wording the message kindly. Consider allowing the current table to finish if it is nearly done, though that complicates the rule; deferred.
-- **Two overlapping settings confuse parents** → `dailyGoalMinutes` (a goal, from onboarding) and `maxSessionTimeMinutes` (a limit, from parent settings) may need merging, or clearly distinct labels. Flagged as an open question.
-- **Clock tampering defeats the limit** → Accepted; out of scope.
+- **Parents who relied on the label lose nothing.** It never did anything.
+- **The invariant has no direct test.** It holds by review today, not by a test. There is no widget test for `parent_settings_screen.dart` or for the notification-denial path of `ParentNotifier.setNotificationsEnabled`. Coverage exists only for the downstream consumers (home screen and reminder plan tests). Noted as a gap; not fixed by this change.
 
 ## Migration Plan
 
-1. Owner decides: per-session, per-day, or remove.
-2. If keeping: implement enforcement in the game timer, route the end through normal completion, add the localized message.
-3. Add tests for limit reached, limit not reached, and unlimited.
-4. Manually verify with a short limit that the message appears and progress is kept.
-5. Update `parent-panel.md` to describe the real behaviour.
+None required. The stored orphan value is inert. Rollback would mean re-adding the control, which the owner decision forbids.
 
-**Rollback:** revert the enforcement; the setting returns to being inert, which is today's state. No user data is affected either way.
+## Historical analysis (superseded, kept for the record)
 
-## Open Questions
-
-- **Per-session or per-day?** The central decision. Recommendation above is per-day.
-- Should `maxSessionTimeMinutes` and `dailyGoalMinutes` be merged into one concept?
-- Should a nearly finished table be allowed to complete when the budget expires?
-- Should the parent dashboard show how much of the budget was used today?
+Before the decision, this document recommended enforcing the limit as a **daily** budget, based on the mismatch between session length and the option values. It also suggested merging the limit with onboarding's `dailyGoalMinutes`, ending a limited session through the normal completion path with no personal record, excluding the countdown from elapsed time, and never cutting off a session already in progress. All of this is moot after the removal decision, and none of it was implemented.

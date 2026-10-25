@@ -1,8 +1,21 @@
+## Decision / Outcome (2026-10-25)
+
+Implemented as designed, with the corrections below. The evidence is listed per task in `tasks.md`.
+
+- **One validation rule for three modes.** `GridCell.number` is the ordinal and `label` is what is drawn. A single pure `processOrdinalTap` (`game_provider.dart:153`) validates classic, reverse and letters, while Gorbov keeps `processGorbovTap`. The separate `processReverseTap` and `processLettersTap` named in the Migration Plan were deliberately not written, because they would duplicate `processOrdinalTap`.
+- **The badge reads the drawn label, not the ordinal.** `GameState.expectedLabel` (`game_state.dart:70`) shows N² first in reverse and a letter in letters. The first build showed the raw ordinal ("1").
+- **Records needed a storage fix.** The claim below that "a new mode needs no storage work" was wrong. `_loadRecords` iterated a fixed `classic`/`gorbov` list, so reverse/letters records were dropped after a restart. That made every result a record (+25 coins) and let slower times overwrite the best. It now loads every non-legacy key (`records_provider.dart:37`).
+- **Size clamping is applied wherever a size enters.** That covers the picker, the mode switch, the persisted size, the parent-fixed size (`home_screen.dart:70`) and untrusted route params (`GameNotifier.initGame`, `game_provider.dart:288`). Before the fix, a parent-fixed 7×7 crashed letters with `ArgumentError` and Gorbov ran at 3×3.
+- **Leaderboards.** Game Center time boards have no mode dimension, so only classic best times are submitted. Weekly XP covers every mode.
+- **Achievements** are mode-agnostic by design.
+- **Statistics were not "already mode-agnostic".** They showed classic only. A per-mode switcher (`ModeFilterChips`) with per-mode records, charts and session badges was added (8a340da).
+- **Adaptive difficulty was not "existing code".** It was described in the plans but not implemented. It was built in this change (`training_goals_provider.dart`, b1391c2). A suggestion needs 5 recent games at the current size and mode with an average at or under the mode's target: base for classic and reverse, ×1.5 for letters, ×2 for Gorbov. It only offers the next size in the mode's own list, so letters stops at 5×5. It is hidden while the parent fixes the size.
+
 ## Context
 
 The store listing claims three modes; the app has two, and neither matches the claim. Rather than shrink the listing, the decision is to build reverse and letters.
 
-The existing code makes this cheaper than it looks. Records are already keyed `{mode}_{gridSize}`, with a migration for the legacy numeric format, so a new mode needs no storage work. `GameSession` already carries a `mode` string. Gorbov-Schulte established the pattern for a second mode: grid generation and tap validation extracted as pure functions (`generateGorbovGrid`, `processGorbovTap`) precisely so they could be unit-tested, and those tests are among the few genuinely valuable ones in the suite.
+The existing code makes this cheaper than it looks. Records are already keyed `{mode}_{gridSize}`, with a migration for the legacy numeric format. *(Correction: loading still enumerated only classic and Gorbov keys and had to be changed. See Outcome.)* `GameSession` already carries a `mode` string. Gorbov-Schulte established the pattern for a second mode: grid generation and tap validation extracted as pure functions (`generateGorbovGrid`, `processGorbovTap`) precisely so they could be unit-tested, and those tests are among the few genuinely valuable ones in the suite.
 
 The obstacle is `GridCell`, which models a number. Letters mode needs cells that display a character. The cleanest resolution is for cells to carry a display string plus an ordinal position in the target sequence — which subsumes numbers, reversed numbers and letters uniformly.
 
@@ -17,7 +30,7 @@ The obstacle is `GridCell`, which models a number. Letters mode needs cells that
 - A general mode plug-in architecture. Four concrete modes do not justify one, and speculative generality is how this codebase accumulated the debt the audit found.
 - A letters variant of Gorbov (two-colour alphabetical). Combinatorially possible, not obviously valuable.
 - Localised alphabets beyond the two supported languages.
-- Reworking the results or statistics screens; they are already mode-agnostic.
+- Reworking the results screen. *(Correction: the statistics screens were **not** mode-agnostic, because they showed classic only. A per-mode switcher was added; see Outcome.)*
 
 ## Decisions
 
@@ -41,19 +54,19 @@ The obstacle is `GridCell`, which models a number. Letters mode needs cells that
 
 ## Risks / Trade-offs
 
-- **Generalising `GridCell` touches the shared game loop, which has no test coverage** → The largest risk in this change. Mitigate by landing `test-coverage-expansion`'s `GameNotifier` tests first, or by writing them as part of this change. Refactoring an untested core game loop for a new feature is how regressions reach production.
+- **Generalising `GridCell` touches the shared game loop, which has no test coverage** → The largest risk in this change. Mitigate by landing `test-coverage-expansion`'s `GameNotifier` tests first, or by writing them as part of this change. *(Done: `test/game/game_notifier_test.dart` and `ordinal_tap_test.dart`.)*
 - **Switching mode with an incompatible size selected** → Explicit rule: on mode switch, clamp the selected size into the new mode's allowed range. Needs a test; it is the obvious source of a crash or an empty grid.
 - **Letters star thresholds guessed wrong** → Ship deliberately loose and tighten later. A 5×5 letters table is materially harder than 5×5 classic.
-- **Adaptive difficulty suggests a size letters cannot offer** → The suggestion logic must consult the mode's size list, not the global one.
+- **Adaptive difficulty suggests a size letters cannot offer** → Adaptive difficulty did not exist yet. It was built with `gridSizesForMode(mode)` as its ceiling (`training_goals_provider.dart:19`), and is tested by "skips sizes the mode lacks and stops at its ceiling".
 - **Four modes crowd the home screen** → A real design cost of the decision, accepted.
-- **Russian «Ъ», «Ь», «Ы» are awkward as standalone letters for young children** → They sit at positions 28–30 and are never reached within a 25-cell bound, so the issue does not arise in practice.
+- **Russian «Ъ», «Ь», «Ы» are awkward as standalone letters for young children** → They sit at positions 26–28 of `alphabetRu` (after removing «Ё» and «Й»), past the 25-cell bound, so they are never reached in practice.
 
 ## Migration Plan
 
 1. Ensure `GameNotifier` has test coverage before refactoring it.
 2. Generalise `GridCell` to display string plus ordinal; keep classic and Gorbov green throughout.
-3. Add `generateReverseGrid` and `processReverseTap` as pure functions, with tests.
-4. Add `generateLettersGrid` and `processLettersTap` as pure functions, with tests, including alphabet bounds.
+3. Add `generateReverseGrid` as a pure function, with tests. Validation goes through the shared `processOrdinalTap`.
+4. Add `generateLettersGrid` as a pure function, with tests, including alphabet bounds. Validation goes through `processOrdinalTap`.
 5. Add per-mode grid size lists, alphabets, target times and star thresholds to `AppConstants`.
 6. Restructure the home screen selector; implement size clamping on mode switch.
 7. Add mode names and hints to both ARB files.
@@ -62,9 +75,9 @@ The obstacle is `GridCell`, which models a number. Letters mode needs cells that
 
 **Rollback:** the modes are additive. Removing them from the selector disables them without touching stored records, though any records already set under the new keys would become unreachable rather than lost.
 
-## Open Questions
+## Open Questions (answered)
 
-- What are the right star thresholds and target times for letters mode? Needs playtesting; ship loose.
-- Should reverse mode be offered for Gorbov-Schulte too (descending white, ascending red)? Deliberately out of scope.
-- Should the letters alphabet be configurable by a parent, for a child learning a third language?
-- Does the home screen selector become a 2×2 grid or a wrapped chip row? A design call to make before implementing step 6.
+- **Letters star thresholds and target times?** They shipped loose: `starThresholdsLetters` is about 1.5× the digit thresholds, and the adaptive target is 1.5× the base. Tighten them once real play data exists. Gorbov's adaptive target is 2× the base.
+- **Reverse Gorbov (descending white, ascending red)?** Out of scope and not built.
+- **Parent-configurable letters alphabet?** Not built. The alphabet follows the app locale (`Localizations.localeOf(context)` → `alphabetFor`, with English for anything but `ru`).
+- **2×2 grid or wrapped chip row?** A 2×2 grid of chips (`home_screen.dart:243`), with the mode's rule hint underneath.

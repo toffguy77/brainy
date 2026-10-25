@@ -1,40 +1,52 @@
-## Decision (2026-08-01)
+## Decision and Outcome (2026-08-01, verified 2026-10-25)
 
-Owner decision: **remove the control entirely.** There is no play-time limit; children play as long as they like. The per-session versus per-day question is moot. This change is therefore a removal, not an implementation — tasks in group 1.4 apply and groups 2 through 5 are dropped.
+Owner decision: **remove the "Maximum session time" control entirely.** The app has no play-time limit, and children play as long as they like. The per-session versus per-day question no longer applies.
+
+Outcome: removed in commit `f0e1ec8`. The 2026-10-25 re-check finds no trace of the control in `brainy-app/lib`, `brainy-app/test`, `brainy-app/integration_test`, the ARB files, `AppConstants` or `docs/plans`. This change is a **removal**. The enforcement work it originally proposed (groups 2-5 of `tasks.md`) is dropped.
 
 ## Why
 
-The parent settings screen offers a "Maximum session time" control with options of 5, 10, 15 minutes or unlimited. A parent can select a value; it is written to Hive under `parentMaxSessionTimeKey` and read back into `ParentSettings.maxSessionTimeMinutes`. Nothing else reads it. Grepping the codebase finds references only inside `parent_provider.dart` — `game_screen.dart` and `game_provider.dart` never consult it.
+The parent settings screen offered "Maximum session time" with options of 5 / 10 / 15 minutes or unlimited. The value was written to Hive and read back into `ParentSettings.maxSessionTimeMinutes`, but nothing else read it. Neither `game_screen.dart` nor `game_provider.dart` consulted it. A parent who chose 5 minutes got no limit and had no way to notice. `docs/plans/features/parent-panel.md` described it as working.
 
-The setting is decorative. A parent who limits their child to 5 minutes gets no limit at all, and has no way to discover this. `docs/plans/features/parent-panel.md` documents it as a working control, so the documentation actively confirms the false impression.
+A parental control that silently does nothing breaks a promise to the parent. Shipping it as it was was ruled out, which left two options: enforce it or remove it. The owner chose removal for three reasons:
 
-For a product aimed at children with a parent-control surface, a screen-time limit that silently does nothing is the worst kind of defect: it is a promise to a parent that the app does not keep.
+- A per-session cap would almost never fire. A Schulte table takes 25 to 81 seconds at target pace, against limits of 5 to 15 minutes.
+- A per-day budget would need day-boundary handling, a child-facing "time is up" flow and partial-session rules. That is a lot of design and code for a brain-training app whose sessions are already short.
+- The product position is that there is no play-time limit.
 
 ## What Changes
 
-- The session time limit is enforced during gameplay: when a session reaches the configured limit, it ends.
-- The child is told why the session ended, in age-appropriate language, rather than being dropped without explanation.
-- Progress earned up to that point is preserved — the session is completed, not discarded.
-- "Unlimited" (0) continues to mean no limit.
-- The behaviour is covered by tests, so a future refactor cannot silently disconnect it again.
+Removed (all in `f0e1ec8`):
+- The "Max session time" segmented control on `parent_settings_screen.dart`.
+- `ParentSettings.maxSessionTimeMinutes`, its `copyWith` and load code, and `ParentNotifier.setMaxSessionTime` in `parent_provider.dart`.
+- `AppConstants.parentMaxSessionTimeKey`.
+- The ARB key `parentMaxSessionTime` in `l10n/app_en.arb` and `l10n/app_ru.arb`, and the generated getters.
+- The "Максимальное время сессии" bullet in `docs/plans/features/parent-panel.md`.
 
-Alternatively, if the product decision is that the limit is not wanted, the control and its Hive key are removed and the plan is corrected. Shipping the current state — a control that lies — is not an option.
+Kept as an invariant: every control left on the parent settings screen changes observable behaviour. Later commits on this branch (`f0e1ec8..HEAD`) wired up the controls that were partly decorative. The notifications toggle now asks for permission and reverts on denial. A daily goal control was added that drives the home "Today: X of N min" bar. The fixed grid size is clamped per mode, auto mode gets an adaptive size suggestion, and privacy and terms links were added. See `tasks.md` 6.3 for the control-to-consumer map.
+
+### Orphan Hive value (left in place on purpose)
+
+Devices that ran an older build may still hold an `int` under the string key `'parentMaxSessionTime'` in the user box. It is left alone because it is harmless:
+- Nothing reads it, because no code refers to that key any more.
+- It is a primitive stored in an untyped box, so no Hive adapter or typeId depends on it and it cannot break deserialization.
+- Nothing iterates the user box's keys or values, so it cannot leak into other logic.
+- It costs a few bytes.
+
+Deleting it would need a migration step that can never matter to the user.
+
+### `dailyGoalMinutes` follow-up: resolved
+
+The original analysis asked whether the limit duplicated onboarding's `dailyGoalMinutes`, which at the time was stored but unused. That question is closed. With the limit removed, `UserProgress.dailyGoalMinutes` is the only time-related setting. It is a goal, not a limit, and it is used: it can be edited from parent settings (`parent_settings_screen.dart:89-102`) and drives the home daily-goal bar (`home_screen.dart:110-113`) and the dashboard (`parent_dashboard_screen.dart:85`).
 
 ## Capabilities
 
 ### New Capabilities
-- `session-time-limit`: how a parent-configured play-time limit constrains a game session.
+- `session-time-limit`: records that the app has **no** parent-configured play-time limit, and requires that every parent-settings control has an observable effect.
 
 ### Modified Capabilities
 <!-- None: openspec/specs/ has no existing capability for parental controls. -->
 
 ## Impact
 
-- `lib/features/game/providers/game_provider.dart` — the timer gains a limit check.
-- `lib/features/game/screens/game_screen.dart` — reads `parentProvider` and handles the limit-reached transition.
-- `lib/features/game/screens/result_screen.dart` — a variant explaining the session ended on the limit.
-- `l10n/app_ru.arb`, `l10n/app_en.arb` — new strings for the limit message.
-- `test/game/` — new coverage for limit reached, limit not reached, and unlimited.
-- `docs/plans/features/parent-panel.md` — describes real behaviour.
-
-Open question for the owner: does the limit cap a single session, or total play time per day? The setting is named "maximum session time" and the options are 5/10/15 minutes, which reads as per-session — but a child can immediately start another session, which makes a per-session cap weak as a screen-time control. This must be decided before implementation; see `design.md`.
+All code and docs impact landed in `f0e1ec8`: `parent_settings_screen.dart`, `parent_provider.dart`, `app_constants.dart`, both ARB files and generated localizations, and `docs/plans/features/parent-panel.md`. This change folder records the decision and verifies the result. It adds no further code changes.

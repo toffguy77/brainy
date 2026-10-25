@@ -58,6 +58,11 @@ Brainy предлагает четыре игровых режима на осн
 
 Доступные размеры для Горбова: 5x5, 6x6, 7x7, 9x9 (`AppConstants.gorbovGridSizes`).
 
+Красные ячейки отображаются цветом `AppColors.gorbovRed` (`#E17055`, не `AppColors.error`), чтобы не
+путать с подсветкой ошибок.
+
+Завершение: `nextWhiteNumber > whiteCount && nextRedNumber < 1`.
+
 ## Выбор размера по режиму
 
 `AppConstants.gridSizesForMode(mode)` возвращает список размеров режима, а
@@ -82,10 +87,6 @@ Brainy предлагает четыре игровых режима на осн
 закрыта оверлеем «Пауза — нажми, чтобы продолжить», чтобы нельзя было изучать таблицу с
 остановленным временем.
 
-Красные ячейки отображаются цветом `#E17055` (не `AppColors.error`), чтобы не путать с подсветкой ошибок.
-
-Завершение: `nextWhiteNumber > whiteCount && nextRedNumber < 1`.
-
 ## Размеры таблиц
 
 | Размер | Целевое время (сек) | 3 звезды (<=) | 2 звезды (<=) | Буквы: 3★ / 2★ |
@@ -97,7 +98,8 @@ Brainy предлагает четыре игровых режима на осн
 | 7x7 | 49 | 45s | 75s | — |
 | 9x9 | 81 | 80s | 130s | — |
 
-Все размеры отображаются в пикере на home screen (`AppConstants.pickerGridSizes = [3, 4, 5, 6, 7, 9]`) и доступны всем без ограничений.
+Пикер на главном экране показывает размеры выбранного режима (`AppConstants.gridSizesForMode`);
+для классики это `AppConstants.pickerGridSizes = [3, 4, 5, 6, 7, 9]`. Все размеры доступны всем без ограничений.
 
 ## Адаптивная сложность
 
@@ -146,4 +148,7 @@ Brainy предлагает четыре игровых режима на осн
 - `brainy-app/lib/features/game/providers/game_provider.dart` — GameNotifier (логика игры)
 - `brainy-app/lib/features/game/providers/records_provider.dart` — RecordsNotifier
 - `brainy-app/lib/features/game/providers/sessions_provider.dart` — SessionsNotifier
+- `brainy-app/lib/features/game/providers/session_completion_provider.dart` — SessionCompleter
+- `brainy-app/lib/features/home/providers/training_goals_provider.dart` — suggestNextGridSize, todayPlaySeconds
+- `brainy-app/lib/constants/game_modes.dart` — идентификаторы режимов `GameModes`
 - `brainy-app/lib/constants/app_constants.dart` — все числовые константы

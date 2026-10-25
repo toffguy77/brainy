@@ -1,31 +1,49 @@
+## Decision / Outcome
+
+**Owner decision:** RevenueCat is not needed at all. Brainy is completely free; it has no payments of any kind (no RevenueCat, no YooKassa, no StoreKit products, no Cloud Functions).
+
+**Outcome (as of `1e1e279`, branch `chore/finish-audit-changes`):** all in-repo work is done across `f0e1ec8`..HEAD.
+
+- `f0e1ec8` — deleted `brainy-app/docs/setup/revenue_cat/`, the `purchases_flutter` import and `Purchases.configure` block in `integration_test/screenshot_test.dart`, the `RevenueCat` group in `test/constants/app_constants_test.dart`, and (as part of going free) the YooKassa constants and `subscription_constants_test.dart`.
+- `9180bab` — removed `REVENUECAT_API_KEY` from `.github/workflows/deploy-testflight.yml`, `.github/workflows/release.yml` and the `--dart-define` from both Fastfile lanes (`deploy_testflight`, `release`); deleted `ios/Runner/Products.storekit`.
+- `faf276b` — removed the `Products.storekit` reference from `Runner.xcscheme`.
+- A repo-wide grep finds no functional RevenueCat reference; `test/app/free_access_test.dart` guards against `purchases_flutter` reappearing in `lib/`.
+- Maintainer reports `flutter analyze --fatal-infos` clean and `flutter test` green (267 tests); CI enforces both (`.github/workflows/ci.yml:54,57`).
+
+**Still pending (external, not in git):** delete the `REVENUECAT_API_KEY` GitHub secret; revoke the key in the RevenueCat dashboard; confirm a TestFlight build succeeds without it (CI run on `main`).
+
 ## Why
 
-`flutter analyze` reports 11 errors and 3 infos, every one of them a leftover of the RevenueCat integration that was replaced by YooKassa in `3b9684a`. The dependency was dropped from `pubspec.yaml` and the constants were commented out, but three files still import `purchases_flutter` and reference deleted constants. Two of those files are tests, so they fail at the `loading` stage — which means they contribute no coverage while looking like they do.
+`flutter analyze` reported 11 errors and 3 infos, every one of them a leftover of the RevenueCat integration. The dependency had been dropped from `pubspec.yaml` and the constants commented out, but three files still imported `purchases_flutter` and referenced deleted constants. Two of those files were tests, so they failed at the `loading` stage and contributed no coverage while looking like they did. The CI pipeline also still injected a RevenueCat secret into release builds.
 
-A red analyzer is not just untidy: it trains everyone to ignore analyzer output, so the next real defect hides in the noise. It also blocks the `ci-quality-gate` change, which runs `flutter analyze --fatal-infos`.
+(Historical note: the original write-up described RevenueCat as "replaced by YooKassa" in `3b9684a`. YooKassa has since been removed too; the app has no payments at all.)
+
+A red analyzer trains everyone to ignore analyzer output, and it blocked `ci-quality-gate`, which runs `flutter analyze --fatal-infos`.
 
 ## What Changes
 
-- `brainy-app/docs/setup/revenue_cat/initialize.dart` is removed with the rest of that folder, eliminating 3 errors and 1 info. (The folder deletion is driven by `secrets-hygiene`, which removes the credentials file beside it; this change owns the analyzer consequence.)
-- `integration_test/screenshot_test.dart` stops importing `purchases_flutter` and stops calling `Purchases.configure(AppConstants.revenueCatApiKey)` — 4 errors and 1 info.
-- `test/constants/app_constants_test.dart` drops its `RevenueCat` group, which asserted four constants that no longer exist — 4 errors, and the file starts loading again.
-- The unused `REVENUECAT_API_KEY` GitHub secret and its `--dart-define` in the fastlane lane are removed.
+- `brainy-app/docs/setup/revenue_cat/` is removed (shared with `secrets-hygiene`, which owns the credential in it).
+- `integration_test/screenshot_test.dart` no longer imports `purchases_flutter` or calls `Purchases.configure`.
+- `test/constants/app_constants_test.dart` drops its `RevenueCat` group.
+- `REVENUECAT_API_KEY` is no longer passed by `deploy-testflight.yml`, `release.yml`, or either Fastfile lane.
+- `ios/Runner/Products.storekit` and its scheme reference are removed.
+- Externally: the GitHub secret is deleted and the RevenueCat key revoked.
 
 ## Capabilities
 
 ### New Capabilities
-- `static-analysis-health`: the analyzer runs clean, and clean is enforced rather than hoped for.
+- `static-analysis-health`: the analyzer runs clean, every test file loads, no code or build plumbing references the removed purchase SDK, and this is enforced by CI and a guard test.
 
 ### Modified Capabilities
 <!-- None: openspec/specs/ has no existing capability for build hygiene. -->
 
 ## Impact
 
-- `brainy-app/docs/setup/revenue_cat/` — deleted (shared with `secrets-hygiene`).
-- `brainy-app/integration_test/screenshot_test.dart` — import and `setUpAll` block removed.
-- `brainy-app/test/constants/app_constants_test.dart` — RevenueCat group removed; the YooKassa constants it half-duplicated are already covered by `subscription_constants_test.dart`.
-- `brainy-app/ios/fastlane/Fastfile` — `--dart-define` for the RevenueCat key removed.
-- GitHub repository secrets — `REVENUECAT_API_KEY` deleted.
-- Unblocks `test-suite-stabilization` (two load failures) and `ci-quality-gate` (analyzer job).
-
-Note: `test/constants/subscription_constants_test.dart` and the YooKassa constants themselves are deleted by `remove-monetization-go-free`, not here. This change only removes what the analyzer is failing on.
+- `brainy-app/docs/setup/revenue_cat/` — deleted.
+- `brainy-app/integration_test/screenshot_test.dart` — SDK import and `setUpAll` call removed.
+- `brainy-app/test/constants/app_constants_test.dart` — RevenueCat group removed.
+- `.github/workflows/deploy-testflight.yml`, `.github/workflows/release.yml` — `REVENUECAT_API_KEY` env removed.
+- `brainy-app/ios/fastlane/Fastfile` — `--dart-define` removed from `deploy_testflight` and `release`.
+- `brainy-app/ios/Runner/Products.storekit`, `Runner.xcscheme` — deleted / reference removed.
+- GitHub repository secrets and RevenueCat dashboard — external cleanup pending.
+- Unblocked `test-suite-stabilization` (two load failures) and `ci-quality-gate` (analyzer job).

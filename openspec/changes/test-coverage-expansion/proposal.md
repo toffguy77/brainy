@@ -1,41 +1,78 @@
+## Outcome (2026-10-25)
+
+Implemented on `chore/finish-audit-changes`. 126 → 267 tests, ~5 s locally (maintainer-reported); CI
+on GitHub not yet run (External). Time is controlled with `fakeAsync` for `GameNotifier`, an injected
+clock for `PinLockout`, and an injected `now` for `NotificationService.planReminder`. Refactors made
+for testability: `processOrdinalTap`, `coinsForSession`, `buildSessionFrom`, `SessionCompleter`
+(moved out of `GameScreen`), `achievementsToUnlock`, `planReminder`, `PinLockout`. Remaining gaps
+(wiring between layers, the `ParentPinScreen` widget, beating an existing record, Gorbov
+early-completion) are listed in `design.md`.
+
 ## Why
 
-The test suite covers the easy things and skips the load-bearing ones. 118 tests pass, but the areas with the most logic and the highest cost of failure have none.
+The test suite covered the easy things and skipped the load-bearing ones. The areas with the most
+logic and the highest cost of failure had no tests.
 
-`GameNotifier` — the core game loop, driving the timer, tap validation, mistake penalties, completion detection and session creation for both modes — has no tests. Only the pure Gorbov helpers (`generateGorbovGrid`, `processGorbovTap`) are covered, and they were extracted specifically to be testable, which shows the intent existed and stopped short.
+The game loop for all four modes (classic, reverse, letters, Gorbov) was untested: tap validation for
+the three ordinal modes lived in private `GameNotifier` methods, and session and record persistence
+lived inside the `GameScreen` widget. Only the pure Gorbov helpers were covered.
 
-`NotificationService.reschedule()` has three branches (disabled, already played today, schedule) plus custom-time handling and two text pools, and is called from three places. No tests.
+Reminder scheduling (off, already played today, schedule; custom time; two message pools) was mixed
+with platform calls and untested. The ten achievement conditions were untested. The parent PIN
+lockout was untested and reset whenever the screen was left.
 
-`AchievementsProvider` evaluates ten unlock conditions after every session. No tests.
-
-`ParentPinScreen` implements PIN setting, verification, a three-attempt limit and a 30-second lockout — a security-adjacent control protecting the parent area. No tests.
-
-Two of the audit's confirmed bugs sat in exactly these gaps: the `ShareCard` record lookup never worked, and the parent session time limit was never wired up. Both would have been caught by a single test asserting observable behaviour.
+Confirmed audit bugs sat in exactly these gaps — the `ShareCard` record lookup that never matched, and
+reverse/letters records not reloaded after restart. Both would have been caught by a single test
+asserting observable behaviour.
 
 ## What Changes
 
-- `GameNotifier` gains coverage for both modes: correct and incorrect taps, mistake penalties, completion, session and record writing.
-- `NotificationService.reschedule()` gains coverage for all three branches and custom-time handling.
-- `AchievementsProvider` gains coverage for each unlock condition and for not re-awarding.
-- `ParentPinScreen` gains coverage for set, verify, wrong PIN, attempt limit and lockout expiry.
-- New tests follow the properties established by `test-suite-stabilization`: order-independent, bounded waits, no hangs.
-- The suite stays within its wall-clock budget.
+- Pure tap rules for classic, reverse and letters (`processOrdinalTap`) and Gorbov
+  (`processGorbovTap`) are covered for correct, wrong, already-found and final taps.
+- `GameNotifier` gains `fakeAsync` coverage of countdown, timer, pause/resume, stop on finish, error
+  flash, size clamping and timer disposal.
+- Session completion moves into `SessionCompleter` and gains coverage of the saved session,
+  `{mode}_{size}` records, no overwrite by slower or equal times, persistence across restart,
+  classic-only Game Center submission, achievements and character unlocks.
+- Achievement rules become the pure `achievementsToUnlock`, covered per condition at its boundary and
+  for no re-award.
+- Reminder scheduling becomes the pure `NotificationService.planReminder`, covered for every branch,
+  custom time, pool threshold and per-day variant.
+- PIN lockout moves into `PinLockout` (persisted, injectable clock), covered for limit, expiry,
+  persistence and reset on success.
+- CI produces a coverage artifact without a threshold.
+- New tests follow `test-suite-stabilization`: order-independent, bounded waits, no hangs, within the
+  wall-clock budget.
 
 ## Capabilities
 
 ### New Capabilities
-- `behavioural-test-coverage`: which behaviours must be covered by automated tests, and to what standard.
+- `behavioural-test-coverage`: which behaviours must be covered by automated tests, and to what
+  standard.
 
 ### Modified Capabilities
 <!-- None: `test-suite-health` in `test-suite-stabilization` covers suite mechanics; this covers what is tested. -->
 
 ## Impact
 
-- `test/game/game_provider_test.dart` — new.
-- `test/services/notification_service_test.dart` — new.
-- `test/progress/achievements_provider_test.dart` — new.
-- `test/parent/parent_pin_screen_test.dart` — new.
-- `test/parent/share_card_test.dart` — created by `share-card-record-key-fix`.
-- Suite runtime grows; must stay within the budget set by `test-suite-stabilization`.
+Tests (new, under `brainy-app/test/`):
+- `game/ordinal_tap_test.dart`, `game/game_notifier_test.dart`, `game/session_completion_test.dart`
+- `progress/achievement_rules_test.dart`
+- `services/reminder_plan_test.dart`
+- `parent/pin_lockout_test.dart`
 
-Sequencing: after `test-suite-stabilization` (so new tests are added to a green, terminating suite) and after `remove-monetization-go-free` (so no test is written against code about to be deleted).
+Related tests added on the same branch by sibling changes (not claimed here):
+`parent/share_card_test.dart` (rewritten, `share-card-record-key-fix`), `home/home_screen_test.dart`,
+`home/training_goals_test.dart`, `character/dressed_avatar_test.dart`,
+`progress/grid_stats_mode_test.dart`, `game/game_screen_pause_test.dart`.
+
+Production code (testability refactors, under `brainy-app/lib/`):
+- `features/game/providers/game_provider.dart`, `features/game/providers/session_completion_provider.dart` (new),
+  `features/game/screens/game_screen.dart`
+- `features/progress/providers/achievements_provider.dart`
+- `shared/services/notification_service.dart`
+- `features/parent/providers/pin_lockout.dart` (new), `features/parent/screens/parent_pin_screen.dart`
+
+CI: `.github/workflows/ci.yml` runs `flutter test --coverage` and uploads `lcov.info`.
+
+Sequencing: after `test-suite-stabilization` and `remove-monetization-go-free` — both landed.
