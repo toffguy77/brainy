@@ -43,13 +43,13 @@ class ParentSettingsScreen extends ConsumerWidget {
               const SizedBox(height: 8),
               _SegmentedControl(
                 options: [l10n.parentGridSizeAuto, l10n.parentGridSizeFixed],
-                selectedIndex: settings.gridSizeMode == 'auto' ? 0 : 1,
+                selectedIndex: settings.gridSizeMode == AppConstants.gridSizeModeAuto ? 0 : 1,
                 onChanged: (index) {
-                  final mode = index == 0 ? 'auto' : 'fixed';
+                  final mode = index == 0 ? AppConstants.gridSizeModeAuto : AppConstants.gridSizeModeFixed;
                   ref.read(parentProvider.notifier).setGridSizeMode(mode);
                 },
               ),
-              if (settings.gridSizeMode == 'fixed') ...[
+              if (settings.gridSizeMode == AppConstants.gridSizeModeFixed) ...[
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
@@ -128,10 +128,16 @@ class ParentSettingsScreen extends ConsumerWidget {
                   _SettingsLabel(l10n.parentNotifications),
                   Switch(
                     value: settings.notificationsEnabled,
-                    onChanged: (value) {
-                      ref
+                    onChanged: (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final applied = await ref
                           .read(parentProvider.notifier)
                           .setNotificationsEnabled(value);
+                      if (!applied) {
+                        messenger.showSnackBar(SnackBar(
+                          content: Text(l10n.settingsNotificationsDenied),
+                        ));
+                      }
                     },
                     activeTrackColor: AppColors.primary,
                     activeThumbColor: AppColors.textPrimary,

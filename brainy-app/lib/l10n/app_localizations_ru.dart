@@ -632,6 +632,21 @@ class AppLocalizationsRu extends AppLocalizations {
   String get gameModeLettersHint => 'Нажимай буквы по алфавиту';
 
   @override
+  String get gameFind => 'Найди';
+
+  @override
+  String gameFoundProgress(int found, int total) {
+    return 'Найдено: $found / $total';
+  }
+
+  @override
+  String get gameModeClassicHint => 'Нажимай числа по возрастанию';
+
+  @override
+  String get gameModeGorbovHint =>
+      'Чередуй: белые по возрастанию, красные по убыванию';
+
+  @override
   String get notificationMotivation1 => 'Время потренировать мозг!';
 
   @override
@@ -688,4 +703,8 @@ class AppLocalizationsRu extends AppLocalizations {
   String notificationStreak7(int count) {
     return 'Брейни переживает за стрик $count дней!';
   }
+
+  @override
+  String get settingsNotificationsDenied =>
+      'Уведомления запрещены. Разрешите их в Настройках iOS.';
 }

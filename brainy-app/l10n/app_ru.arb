@@ -368,6 +368,20 @@
   "gameModeLetters": "Буквенный",
   "gameModeReverseHint": "Нажимай числа по убыванию",
   "gameModeLettersHint": "Нажимай буквы по алфавиту",
+  "gameFind": "Найди",
+  "gameFoundProgress": "Найдено: {found} / {total}",
+  "@gameFoundProgress": {
+    "placeholders": {
+      "found": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gameModeClassicHint": "Нажимай числа по возрастанию",
+  "gameModeGorbovHint": "Чередуй: белые по возрастанию, красные по убыванию",
   "notificationMotivation1": "Время потренировать мозг!",
   "notificationStreak1": "Стрик {count} дней сгорит сегодня!",
   "@notificationStreak1": {
@@ -430,5 +444,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "settingsNotificationsDenied": "Уведомления запрещены. Разрешите их в Настройках iOS."
 }

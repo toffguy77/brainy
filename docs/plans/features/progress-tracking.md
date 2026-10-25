@@ -41,29 +41,36 @@ XP за каждую сессию = количество клеток в таб�
 3. lastPlayedDate < вчера -> streak = 1 (сброс)
 4. lastPlayedDate == null -> streak = 1 (первая игра)
 
-Бонусы за стрик:
-- 7 дней: +50 монет
-- 14 дней: разблокировка персонажа Pixel
-- 30 дней: +200 монет + разблокировка персонажа Vortex
+Бонусы за стрик (`UserProgressNotifier.updateStreak`):
+- 7 дней: +50 монет (`coinsForStreak7`)
+- 30 дней: +200 монет (`coinsForStreak30`)
+
+Разблокировка персонажей — после каждой сессии в `SessionCompleter` через
+`CharacterNotifier.unlockEligible(progress)`: Zap — уровень 10, Pixel — лучший стрик 14 дней,
+Vortex — 30, Glitch — 60 (`longestStreak`, поэтому прерванный стрик открытое не закрывает).
+Игроки, выполнившие условие раньше, получают персонажа после следующей игры.
 
 Стрик отображается на главном экране (иконка огня, оранжевая если > 0).
 
 ## Достижения
 
-10 достижений в MVP, определены в `AchievementsProvider`:
+10 достижений. Правила — чистая функция `achievementsToUnlock(session, progress, sessions)` в
+`achievements_provider.dart` (покрыта тестами на границы); `checkAchievements` вызывается из
+`SessionCompleter` после применения стрика, монет и XP, поэтому стриковые достижения тоже
+показываются на экране результата. Уже открытое достижение повторно не выдаётся.
 
 | ID | Условие |
 |----|---------|
 | first_game | Первая завершённая сессия |
 | personal_record | Личный рекорд |
 | speed_demon | 3x3 за <=5 сек |
-| master_5x5 | 5x5 за <=20 сек |
+| master_5x5 | 5x5 за <=20 сек (любой режим) |
 | focus_mode | Таблица без ошибок |
 | streak_3 | Стрик 3 дня |
 | streak_7 | Стрик 7 дней |
 | streak_30 | Стрик 30 дней |
 | night_owl | Игра после 22:00 |
-| coin_hoarder | Накоплено 500 монет |
+| coin_hoarder | Баланс 500 монет (траты в магазине открытое не отзывают) |
 
 Источник истины — enum `AchievementId` в `lib/models/achievement.dart`. Ключ хранения
 (`idString`) — snake_case от имени варианта; путь к бейджу — `assets/badges/{idString}.png`.
@@ -85,7 +92,7 @@ XP за каждую сессию = количество клеток в таб�
 
 ## Модель UserProgress
 
-Hive typeId: 1. Поля: coins, xp, level, currentStreak, longestStreak, lastPlayedDate, childAge, goals, dailyGoalMinutes, activeCharacterId.
+Hive typeId: 1. Поля (индексы 0–12 постоянны): coins, xp, level, currentStreak, longestStreak, lastPlayedDate, childAge, goals, dailyGoalMinutes, activeCharacterId, lastSelectedGridSize, unlockedAccessories, unlockedAchievements. Владение аксессуарами — глобальное, в `unlockedAccessories`.
 
 Файл: `brainy-app/lib/models/user_progress.dart`
 

@@ -9,7 +9,7 @@ class GameServicesService {
   bool get isSignedIn => _isSignedIn;
   String? get playerName => _playerName;
 
-  /// Sign in to Game Center (iOS) / Play Games (Android).
+  /// Sign in to Game Center.
   /// Call at app startup. Returns true if signed in successfully.
   Future<bool> signIn() async {
     try {

@@ -1,9 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import '../../../constants/app_constants.dart';
 import '../../../models/session.dart';
 
 class SessionsNotifier extends Notifier<List<GameSession>> {
-  static const String _boxName = 'sessions';
+  static const String _boxName = AppConstants.sessionsBox;
 
   @override
   List<GameSession> build() {

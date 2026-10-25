@@ -19,7 +19,7 @@ final weeklyXpProvider = Provider<int>((ref) {
   final start = _weekStart();
   final end = DateTime.now();
   return sessions
-      .where((s) => s.playedAt.isAfter(start) && s.playedAt.isBefore(end))
+      .where((s) => !s.playedAt.isBefore(start) && !s.playedAt.isAfter(end))
       .fold<int>(0, (sum, s) => sum + s.xpEarned);
 });
 
@@ -53,11 +53,12 @@ final leagueStandingsProvider = FutureProvider<List<LeaguePlayer>>((ref) async {
   if (isSignedIn) {
     final entries = await service.getWeeklyLeaderboard(count: 25);
     if (entries.isNotEmpty) {
-      return _buildRealStandings(
+      return buildRealStandings(
         entries: entries,
         userXp: userXp,
         userLevel: progress.level,
         playerName: pName,
+        gameCenterName: service.playerName,
       );
     }
   }
@@ -73,22 +74,27 @@ final leagueStandingsProvider = FutureProvider<List<LeaguePlayer>>((ref) async {
   );
 });
 
-List<LeaguePlayer> _buildRealStandings({
+/// Merge Game Center entries with the current player. Game Center lists the
+/// player under their Game Center name, while [playerName] may be a local
+/// custom name — matching on either keeps the player from appearing twice.
+List<LeaguePlayer> buildRealStandings({
   required List<LeaderboardEntry> entries,
   required int userXp,
   required int userLevel,
   required String? playerName,
+  required String? gameCenterName,
 }) {
   final players = <LeaguePlayer>[];
   bool userFound = false;
 
   for (final entry in entries) {
-    // Check if this entry is the current player by name match
-    final isMe = playerName != null && entry.playerName == playerName;
+    final isMe = !userFound &&
+        ((gameCenterName != null && entry.playerName == gameCenterName) ||
+            (playerName != null && entry.playerName == playerName));
     if (isMe) userFound = true;
 
     players.add(LeaguePlayer(
-      name: entry.playerName,
+      name: isMe ? (playerName ?? entry.playerName) : entry.playerName,
       weeklyXp: entry.score,
       isCurrentUser: isMe,
     ));

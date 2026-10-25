@@ -1238,6 +1238,30 @@ abstract class AppLocalizations {
   /// **'Нажимай буквы по алфавиту'**
   String get gameModeLettersHint;
 
+  /// No description provided for @gameFind.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найди'**
+  String get gameFind;
+
+  /// No description provided for @gameFoundProgress.
+  ///
+  /// In ru, this message translates to:
+  /// **'Найдено: {found} / {total}'**
+  String gameFoundProgress(int found, int total);
+
+  /// No description provided for @gameModeClassicHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажимай числа по возрастанию'**
+  String get gameModeClassicHint;
+
+  /// No description provided for @gameModeGorbovHint.
+  ///
+  /// In ru, this message translates to:
+  /// **'Чередуй: белые по возрастанию, красные по убыванию'**
+  String get gameModeGorbovHint;
+
   /// No description provided for @notificationMotivation1.
   ///
   /// In ru, this message translates to:
@@ -1321,6 +1345,12 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Брейни переживает за стрик {count} дней!'**
   String notificationStreak7(int count);
+
+  /// No description provided for @settingsNotificationsDenied.
+  ///
+  /// In ru, this message translates to:
+  /// **'Уведомления запрещены. Разрешите их в Настройках iOS.'**
+  String get settingsNotificationsDenied;
 }
 
 class _AppLocalizationsDelegate

@@ -8,7 +8,7 @@ class GameSession extends HiveObject {
   final int durationSeconds;
   final int mistakesCount;
   final bool isPersonalRecord;
-  final String mode; // 'classic' | 'gorbov'
+  final String mode; // one of GameModes.all
   final int coinsEarned;
 
   GameSession({

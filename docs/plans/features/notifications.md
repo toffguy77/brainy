@@ -11,19 +11,29 @@ tags: [notifications, reminders, schedule, permissions]
 
 ## Логика пересчёта
 
-Единый метод `NotificationService.reschedule()` вызывается:
+Единая точка входа `NotificationService.rescheduleFromStorage()` сама читает настройки, стрик и
+сегодняшние сессии из Hive и язык устройства. Вызывается:
 1. При старте приложения (`main.dart`)
-2. После завершения игры (`game_screen.dart`)
-3. При изменении настроек уведомлений (`parent_provider.dart`)
+2. После завершения игры (`SessionCompleter` в `session_completion_provider.dart`)
+3. После онбординга, если разрешение получено (`onboarding_provider.dart`)
+4. При изменении настроек уведомлений (`parent_provider.dart`)
 
-Алгоритм:
-1. `notificationsEnabled` выключены -> `cancel()`, выход
-2. Ребёнок уже играл сегодня (`hasPlayedToday`) -> `cancel()`, выход
-3. Не играл сегодня -> планируем уведомление
+Решение принимает чистая функция `NotificationService.planReminder(...)` (покрыта тестами):
+1. `notificationsEnabled` выключены -> `null` (ничего не планируется, прежнее отменено)
+2. Уже играл сегодня (`hasPlayedOn(sessions, now)`) -> `null`
+3. Иначе -> `ReminderPlan` (час, минута, пул, индекс варианта)
 
 Параметры:
-- Время: `customReminderTime` если задано, иначе 20:00 (`AppConstants.defaultReminderHour/Minute`)
-- Текст: если `currentStreak > 2` -> из пула «стрик горит», иначе -> из пула «мотивация»
+- Время: кастомное, если `hasCustomReminderTime`, иначе `AppConstants.defaultReminderHour/Minute` (20:00)
+- Пул: `currentStreak > AppConstants.streakWarningThreshold` (2) -> «стрик горит», иначе «мотивация»
+
+## Часовой пояс и язык
+
+- При инициализации `flutter_timezone` задаёт `tz.local` по поясу устройства — иначе `timezone`
+  остаётся в UTC и напоминание на 20:00 срабатывало бы в 20:00 UTC.
+- Язык текста — язык устройства через `AppConstants.resolveLanguage`: `ru` -> русский, любой
+  другой -> английский (то же правило, что `localeResolutionCallback` в `main.dart`).
+- Заголовок — `l10n.appName`.
 
 ## Текст уведомлений
 
@@ -39,7 +49,8 @@ EN: «Time to train your brain!», «Brainy is waiting for you!», «Zap is call
 RU: «Стрик {N} дней сгорит сегодня!», «Не потеряй свой стрик {N} дней!» и др.
 EN: «Your {N}-day streak expires today!», «Don't lose your {N}-day streak!» и др.
 
-Выбор варианта: `dayOfYear % count` (детерминированный, меняется каждый день).
+Выбор варианта: число дней с 2024-01-01 по UTC-датам `% 7` (`variantIndexFor`) — детерминированно,
+меняется каждый день, не сбивается переходом на летнее время.
 
 ## Настройки (Hive)
 
@@ -60,12 +71,16 @@ EN: «Your {N}-day streak expires today!», «Don't lose your {N}-day streak!» 
 
 ## Разрешения
 
-Запрос разрешения через `permission_handler` на последней странице онбординга (страница 7, notifications). При получении разрешения `notificationsEnabled = true` и вызывается `reschedule` с дефолтными параметрами.
+- Онбординг: запрос через `permission_handler` в `completeOnboarding()` (последняя страница). При
+  согласии `notificationsEnabled = true` и вызывается `rescheduleFromStorage()`.
+- Родительские настройки: включение тоггла сначала запрашивает разрешение. При отказе настройка
+  остаётся выключенной и показывается подсказка открыть настройки iOS — тоггл не обещает того,
+  чего iOS не доставит.
 
-## Приоритет уведомлений
+## Приоритет уведомлений (iOS)
 
-- Стрик-предупреждения: `Importance.high`, `Priority.high`
-- Мотивационные: `Importance.defaultImportance`, `Priority.defaultPriority`
+- Стрик-предупреждения: `InterruptionLevel.timeSensitive`
+- Мотивационные: `InterruptionLevel.active`
 
 ## Ключевые файлы
 

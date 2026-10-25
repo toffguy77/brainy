@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../constants/app_constants.dart';
-import '../../../models/session.dart';
-import '../../../models/user_progress.dart';
 import '../../../shared/services/notification_service.dart';
 import '../../../shared/services/sound_service.dart';
 import '../../../shared/services/haptic_service.dart';
@@ -14,7 +12,7 @@ bool parentPinVerifiedSession = false;
 
 class ParentSettings {
   final bool hasPin;
-  final String gridSizeMode; // 'auto' | 'fixed'
+  final String gridSizeMode; // AppConstants.gridSizeModeAuto | gridSizeModeFixed
   final int fixedGridSize;
   final bool notificationsEnabled;
   final bool hasCustomReminderTime;
@@ -25,7 +23,7 @@ class ParentSettings {
 
   const ParentSettings({
     this.hasPin = false,
-    this.gridSizeMode = 'auto',
+    this.gridSizeMode = AppConstants.gridSizeModeAuto,
     this.fixedGridSize = 5,
     this.notificationsEnabled = false,
     this.hasCustomReminderTime = false,
@@ -72,7 +70,7 @@ class ParentNotifier extends Notifier<ParentSettings> {
     return ParentSettings(
       hasPin: pinHash != null && pinHash.isNotEmpty,
       gridSizeMode:
-          _box.get(AppConstants.parentGridSizeModeKey) as String? ?? 'auto',
+          _box.get(AppConstants.parentGridSizeModeKey) as String? ?? AppConstants.gridSizeModeAuto,
       fixedGridSize:
           _box.get(AppConstants.parentFixedGridSizeKey) as int? ?? 5,
       notificationsEnabled:
@@ -125,35 +123,20 @@ class ParentNotifier extends Notifier<ParentSettings> {
   }
 
 
-  Future<void> _rescheduleNotification() async {
-    final sessions = Hive.box<GameSession>(AppConstants.sessionsBox);
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final hasPlayedToday = sessions.values.any((s) {
-      final d = s.playedAt;
-      return d.year == today.year &&
-          d.month == today.month &&
-          d.day == today.day;
-    });
+  Future<void> _rescheduleNotification() =>
+      NotificationService.rescheduleFromStorage();
 
-    final progress = Hive.box<UserProgress>(AppConstants.progressBox)
-        .get(AppConstants.progressDataKey);
-    final currentStreak = progress?.currentStreak ?? 0;
-
-    await NotificationService.reschedule(
-      enabled: state.notificationsEnabled,
-      hasCustomTime: state.hasCustomReminderTime,
-      hour: state.customReminderHour,
-      minute: state.customReminderMinute,
-      currentStreak: currentStreak,
-      hasPlayedToday: hasPlayedToday,
-    );
-  }
-
-  Future<void> setNotificationsEnabled(bool enabled) async {
+  /// Turning reminders on asks for permission first. If the system refuses,
+  /// the setting stays off and false is returned, so the toggle never claims
+  /// reminders that iOS will not deliver.
+  Future<bool> setNotificationsEnabled(bool enabled) async {
+    if (enabled && !await NotificationService.requestPermission()) {
+      return false;
+    }
     await _box.put(AppConstants.notificationsEnabledKey, enabled);
     state = state.copyWith(notificationsEnabled: enabled);
     await _rescheduleNotification();
+    return true;
   }
 
   Future<void> setCustomReminderTime(int hour, int minute) async {

@@ -4,6 +4,7 @@ import '../providers/game_provider.dart';
 import '../../../models/game_state.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../constants/game_modes.dart';
 
 class GameHeader extends ConsumerWidget {
   final GameState gameState;
@@ -64,47 +65,38 @@ class _NextNumberBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isGorbov = gameState.mode == 'gorbov';
+    final isGorbov = gameState.mode == GameModes.gorbov;
 
     String hintText;
-    int displayNumber;
+    String displayLabel;
     Color badgeColor;
 
     if (isGorbov) {
       if (gameState.nextExpectedColor == 'white') {
         hintText = l10n.gorbovHintWhite(gameState.nextWhiteNumber);
-        displayNumber = gameState.nextWhiteNumber;
+        displayLabel = '${gameState.nextWhiteNumber}';
         badgeColor = AppColors.textPrimary;
       } else {
         hintText = l10n.gorbovHintRed(gameState.nextRedNumber);
-        displayNumber = gameState.nextRedNumber;
+        displayLabel = '${gameState.nextRedNumber}';
         badgeColor = AppColors.gorbovRed;
       }
     } else {
-      hintText = '';
-      displayNumber = gameState.nextNumber;
+      hintText = l10n.gameFind;
+      displayLabel = gameState.expectedLabel;
       badgeColor = Colors.white;
     }
 
     return Column(
       children: [
-        if (isGorbov)
-          Text(
-            hintText,
-            style: const TextStyle(
-              fontFamily: 'Nunito',
-              color: AppColors.textSecondary,
-              fontSize: 12,
-            ),
-          )
-        else
-          const Text(
-            'Найди',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-            ),
+        Text(
+          hintText,
+          style: const TextStyle(
+            fontFamily: 'Nunito',
+            color: AppColors.textSecondary,
+            fontSize: 12,
           ),
+        ),
         const SizedBox(height: 4),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
@@ -115,7 +107,7 @@ class _NextNumberBadge extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            '$displayNumber',
+            displayLabel,
             style: TextStyle(
               color: badgeColor,
               fontSize: 28,
@@ -132,14 +124,17 @@ class _TimerDisplay extends StatelessWidget {
   final int seconds;
   const _TimerDisplay({required this.seconds});
 
-  String get _formatted {
+  String _formatted(AppLocalizations l10n) {
     final m = seconds ~/ 60;
     final s = seconds % 60;
-    return m > 0 ? '$m:${s.toString().padLeft(2, '0')}' : '$s сек';
+    return m > 0
+        ? l10n.timeMinSec(m, s.toString().padLeft(2, '0'))
+        : l10n.timeSec(s);
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
@@ -147,7 +142,7 @@ class _TimerDisplay extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
-        _formatted,
+        _formatted(l10n),
         style: const TextStyle(
           color: AppColors.textPrimary,
           fontSize: 18,

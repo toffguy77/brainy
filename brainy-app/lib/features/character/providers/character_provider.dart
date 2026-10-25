@@ -105,6 +105,20 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
     };
   }
 
+  /// Unlock every character whose level or streak requirement [progress]
+  /// now meets. Returns the ids unlocked by this call.
+  Future<List<String>> unlockEligible(UserProgress progress) async {
+    final unlocked = <String>[];
+    for (final info in defaultCharacters) {
+      final character = getById(info.id);
+      if (character == null || character.isUnlocked) continue;
+      if (!checkUnlockEligibility(info, progress)) continue;
+      await unlockCharacter(info.id);
+      unlocked.add(info.id);
+    }
+    return unlocked;
+  }
+
   bool checkUnlockEligibility(CharacterInfo info, UserProgress progress) {
     switch (info.unlockType) {
       case UnlockType.free:

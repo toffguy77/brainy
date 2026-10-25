@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../../models/session.dart';
+import '../../../constants/game_modes.dart';
 
 enum TimePeriod { week, month, threeMonths, year, allTime }
 
@@ -50,11 +51,11 @@ class GridStatsNotifier extends FamilyNotifier<GridStatsState, int> {
     List<GameSession> allSessions,
     Map<String, int> records,
   ) {
-    final bestTimeAllTime = records[recordKey('classic', gridSize)] ?? 0;
+    final bestTimeAllTime = records[recordKey(GameModes.classic, gridSize)] ?? 0;
 
     // Filter by gridSize and classic mode
     final gridSessions = allSessions
-        .where((s) => s.gridSize == gridSize && s.mode == 'classic')
+        .where((s) => s.gridSize == gridSize && s.mode == GameModes.classic)
         .toList();
 
     // Determine period and check if week has data

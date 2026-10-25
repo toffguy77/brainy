@@ -101,14 +101,7 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
     final granted = await NotificationService.requestPermission();
     if (granted) {
       await box.put(AppConstants.notificationsEnabledKey, true);
-      await NotificationService.reschedule(
-        enabled: true,
-        hasCustomTime: false,
-        hour: AppConstants.defaultReminderHour,
-        minute: AppConstants.defaultReminderMinute,
-        currentStreak: 0,
-        hasPlayedToday: false,
-      );
+      await NotificationService.rescheduleFromStorage();
     }
 
     state = state.copyWith(isCompleted: true);

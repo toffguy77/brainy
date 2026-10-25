@@ -10,6 +10,7 @@ import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
+import '../../../constants/game_modes.dart';
 
 class ShareCard extends StatelessWidget {
   final int streakDays;
@@ -36,7 +37,7 @@ class ShareCard extends StatelessWidget {
     final controller = ScreenshotController();
     final widget = ShareCard(
       streakDays: progress.currentStreak,
-      best5x5: records[recordKey('classic', 5)],
+      best5x5: records[recordKey(GameModes.classic, 5)],
       l10n: l10n,
     );
 

@@ -630,6 +630,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameModeLettersHint => 'Tap letters in alphabetical order';
 
   @override
+  String get gameFind => 'Find';
+
+  @override
+  String gameFoundProgress(int found, int total) {
+    return 'Found: $found / $total';
+  }
+
+  @override
+  String get gameModeClassicHint => 'Tap numbers in ascending order';
+
+  @override
+  String get gameModeGorbovHint => 'Alternate: white ascending, red descending';
+
+  @override
   String get notificationMotivation1 => 'Time to train your brain!';
 
   @override
@@ -689,4 +703,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String notificationStreak7(int count) {
     return 'Brainy is worried about your $count-day streak!';
   }
+
+  @override
+  String get settingsNotificationsDenied =>
+      'Notifications are blocked. Allow them in iOS Settings.';
 }

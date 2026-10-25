@@ -10,6 +10,7 @@ import '../../game/providers/records_provider.dart' show recordKey, recordsProvi
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../widgets/share_card.dart';
+import '../../../constants/game_modes.dart';
 
 class ParentDashboardScreen extends ConsumerWidget {
   const ParentDashboardScreen({super.key});
@@ -387,7 +388,7 @@ class _BestResultsCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: AppConstants.allGridSizes.map((size) {
-              final record = records[recordKey('classic', size)];
+              final record = records[recordKey(GameModes.classic, size)];
               return _RecordChip(
                 label: '$size×$size',
                 value: record != null
@@ -538,7 +539,7 @@ class _SessionRow extends StatelessWidget {
               ),
             ),
           ),
-          if (session.mode == 'gorbov')
+          if (session.mode == GameModes.gorbov)
             Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),

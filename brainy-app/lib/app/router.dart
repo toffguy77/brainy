@@ -15,6 +15,7 @@ import '../features/parent/screens/parent_dashboard_screen.dart';
 import '../features/parent/screens/parent_settings_screen.dart';
 import '../features/league/screens/league_screen.dart';
 import 'main_shell.dart';
+import '../constants/game_modes.dart';
 
 
 final router = GoRouter(
@@ -59,7 +60,7 @@ final router = GoRouter(
           builder: (context, state) {
             final gridSize =
                 int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
-            final mode = state.uri.queryParameters['mode'] ?? 'classic';
+            final mode = state.uri.queryParameters['mode'] ?? GameModes.classic;
             return GameScreen(gridSize: gridSize, mode: mode);
           },
         ),

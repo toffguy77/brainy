@@ -1,7 +1,7 @@
+import 'game_modes.dart';
+
 class AppConstants {
   AppConstants._();
-
-  static const String appName = 'Brainy';
 
   // Grid sizes
   static const List<int> allGridSizes = [3, 4, 5, 6, 7, 9];
@@ -40,7 +40,7 @@ class AppConstants {
   /// Reverse is the same visual search as classic with a different traversal,
   /// so it reuses the classic thresholds.
   static List<int>? starThresholdsFor(String mode, int gridSize) =>
-      mode == 'letters'
+      mode == GameModes.letters
           ? starThresholdsLetters[gridSize]
           : starThresholds[gridSize];
 
@@ -87,6 +87,8 @@ class AppConstants {
   static const String parentPinHashKey = 'parentPinHash';
   static const String parentGridSizeModeKey = 'parentGridSizeMode';
   static const String parentFixedGridSizeKey = 'parentFixedGridSize';
+  static const String gridSizeModeAuto = 'auto';
+  static const String gridSizeModeFixed = 'fixed';
   static const String notificationsEnabledKey = 'notificationsEnabled';
 
   // Onboarding Hive keys
@@ -115,6 +117,9 @@ class AppConstants {
   static const String progressBox = 'progress';
   static const String progressDataKey = 'data';
 
+  // Last mode picked on the home screen
+  static const String lastSelectedModeKey = 'lastSelectedMode';
+
   // Custom player name
   static const String customPlayerNameKey = 'customPlayerName';
 
@@ -128,6 +133,10 @@ class AppConstants {
   static const String customReminderMinuteKey = 'customReminderMinute';
   static const int defaultReminderHour = 20;
   static const int defaultReminderMinute = 0;
+
+  /// Above this streak a reminder warns the streak is at risk instead of
+  /// motivating a fresh start.
+  static const int streakWarningThreshold = 2;
 
   // Grid sizes for home screen picker
   static const List<int> pickerGridSizes = [3, 4, 5, 6, 7, 9];
@@ -155,14 +164,24 @@ class AppConstants {
     'N','O','P','Q','R','S','T','U','V','W','X','Y','Z',
   ];
 
+  /// Supported UI languages. The first is the fallback for any other device
+  /// language — English is the widest-understood choice.
+  static const List<String> supportedLanguages = ['en', 'ru'];
+
+  /// Map a device language to a supported one ('ru' or 'en').
+  static String resolveLanguage(String? languageCode) =>
+      supportedLanguages.contains(languageCode)
+          ? languageCode!
+          : supportedLanguages.first;
+
   static List<String> alphabetFor(String locale) =>
       locale == 'ru' ? alphabetRu : alphabetEn;
 
   /// Grid sizes available in a given mode.
   static List<int> gridSizesForMode(String mode) => switch (mode) {
-        'gorbov' => gorbovGridSizes,
-        'letters' => lettersGridSizes,
-        'reverse' => reverseGridSizes,
+        GameModes.gorbov => gorbovGridSizes,
+        GameModes.letters => lettersGridSizes,
+        GameModes.reverse => reverseGridSizes,
         _ => pickerGridSizes,
       };
 

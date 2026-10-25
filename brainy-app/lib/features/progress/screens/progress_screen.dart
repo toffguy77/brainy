@@ -10,6 +10,7 @@ import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../providers/achievements_provider.dart';
+import '../../../constants/game_modes.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -729,7 +730,7 @@ class _RecordsSection extends StatelessWidget {
               for (final size in [3, 4, 5, 6, 7, 9])
                 _RecordChip(
                   gridSize: size,
-                  seconds: records[recordKey('classic', size)],
+                  seconds: records[recordKey(GameModes.classic, size)],
                   onTap: () =>
                       context.push('/progress/grid-detail?size=$size'),
                 ),

@@ -2,8 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../../../constants/app_constants.dart';
 import '../../../models/user_progress.dart';
-import '../../../shared/services/sound_service.dart';
-import '../../character/providers/character_provider.dart';
 
 class UserProgressNotifier extends Notifier<UserProgress> {
   Box<UserProgress> get _box =>
@@ -71,16 +69,9 @@ class UserProgressNotifier extends Notifier<UserProgress> {
       state.coins += AppConstants.coinsForStreak30;
     }
 
-    // Streak achievements & character unlocks
-    if (state.currentStreak >= 7) {
-      final unlocked = await unlockAchievement('streak_7');
-      if (unlocked) SoundService.play(SoundEffect.achievement);
-    }
-    if (state.currentStreak >= 30) {
-      final unlocked30 = await unlockAchievement('streak_30');
-      if (unlocked30) SoundService.play(SoundEffect.achievement);
-      ref.read(characterProvider.notifier).unlockCharacter('vortex');
-    }
+    // Streak achievements and character unlocks are evaluated after the
+    // session by checkAchievements and CharacterNotifier.unlockEligible, so
+    // the result screen announces them like any other unlock.
 
     await _persist();
   }

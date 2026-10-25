@@ -368,6 +368,20 @@
   "gameModeLetters": "Letters",
   "gameModeReverseHint": "Tap numbers in descending order",
   "gameModeLettersHint": "Tap letters in alphabetical order",
+  "gameFind": "Find",
+  "gameFoundProgress": "Found: {found} / {total}",
+  "@gameFoundProgress": {
+    "placeholders": {
+      "found": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gameModeClassicHint": "Tap numbers in ascending order",
+  "gameModeGorbovHint": "Alternate: white ascending, red descending",
   "notificationMotivation1": "Time to train your brain!",
   "notificationStreak1": "Your {count}-day streak expires today!",
   "@notificationStreak1": {
@@ -430,5 +444,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "settingsNotificationsDenied": "Notifications are blocked. Allow them in iOS Settings."
 }
