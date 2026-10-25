@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -49,7 +50,8 @@ void main() {
   ProviderContainer newContainer() => ProviderContainer(overrides: [
         gameServicesProvider.overrideWithValue(gameServices),
         sessionCompleterProvider.overrideWith((ref) => SessionCompleter(ref,
-            rescheduleReminder: () async => reschedules++)),
+            rescheduleReminder: () async => reschedules++,
+            onSideEffectError: (_, __) {})),
       ]);
 
   setUpAll(() async {
@@ -80,6 +82,36 @@ void main() {
 
   Future<SessionOutcome> complete(GameState g) =>
       container.read(sessionCompleterProvider).complete(g);
+
+  test('a failing or hanging reminder never holds up the outcome', () async {
+    final errors = <Object>[];
+    final failing = ProviderContainer(overrides: [
+      gameServicesProvider.overrideWithValue(gameServices),
+      sessionCompleterProvider.overrideWith((ref) => SessionCompleter(ref,
+          rescheduleReminder: () async => throw StateError('plugin'),
+          onSideEffectError: (e, _) => errors.add(e))),
+    ]);
+    addTearDown(failing.dispose);
+    final outcome = await failing
+        .read(sessionCompleterProvider)
+        .complete(_finished(GameModes.classic, 3, 10));
+    expect(outcome.session.gridSize, 3);
+    await Future<void>.delayed(Duration.zero);
+    expect(errors, hasLength(1));
+
+    final hanging = ProviderContainer(overrides: [
+      gameServicesProvider.overrideWithValue(gameServices),
+      sessionCompleterProvider.overrideWith((ref) => SessionCompleter(ref,
+          rescheduleReminder: () => Completer<void>().future,
+          onSideEffectError: (_, __) {})),
+    ]);
+    addTearDown(hanging.dispose);
+    final second = await hanging
+        .read(sessionCompleterProvider)
+        .complete(_finished(GameModes.classic, 4, 12))
+        .timeout(const Duration(seconds: 2));
+    expect(second.session.gridSize, 4);
+  });
 
   test('a finished game is saved with its mode, size, time and coins', () async {
     final outcome = await complete(_finished(GameModes.reverse, 4, 24, mistakes: 2));
