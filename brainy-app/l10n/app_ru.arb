@@ -426,6 +426,16 @@
       }
     }
   },
+  "resultNewCharacter": "Новый персонаж: {name}!",
+  "@resultNewCharacter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gamePaused": "Пауза",
+  "gameTapToResume": "Нажми, чтобы продолжить",
   "characterBrainyName": "Брейни",
   "characterBrainyDescription": "Мозг с характером. Стартовый герой!",
   "characterBrainyUnlock": "Доступен бесплатно",

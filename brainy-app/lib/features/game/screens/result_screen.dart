@@ -1,5 +1,7 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import '../../character/data/characters_data.dart';
+import '../../character/screens/character_screen.dart' show characterAvatar;
 import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
@@ -25,6 +27,7 @@ class _ResultScreenState extends State<ResultScreen>
   int _totalXp = 0;
   int _level = 1;
   List<AchievementDef> _newAchievements = [];
+  List<String> _unlockedCharacters = [];
 
   late final AnimationController _titleController;
   late final AnimationController _starsController;
@@ -59,6 +62,8 @@ class _ResultScreenState extends State<ResultScreen>
     _level = extra['level'] as int? ?? 1;
     _newAchievements =
         (extra['newAchievements'] as List<AchievementDef>?) ?? [];
+    _unlockedCharacters =
+        (extra['unlockedCharacters'] as List<String>?) ?? [];
 
     _titleController = AnimationController(
       vsync: this,
@@ -113,11 +118,52 @@ class _ResultScreenState extends State<ResultScreen>
       });
     }
 
-    // Show achievement notifications
-    if (_newAchievements.isNotEmpty) {
+    // Show achievement notifications, then newly unlocked characters
+    if (_newAchievements.isNotEmpty || _unlockedCharacters.isNotEmpty) {
       Future.delayed(const Duration(milliseconds: 1500), () {
         if (!mounted) return;
-        _showAchievementNotifications();
+        if (_newAchievements.isNotEmpty) _showAchievementNotifications();
+        _showCharacterUnlocks(_newAchievements.length);
+      });
+    }
+  }
+
+  /// Announce characters this game unlocked, after [after] achievement
+  /// snackbars so they do not overlap.
+  void _showCharacterUnlocks(int after) {
+    final l10n = AppLocalizations.of(context)!;
+    for (int i = 0; i < _unlockedCharacters.length; i++) {
+      Future.delayed(Duration(milliseconds: (after + i) * 800), () {
+        if (!mounted) return;
+        final info = defaultCharacters.firstWhere(
+          (c) => c.id == _unlockedCharacters[i],
+          orElse: () => defaultCharacters.first,
+        );
+        SoundService.play(SoundEffect.achievement);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            duration: const Duration(seconds: 3),
+            backgroundColor: AppColors.surface,
+            behavior: SnackBarBehavior.floating,
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            content: Row(
+              children: [
+                characterAvatar(info.id, size: 36),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.resultNewCharacter(info.name(l10n)),
+                    style: const TextStyle(
+                      fontFamily: 'Nunito',
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       });
     }
   }

@@ -1340,6 +1340,24 @@ abstract class AppLocalizations {
   /// **'Готов к {size}×{size}? Попробуй!'**
   String homeSuggestNextSize(int size);
 
+  /// No description provided for @resultNewCharacter.
+  ///
+  /// In ru, this message translates to:
+  /// **'Новый персонаж: {name}!'**
+  String resultNewCharacter(String name);
+
+  /// No description provided for @gamePaused.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пауза'**
+  String get gamePaused;
+
+  /// No description provided for @gameTapToResume.
+  ///
+  /// In ru, this message translates to:
+  /// **'Нажми, чтобы продолжить'**
+  String get gameTapToResume;
+
   /// No description provided for @characterBrainyName.
   ///
   /// In ru, this message translates to:

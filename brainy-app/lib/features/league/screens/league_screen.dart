@@ -126,6 +126,7 @@ class _EditNameDialog extends StatefulWidget {
 
 class _EditNameDialogState extends State<_EditNameDialog> {
   late final TextEditingController _controller;
+  bool _saving = false;
 
   @override
   void initState() {
@@ -141,16 +142,22 @@ class _EditNameDialogState extends State<_EditNameDialog> {
   }
 
   Future<void> _save() async {
+    // A second tap during the write would pop the route under the dialog.
+    if (_saving) return;
+    _saving = true;
     final newName = _controller.text.trim();
     final navigator = Navigator.of(context);
+    // Read the notifier before the await: the screen owning the ref may be
+    // gone by the time the write completes.
+    final playerName = widget.ref.read(playerNameProvider.notifier);
     if (newName.isNotEmpty) {
       HapticFeedback.lightImpact();
       final box = Hive.box(AppConstants.userBox);
       // Await the write: firing it off unawaited races the next read.
       await box.put(AppConstants.customPlayerNameKey, newName);
-      widget.ref.read(playerNameProvider.notifier).state = newName;
+      playerName.state = newName;
     }
-    navigator.pop();
+    if (mounted) navigator.pop();
   }
 
   @override
@@ -169,10 +176,10 @@ class _EditNameDialogState extends State<_EditNameDialog> {
       ),
       content: TextField(
         controller: _controller,
-        // No autofocus: it opens a platform text-input connection that leaks
-        // between widget tests and deadlocks the test isolate. The user has
-        // already tapped deliberately to get here, so tapping the field is
-        // no hardship.
+        // No autofocus. It was removed while chasing a widget-test deadlock;
+        // the deadlock turned out unrelated (fixed by splitting the dialog
+        // tests into separate files — see test-suite-stabilization), so this
+        // is a UX choice only: the user tapped deliberately to get here.
         maxLength: 20,
         style: const TextStyle(
           fontFamily: 'Nunito',

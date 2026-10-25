@@ -28,12 +28,14 @@ class GameScreen extends ConsumerStatefulWidget {
   ConsumerState<GameScreen> createState() => _GameScreenState();
 }
 
-class _GameScreenState extends ConsumerState<GameScreen> {
+class _GameScreenState extends ConsumerState<GameScreen>
+    with WidgetsBindingObserver {
   bool _finished = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gameProvider.notifier).initGame(
@@ -42,6 +44,25 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             locale: Localizations.localeOf(context).languageCode,
           );
     });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// iOS suspends timers in the background, which would undercount the time
+  /// and allow a free look at the grid. Leaving the app pauses the game; the
+  /// player resumes with the pause button.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused) {
+      if (ref.read(gameProvider).status == GameStatus.playing) {
+        ref.read(gameProvider.notifier).togglePause();
+      }
+    }
   }
 
   @override
@@ -77,6 +98,45 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             ),
             if (gameState.status == GameStatus.countdown)
               CountdownOverlay(value: gameState.countdownValue ?? 3),
+            // The grid stays hidden while paused, so a pause cannot be used
+            // to study it with the clock stopped.
+            if (gameState.status == GameStatus.paused)
+              Positioned.fill(
+                child: GestureDetector(
+                  key: const Key('pauseOverlay'),
+                  onTap: () => ref.read(gameProvider.notifier).togglePause(),
+                  child: Container(
+                    color: AppColors.background,
+                    alignment: Alignment.center,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.pause_circle_filled_rounded,
+                            size: 72, color: AppColors.primary),
+                        const SizedBox(height: 12),
+                        Text(
+                          AppLocalizations.of(context)!.gamePaused,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          AppLocalizations.of(context)!.gameTapToResume,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 14,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
           ],
         ),
       ),
@@ -152,6 +212,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       'totalXp': progressAfter.xp,
       'level': progressAfter.level,
       'newAchievements': outcome.newAchievements,
+      'unlockedCharacters': outcome.unlockedCharacters,
     });
   }
 }

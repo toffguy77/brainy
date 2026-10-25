@@ -700,6 +700,17 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String resultNewCharacter(String name) {
+    return 'New character: $name!';
+  }
+
+  @override
+  String get gamePaused => 'Paused';
+
+  @override
+  String get gameTapToResume => 'Tap to continue';
+
+  @override
   String get characterBrainyName => 'Brainy';
 
   @override

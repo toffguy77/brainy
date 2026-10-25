@@ -426,6 +426,16 @@
       }
     }
   },
+  "resultNewCharacter": "New character: {name}!",
+  "@resultNewCharacter": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gamePaused": "Paused",
+  "gameTapToResume": "Tap to continue",
   "characterBrainyName": "Brainy",
   "characterBrainyDescription": "A brain with personality. Starter hero!",
   "characterBrainyUnlock": "Available for free",

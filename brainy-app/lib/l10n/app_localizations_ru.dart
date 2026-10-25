@@ -704,6 +704,17 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String resultNewCharacter(String name) {
+    return 'Новый персонаж: $name!';
+  }
+
+  @override
+  String get gamePaused => 'Пауза';
+
+  @override
+  String get gameTapToResume => 'Нажми, чтобы продолжить';
+
+  @override
   String get characterBrainyName => 'Брейни';
 
   @override
