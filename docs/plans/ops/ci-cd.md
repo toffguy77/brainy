@@ -90,6 +90,9 @@ Runner: `ubuntu-latest`, timeout 5 мин. Проверяет статус revie
 
 ### Lane: deploy_testflight
 
+Если сборка с версией и номером из `pubspec.yaml` уже есть в TestFlight (например, коммит только
+со скриншотами), lane завершается без сборки.
+
 `setup_ci` -> установка App Store Connect API key -> импорт distribution certificate -> установка
 provisioning profile и извлечение UUID -> `update_code_signing_settings` (manual signing, Team ID
 `3GWRDGA8B7`, Bundle ID `com.brainyapp.brainy`, Apple Distribution) -> `flutter build ios --release

@@ -159,11 +159,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Row(
       children: [
         _CoinsDisplay(coins: progress.coins),
-        const Spacer(),
-        Flexible(
-          child: _StreakDisplay(
-            streak: progress.currentStreak,
-            label: l10n.streakDays(progress.currentStreak),
+        const SizedBox(width: 8),
+        // Take all space left of the settings button, aligned right; the
+        // label only truncates when it truly does not fit.
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: _StreakDisplay(
+              streak: progress.currentStreak,
+              label: l10n.streakDays(progress.currentStreak),
+            ),
           ),
         ),
         const SizedBox(width: 8),

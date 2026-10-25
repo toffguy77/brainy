@@ -340,10 +340,13 @@ class _ProgressChart extends StatelessWidget {
                       sideTitles: SideTitles(
                         showTitles: true,
                         reservedSize: 24,
-                        interval: 3,
+                        interval: 1,
                         getTitlesWidget: (value, meta) {
-                          final date = now.subtract(
-                              Duration(days: 13 - value.toInt()));
+                          // Every third day back from today, so the last
+                          // label is today and none collide at the edge.
+                          final daysAgo = 13 - value.toInt();
+                          if (daysAgo % 3 != 0) return const SizedBox.shrink();
+                          final date = now.subtract(Duration(days: daysAgo));
                           return Text(
                             DateFormat('d/M').format(date),
                             style: const TextStyle(

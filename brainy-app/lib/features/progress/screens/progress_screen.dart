@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -161,7 +162,8 @@ class _LevelCard extends StatelessWidget {
                       isMaxLevel
                           ? l10n.progressMaxLevel
                           : l10n.progressXpToNextLevel(
-                              nextThresholdXp! - currentXp, nextLevel),
+                              math.max(0, nextThresholdXp! - currentXp),
+                              nextLevel),
                       style: const TextStyle(
                         fontFamily: 'Nunito',
                         fontSize: 13,
@@ -537,7 +539,8 @@ class _BadgeItem extends StatelessWidget {
     return GestureDetector(
       onTap: () => _showDetail(context),
       child: SizedBox(
-        width: 60,
+        // Wide enough for one-word titles like «Рекордсмен» at 10 pt.
+        width: 72,
         child: Column(
           children: [
             ClipRRect(

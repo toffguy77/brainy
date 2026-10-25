@@ -162,7 +162,7 @@ Future<void> _seedMockData() async {
   final progress = UserProgress(
     coins: 350,
     xp: 1500,
-    level: 10,
+    level: 11, // AppConstants.xpThresholds[11] = 1350
     currentStreak: 15,
     longestStreak: 15,
     lastPlayedDate: DateTime.now(),

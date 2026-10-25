@@ -55,4 +55,26 @@ void main() {
     await tester.pumpWidget(_host({AccessorySlot.cape: _a('cape_wings')}));
     expect(find.text('🪽'), findsNWidgets(2));
   });
+
+  testWidgets('layers follow the size a parent forces, not the nominal one',
+      (tester) async {
+    await tester.pumpWidget(MaterialApp(
+      home: Center(
+        child: SizedBox(
+          width: 122,
+          height: 122,
+          child: DressedAvatarView(
+            characterId: 'brainy',
+            size: 80,
+            worn: {AccessorySlot.hat: _a('hat_crown')},
+          ),
+        ),
+      ),
+    ));
+    final box = tester.getRect(find.byType(DressedAvatarView));
+    final hat = tester.getRect(find.byKey(const ValueKey('worn-hat')));
+    expect(box.width, 122);
+    // Hat sits 28% of the real size above the avatar's top edge.
+    expect(hat.top, closeTo(box.top - 122 * 0.28, 1));
+  });
 }
