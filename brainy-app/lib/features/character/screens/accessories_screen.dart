@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/accessory.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../game/providers/user_progress_provider.dart';
 import '../data/accessories_data.dart';
 import '../data/characters_data.dart';
@@ -417,31 +415,6 @@ class _AccessoryCard extends ConsumerWidget {
       );
     }
 
-    if (accessory.isPremium) {
-      return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-        decoration: BoxDecoration(
-          color: AppColors.accent.withValues(alpha: 0.2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.lock_rounded, size: 14, color: AppColors.accent),
-            const SizedBox(width: 4),
-            Text(
-              l10n.accessoriesPremiumOnly,
-              style: const TextStyle(
-                fontFamily: 'Nunito',
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                color: AppColors.accent,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -498,36 +471,6 @@ class _AccessoryCard extends ConsumerWidget {
     }
 
     // Not owned — attempt purchase
-    if (accessory.isPremium) {
-      final hasPremium = await ref.read(isPremiumProvider.future);
-      if (!hasPremium) {
-        if (context.mounted) {
-          _showPremiumDialog(context, l10n);
-        }
-        return;
-      }
-      // Premium subscriber gets it free
-      await ref
-          .read(userProgressProvider.notifier)
-          .purchaseAccessory(accessory.id, 0);
-      HapticFeedback.mediumImpact();
-      await ref
-          .read(characterProvider.notifier)
-          .equipAccessory(activeId, accessory.id, accessory.slot);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              l10n.accessoriesPurchased,
-              style: const TextStyle(fontFamily: 'Nunito'),
-            ),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
-      return;
-    }
 
     // Purchase with coins
     final success = await ref
@@ -616,81 +559,4 @@ class _AccessoryCard extends ConsumerWidget {
     );
   }
 
-  void _showPremiumDialog(BuildContext context, AppLocalizations l10n) {
-    HapticFeedback.heavyImpact();
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: AppColors.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (sheetContext) {
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.textSecondary.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Icon(
-                Icons.lock_rounded,
-                size: 48,
-                color: AppColors.accent,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                l10n.accessoriesPremiumOnly,
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(16),
-                      onTap: () {
-                        Navigator.pop(sheetContext);
-                        if (context.mounted) context.go('/paywall');
-                      },
-                      child: Center(
-                        child: Text(
-                          l10n.characterUnlockPremium,
-                          style: const TextStyle(
-                            fontFamily: 'Nunito',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
-        );
-      },
-    );
-  }
 }

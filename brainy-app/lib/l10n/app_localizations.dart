@@ -146,12 +146,6 @@ abstract class AppLocalizations {
   /// **'Назад'**
   String get back;
 
-  /// No description provided for @comingSoon.
-  ///
-  /// In ru, this message translates to:
-  /// **'Скоро'**
-  String get comingSoon;
-
   /// No description provided for @result.
   ///
   /// In ru, this message translates to:
@@ -368,48 +362,6 @@ abstract class AppLocalizations {
   /// **'Рекомендуем'**
   String get onboardingRecommended;
 
-  /// No description provided for @onboardingPaywallTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Попробуй Premium бесплатно'**
-  String get onboardingPaywallTitle;
-
-  /// No description provided for @onboardingPaywallBenefit1.
-  ///
-  /// In ru, this message translates to:
-  /// **'Все размеры таблиц (6×6, 7×7, 9×9)'**
-  String get onboardingPaywallBenefit1;
-
-  /// No description provided for @onboardingPaywallBenefit2.
-  ///
-  /// In ru, this message translates to:
-  /// **'Эксклюзивный персонаж'**
-  String get onboardingPaywallBenefit2;
-
-  /// No description provided for @onboardingPaywallBenefit3.
-  ///
-  /// In ru, this message translates to:
-  /// **'Полная статистика прогресса'**
-  String get onboardingPaywallBenefit3;
-
-  /// No description provided for @onboardingPaywallBenefit4.
-  ///
-  /// In ru, this message translates to:
-  /// **'Без рекламы'**
-  String get onboardingPaywallBenefit4;
-
-  /// No description provided for @onboardingTryFree.
-  ///
-  /// In ru, this message translates to:
-  /// **'Начать 7 дней бесплатно'**
-  String get onboardingTryFree;
-
-  /// No description provided for @onboardingSkipPaywall.
-  ///
-  /// In ru, this message translates to:
-  /// **'Продолжить без подписки'**
-  String get onboardingSkipPaywall;
-
   /// No description provided for @onboardingSchulteTitle.
   ///
   /// In ru, this message translates to:
@@ -494,12 +446,6 @@ abstract class AppLocalizations {
   /// **'достаточно для результата — не перегружает ребёнка'**
   String get onboardingScienceFact3Label;
 
-  /// No description provided for @onboardingAlreadySubscribed.
-  ///
-  /// In ru, this message translates to:
-  /// **'Вы уже подписаны!'**
-  String get onboardingAlreadySubscribed;
-
   /// No description provided for @onboardingLetsGo.
   ///
   /// In ru, this message translates to:
@@ -517,12 +463,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Размер таблицы'**
   String get selectGridSize;
-
-  /// No description provided for @premiumGridLocked.
-  ///
-  /// In ru, this message translates to:
-  /// **'Доступно в Premium'**
-  String get premiumGridLocked;
 
   /// No description provided for @lastResult.
   ///
@@ -565,12 +505,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Выбран'**
   String get characterSelected;
-
-  /// No description provided for @characterUnlockPremium.
-  ///
-  /// In ru, this message translates to:
-  /// **'Открыть Premium'**
-  String get characterUnlockPremium;
 
   /// No description provided for @accessoriesTitle.
   ///
@@ -625,12 +559,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Снять'**
   String get accessoriesRemove;
-
-  /// No description provided for @accessoriesPremiumOnly.
-  ///
-  /// In ru, this message translates to:
-  /// **'Premium'**
-  String get accessoriesPremiumOnly;
 
   /// No description provided for @accessoriesNotEnoughCoins.
   ///
@@ -764,12 +692,6 @@ abstract class AppLocalizations {
   /// **'—'**
   String get parentNoRecord;
 
-  /// No description provided for @parentPremiumOnly.
-  ///
-  /// In ru, this message translates to:
-  /// **'Premium'**
-  String get parentPremiumOnly;
-
   /// No description provided for @parentRecentSessions.
   ///
   /// In ru, this message translates to:
@@ -818,24 +740,6 @@ abstract class AppLocalizations {
   /// **'Фиксированный'**
   String get parentGridSizeFixed;
 
-  /// No description provided for @parentMaxSessionTime.
-  ///
-  /// In ru, this message translates to:
-  /// **'Макс. время сессии'**
-  String get parentMaxSessionTime;
-
-  /// No description provided for @parentNoLimit.
-  ///
-  /// In ru, this message translates to:
-  /// **'Без ограничений'**
-  String get parentNoLimit;
-
-  /// No description provided for @parentMinutes.
-  ///
-  /// In ru, this message translates to:
-  /// **'{min} мин'**
-  String parentMinutes(int min);
-
   /// No description provided for @parentNotifications.
   ///
   /// In ru, this message translates to:
@@ -847,12 +751,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Сменить PIN'**
   String get parentChangePin;
-
-  /// No description provided for @parentManageSubscription.
-  ///
-  /// In ru, this message translates to:
-  /// **'Управление подпиской'**
-  String get parentManageSubscription;
 
   /// No description provided for @parentShareCardTitle.
   ///
@@ -877,150 +775,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Звёзды'**
   String get parentStars;
-
-  /// No description provided for @paywallTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Brainy Premium'**
-  String get paywallTitle;
-
-  /// No description provided for @paywallSubtitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Открой всё и тренируйся без ограничений'**
-  String get paywallSubtitle;
-
-  /// No description provided for @paywallBenefit1.
-  ///
-  /// In ru, this message translates to:
-  /// **'Все размеры таблиц — до 9×9'**
-  String get paywallBenefit1;
-
-  /// No description provided for @paywallBenefit2.
-  ///
-  /// In ru, this message translates to:
-  /// **'Эксклюзивный персонаж'**
-  String get paywallBenefit2;
-
-  /// No description provided for @paywallBenefit3.
-  ///
-  /// In ru, this message translates to:
-  /// **'Панель прогресса для родителей'**
-  String get paywallBenefit3;
-
-  /// No description provided for @paywallBenefit4.
-  ///
-  /// In ru, this message translates to:
-  /// **'Без рекламы'**
-  String get paywallBenefit4;
-
-  /// No description provided for @paywallBenefit5.
-  ///
-  /// In ru, this message translates to:
-  /// **'Режим Горбова-Шульте'**
-  String get paywallBenefit5;
-
-  /// No description provided for @paywallPlanYear.
-  ///
-  /// In ru, this message translates to:
-  /// **'Год'**
-  String get paywallPlanYear;
-
-  /// No description provided for @paywallPlanMonth.
-  ///
-  /// In ru, this message translates to:
-  /// **'Месяц'**
-  String get paywallPlanMonth;
-
-  /// No description provided for @paywallPlanFamily.
-  ///
-  /// In ru, this message translates to:
-  /// **'Семейная'**
-  String get paywallPlanFamily;
-
-  /// No description provided for @paywallBestPrice.
-  ///
-  /// In ru, this message translates to:
-  /// **'Лучшая цена'**
-  String get paywallBestPrice;
-
-  /// No description provided for @paywallPerMonth.
-  ///
-  /// In ru, this message translates to:
-  /// **'~{price}/мес'**
-  String paywallPerMonth(String price);
-
-  /// No description provided for @paywallTryFree.
-  ///
-  /// In ru, this message translates to:
-  /// **'Начать 7 дней бесплатно'**
-  String get paywallTryFree;
-
-  /// No description provided for @paywallDisclaimer.
-  ///
-  /// In ru, this message translates to:
-  /// **'Отмена в любое время. Управление подпиской в App Store.'**
-  String get paywallDisclaimer;
-
-  /// No description provided for @paywallRestore.
-  ///
-  /// In ru, this message translates to:
-  /// **'Восстановить покупки'**
-  String get paywallRestore;
-
-  /// No description provided for @paywallTerms.
-  ///
-  /// In ru, this message translates to:
-  /// **'Условия'**
-  String get paywallTerms;
-
-  /// No description provided for @paywallPrivacy.
-  ///
-  /// In ru, this message translates to:
-  /// **'Конфиденциальность'**
-  String get paywallPrivacy;
-
-  /// No description provided for @paywallWelcome.
-  ///
-  /// In ru, this message translates to:
-  /// **'Добро пожаловать в Premium!'**
-  String get paywallWelcome;
-
-  /// No description provided for @paywallErrorTitle.
-  ///
-  /// In ru, this message translates to:
-  /// **'Ошибка покупки'**
-  String get paywallErrorTitle;
-
-  /// No description provided for @paywallErrorMessage.
-  ///
-  /// In ru, this message translates to:
-  /// **'Что-то пошло не так. Попробуйте ещё раз.'**
-  String get paywallErrorMessage;
-
-  /// No description provided for @paywallLoading.
-  ///
-  /// In ru, this message translates to:
-  /// **'Загрузка планов...'**
-  String get paywallLoading;
-
-  /// No description provided for @premiumFeatureLocked.
-  ///
-  /// In ru, this message translates to:
-  /// **'Это Premium фича'**
-  String get premiumFeatureLocked;
-
-  /// No description provided for @premiumUnlock.
-  ///
-  /// In ru, this message translates to:
-  /// **'Открыть Premium'**
-  String get premiumUnlock;
-
-  /// No description provided for @premiumTryFree.
-  ///
-  /// In ru, this message translates to:
-  /// **'Попробовать бесплатно 7 дней'**
-  String get premiumTryFree;
 
   /// No description provided for @settingsSounds.
   ///
@@ -1532,35 +1286,113 @@ abstract class AppLocalizations {
   /// **'Найди: красную {number}'**
   String gorbovHintRed(int number);
 
-  /// No description provided for @gorbovModeBadge.
+  /// No description provided for @gameModeReverse.
   ///
   /// In ru, this message translates to:
-  /// **'Горбов-Шульте'**
-  String get gorbovModeBadge;
+  /// **'Обратный'**
+  String get gameModeReverse;
 
-  /// No description provided for @parentPremiumGateTitle.
+  /// No description provided for @gameModeLetters.
   ///
   /// In ru, this message translates to:
-  /// **'Панель прогресса для родителей'**
-  String get parentPremiumGateTitle;
+  /// **'Буквенный'**
+  String get gameModeLetters;
 
-  /// No description provided for @parentPremiumGateSubtitle.
+  /// No description provided for @gameModeReverseHint.
   ///
   /// In ru, this message translates to:
-  /// **'Следите за прогрессом ребёнка с подробной статистикой'**
-  String get parentPremiumGateSubtitle;
+  /// **'Нажимай числа по убыванию'**
+  String get gameModeReverseHint;
 
-  /// No description provided for @parentPremiumGateUnlock.
+  /// No description provided for @gameModeLettersHint.
   ///
   /// In ru, this message translates to:
-  /// **'Открыть с Premium'**
-  String get parentPremiumGateUnlock;
+  /// **'Нажимай буквы по алфавиту'**
+  String get gameModeLettersHint;
 
-  /// No description provided for @parentPremiumGateSettings.
+  /// No description provided for @notificationMotivation1.
   ///
   /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get parentPremiumGateSettings;
+  /// **'Время потренировать мозг!'**
+  String get notificationMotivation1;
+
+  /// No description provided for @notificationStreak1.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик {count} дней сгорит сегодня!'**
+  String notificationStreak1(int count);
+
+  /// No description provided for @notificationMotivation2.
+  ///
+  /// In ru, this message translates to:
+  /// **'Брейни ждёт тебя! Зайди на тренировку'**
+  String get notificationMotivation2;
+
+  /// No description provided for @notificationStreak2.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не потеряй свой стрик {count} дней!'**
+  String notificationStreak2(int count);
+
+  /// No description provided for @notificationMotivation3.
+  ///
+  /// In ru, this message translates to:
+  /// **'Несколько минут — и мозг станет быстрее!'**
+  String get notificationMotivation3;
+
+  /// No description provided for @notificationStreak3.
+  ///
+  /// In ru, this message translates to:
+  /// **'{count} дней подряд — не останавливайся!'**
+  String notificationStreak3(int count);
+
+  /// No description provided for @notificationMotivation4.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зэп зовёт на тренировку!'**
+  String get notificationMotivation4;
+
+  /// No description provided for @notificationStreak4.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик в опасности! Сыграй сегодня'**
+  String notificationStreak4(int count);
+
+  /// No description provided for @notificationMotivation5.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня ещё не тренировались. Начнём?'**
+  String get notificationMotivation5;
+
+  /// No description provided for @notificationStreak5.
+  ///
+  /// In ru, this message translates to:
+  /// **'Осталось немного до конца дня. Сохрани стрик!'**
+  String notificationStreak5(int count);
+
+  /// No description provided for @notificationMotivation6.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мозг любит тренировки. Не пропусти!'**
+  String get notificationMotivation6;
+
+  /// No description provided for @notificationStreak6.
+  ///
+  /// In ru, this message translates to:
+  /// **'Твой стрик {count} дней на волоске!'**
+  String notificationStreak6(int count);
+
+  /// No description provided for @notificationMotivation7.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пора размять мозг! Таблица Шульте ждёт'**
+  String get notificationMotivation7;
+
+  /// No description provided for @notificationStreak7.
+  ///
+  /// In ru, this message translates to:
+  /// **'Брейни переживает за стрик {count} дней!'**
+  String notificationStreak7(int count);
 }
 
 class _AppLocalizationsDelegate

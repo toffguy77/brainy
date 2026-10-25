@@ -4,13 +4,11 @@ import 'package:go_router/go_router.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/services/subscription_service.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../character/data/characters_data.dart';
 import '../../character/screens/character_screen.dart';
-import '../../subscription/widgets/premium_bottom_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -51,7 +49,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final progress = ref.watch(userProgressProvider);
     final sessions = ref.watch(sessionsProvider);
     final parentSettings = ref.watch(parentProvider);
-    final isPremium = ref.watch(isPremiumProvider).value ?? false;
     final isFixedMode = parentSettings.gridSizeMode == 'fixed';
     final effectiveGridSize =
         isFixedMode ? parentSettings.fixedGridSize : _selectedGridSize;
@@ -78,11 +75,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 ),
               ),
               const Spacer(flex: 1),
-              _buildModeToggle(isPremium, l10n),
+              _buildModeToggle(l10n),
               const SizedBox(height: 16),
-              _buildGridSizePicker(l10n, isFixedMode, effectiveGridSize, isPremium),
+              _buildGridSizePicker(l10n, isFixedMode, effectiveGridSize),
               const SizedBox(height: 24),
-              _buildPlayButton(l10n, effectiveGridSize, isPremium),
+              _buildPlayButton(l10n, effectiveGridSize),
               const SizedBox(height: 16),
               _buildLastResult(sessions, l10n),
               const SizedBox(height: 24),
@@ -167,120 +164,84 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildModeToggle(bool isPremium, AppLocalizations l10n) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 40),
-      padding: const EdgeInsets.all(3),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
+  static const _modes = ['classic', 'reverse', 'gorbov', 'letters'];
+
+  String _modeLabel(String mode, AppLocalizations l10n) => switch (mode) {
+        'reverse' => l10n.gameModeReverse,
+        'gorbov' => l10n.gameModeGorbov,
+        'letters' => l10n.gameModeLetters,
+        _ => l10n.gameModeClassic,
+      };
+
+  /// Four modes no longer fit a two-segment toggle at these font sizes, so the
+  /// selector is a 2x2 grid of chips.
+  Widget _buildModeToggle(AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
+      child: Column(
         children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => _selectedMode = 'classic'),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: _selectedMode == 'classic'
-                      ? AppColors.primaryGradient
-                      : null,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Center(
-                  child: Text(
-                    l10n.gameModeClassic,
-                    style: TextStyle(
-                      fontFamily: 'Nunito',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: _selectedMode == 'classic'
-                          ? AppColors.textPrimary
-                          : AppColors.textSecondary,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () {
-                if (!isPremium) {
-                  showPremiumBottomSheet(
-                    context,
-                    feature: l10n.gorbovModeBadge,
-                    benefit: l10n.paywallBenefit5,
-                  );
-                  return;
-                }
-                setState(() {
-                  _selectedMode = 'gorbov';
-                  if (_selectedGridSize < 5) _selectedGridSize = 5;
-                });
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: BoxDecoration(
-                  gradient: _selectedMode == 'gorbov'
-                      ? const LinearGradient(
-                          colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
-                      : null,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Center(
-                      child: Text(
-                        l10n.gameModeGorbov,
-                        style: TextStyle(
-                          fontFamily: 'Nunito',
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: _selectedMode == 'gorbov'
-                              ? AppColors.textPrimary
-                              : AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    if (!isPremium)
-                      Positioned(
-                        top: -6,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 5, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: AppColors.accent,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: const Text(
-                            'PRO',
-                            style: TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 9,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.background,
-                            ),
-                          ),
-                        ),
-                      ),
+          for (int i = 0; i < _modes.length; i += 2)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  for (int j = i; j < i + 2 && j < _modes.length; j++) ...[
+                    if (j > i) const SizedBox(width: 8),
+                    Expanded(child: _modeChip(_modes[j], l10n)),
                   ],
-                ),
+                ],
               ),
             ),
-          ),
         ],
       ),
     );
   }
 
+  Widget _modeChip(String mode, AppLocalizations l10n) {
+    final isSelected = _selectedMode == mode;
+    return GestureDetector(
+      onTap: () => _onModeTap(mode),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? null : AppColors.surface,
+          gradient: isSelected
+              ? (mode == 'gorbov'
+                  ? const LinearGradient(
+                      colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
+                  : AppColors.primaryGradient)
+              : null,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Center(
+          child: Text(
+            _modeLabel(mode, l10n),
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: isSelected
+                  ? AppColors.textPrimary
+                  : AppColors.textSecondary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onModeTap(String mode) {
+    setState(() {
+      _selectedMode = mode;
+      // A size valid in the previous mode may not exist in the new one.
+      _selectedGridSize =
+          AppConstants.clampGridSizeForMode(mode, _selectedGridSize);
+    });
+  }
+
   Widget _buildGridSizePicker(
-      AppLocalizations l10n, bool isFixedMode, int effectiveGridSize, bool isPremium) {
+      AppLocalizations l10n, bool isFixedMode, int effectiveGridSize) {
     if (isFixedMode) {
       return Column(
         children: [
@@ -316,20 +277,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         const SizedBox(height: 12),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: (_selectedMode == 'gorbov'
-                ? AppConstants.gorbovGridSizes
-                : AppConstants.pickerGridSizes)
-            .map((size) {
-            final isLocked =
-                !isPremium && AppConstants.premiumGridSizes.contains(size);
+          children: AppConstants.gridSizesForMode(_selectedMode).map((size) {
             final isSelected = _selectedGridSize == size;
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: _GridSizeChip(
                 size: size,
                 isSelected: isSelected,
-                isLocked: isLocked,
-                onTap: () => _onGridSizeTap(size, isLocked, l10n),
+                isLocked: false,
+                onTap: () => _onGridSizeTap(size),
               ),
             );
           }).toList(),
@@ -338,20 +294,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  void _onGridSizeTap(int size, bool isLocked, AppLocalizations l10n) {
-    if (isLocked) {
-      showPremiumBottomSheet(
-        context,
-        feature: '$size×$size',
-        benefit: l10n.onboardingPaywallBenefit1,
-      );
-      return;
-    }
+  void _onGridSizeTap(int size) {
     setState(() => _selectedGridSize = size);
     ref.read(userProgressProvider.notifier).setSelectedGridSize(size);
   }
 
-  Widget _buildPlayButton(AppLocalizations l10n, int effectiveGridSize, bool isPremium) {
+  Widget _buildPlayButton(AppLocalizations l10n, int effectiveGridSize) {
     return SizedBox(
       width: double.infinity,
       height: 64,
@@ -365,14 +313,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: () {
-              if (!isPremium && AppConstants.premiumGridSizes.contains(effectiveGridSize)) {
-                showPremiumBottomSheet(
-                  context,
-                  feature: '$effectiveGridSize×$effectiveGridSize',
-                  benefit: l10n.onboardingPaywallBenefit1,
-                );
-                return;
-              }
               context.go('/game?size=$effectiveGridSize&mode=$_selectedMode');
             },
             child: Center(

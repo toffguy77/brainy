@@ -65,8 +65,10 @@ Brainy is a gamified attention trainer for kids 6-14, based on Schulte tables. T
 ## Privacy Nutrition Labels
 
 Данные, собираемые приложением:
-- Analytics (Firebase Analytics)
 - Crash Data (Firebase Crashlytics)
+
+Analytics не собирается: Firebase Analytics удалён (решение 2026-08-01). В App Store Connect
+категория Analytics должна быть снята с декларации.
 
 ## App Review Information
 

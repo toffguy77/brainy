@@ -16,7 +16,6 @@ import 'models/session.dart';
 import 'models/user_progress.dart';
 import 'features/league/providers/game_services_provider.dart';
 import 'shared/services/notification_service.dart';
-import 'shared/services/subscription_service.dart';
 
 void main() async {
   runZonedGuarded<Future<void>>(() async {
@@ -38,7 +37,6 @@ void main() async {
     await Hive.openBox(AppConstants.userBox);
     await Hive.openBox<CharacterData>(AppConstants.characterBox);
     await Hive.openBox<UserProgress>(AppConstants.progressBox);
-    await SubscriptionService.initialize();
     await NotificationService.initialize();
     runApp(
       const ProviderScope(

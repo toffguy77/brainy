@@ -5,7 +5,6 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../models/user_progress.dart';
-import '../../../shared/services/subscription_service.dart';
 import '../../character/data/characters_data.dart';
 import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
@@ -691,8 +690,6 @@ class _RecordsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isPremium = ref.watch(isPremiumProvider).value ?? false;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -733,13 +730,8 @@ class _RecordsSection extends StatelessWidget {
                 _RecordChip(
                   gridSize: size,
                   seconds: records[recordKey('classic', size)],
-                  onTap: () {
-                    if (isPremium) {
-                      context.push('/progress/grid-detail?size=$size');
-                    } else {
-                      context.push('/paywall');
-                    }
-                  },
+                  onTap: () =>
+                      context.push('/progress/grid-detail?size=$size'),
                 ),
             ],
           ),

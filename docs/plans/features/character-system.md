@@ -16,10 +16,10 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 | brainy | Брейни | Brainy | Бесплатно | #6C5CE7 |
 | zap | Зэп | Zap | Уровень 10 | #FDCB6E |
 | vortex | Вортекс | Vortex | Стрик 30 дней | #00CEC9 |
-| pixel | Пиксель | Pixel | Premium подписка | #00B894 |
+| pixel | Пиксель | Pixel | Стрик 14 дней | #00B894 |
 | glitch | Глитч | Glitch | Стрик 60 дней | #FF7675 |
 
-Типы разблокировки определены в enum `UnlockType`: `free`, `level`, `streak`, `premium`.
+Типы разблокировки определены в enum `UnlockType`: `free`, `level`, `streak`. Платных разблокировок нет.
 
 ## Экран персонажа
 
@@ -29,19 +29,19 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 - AppBar: «Мои персонажи»
 - Большой превью активного персонажа (центр, анимированный)
 - PageView с карточками: разблокированные цветные с кнопкой [Выбрать], заблокированные затемнённые с условием
-- Кнопка [Настроить аксессуары] -> экран аксессуаров
+- Кнопка [Настроить аксессуары] -> `/accessories` (активна для разблокированного персонажа)
 
-При тапе на заблокированного — BottomSheet с условием разблокировки. Если условие Premium — кнопка [Открыть Premium].
+При тапе на заблокированного — BottomSheet с условием разблокировки.
 
 ## Аксессуары
 
 15+ предметов в 4 категориях (enum `AccessorySlot`):
 - **Шляпы (hat):** Колпак учёного, Корона, Кепка, Шлем, Цилиндр
 - **Очки (glasses):** Умные очки, Солнцезащитные, Пиксельные, VR-шлем
-- **Эффекты (effect):** Звёзды, Огонь, Электричество (Premium)
+- **Эффекты (effect):** Звёзды, Огонь, Электричество
 - **Плащи (cape):** Мантия, Плащ ниндзя, Крылья
 
-Покупка за игровые монеты. Premium-аксессуары заблокированы для бесплатных пользователей.
+Покупка за игровые монеты. Платных аксессуаров нет.
 
 ## Экран аксессуаров
 
@@ -49,13 +49,13 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 - Превью персонажа с надетыми аксессуарами (верхняя треть)
 - Табы по категориям: Шляпы | Очки | Эффекты | Плащи
-- GridView (2 колонки) с состояниями: куплен+надет, куплен, доступен к покупке, Premium
+- GridView (2 колонки) с состояниями: куплен+надет, куплен, доступен к покупке
 
 При покупке: проверка баланса -> списание монет -> автонадевание.
 
 ## Хранение
 
-- Данные персонажа в `CharacterData` (Hive typeId: 2): id, имена, isUnlocked, unlockedAccessories, equippedHat/Glasses/Effect
+- Данные персонажа в `CharacterData` (Hive typeId: 2): id, имена, isUnlocked, unlockedAccessories, equippedHat/Glasses/Effect/Cape
 - Активный персонаж сохраняется в `UserProgress.activeCharacterId`
 - Hive box: `character`
 
@@ -63,7 +63,7 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 Активный персонаж рендерится в круглом контейнере 160x160 с градиентным фоном цвета персонажа. Idle-анимация: покачивание вверх-вниз (AnimationController, 1800ms, Tween -6..+6).
 
-В текущей реализации персонажи отображаются как SVG-аватары через функцию `characterAvatar()`.
+В текущей реализации персонажи отображаются через функцию `characterAvatar()` из PNG-ассетов `assets/characters/*.png`.
 
 ## Ключевые файлы
 

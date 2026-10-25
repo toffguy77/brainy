@@ -4,17 +4,15 @@ import 'package:brainy/constants/app_constants.dart';
 void main() {
   group('AppConstants', () {
     group('grid sizes', () {
-      test('free grid sizes are 3, 4, 5', () {
-        expect(AppConstants.freeGridSizes, [3, 4, 5]);
+      test('every documented grid size is playable', () {
+        expect(AppConstants.allGridSizes, containsAll([3, 4, 5, 6, 7, 9]));
       });
 
-      test('premium grid sizes are 6, 7, 9', () {
-        expect(AppConstants.premiumGridSizes, [6, 7, 9]);
-      });
-
-      test('allGridSizes contains all sizes', () {
-        expect(AppConstants.allGridSizes,
-            containsAll([...AppConstants.freeGridSizes, ...AppConstants.premiumGridSizes]));
+      test('every playable size is offered in the picker — nothing is gated', () {
+        for (final size in AppConstants.allGridSizes) {
+          expect(AppConstants.pickerGridSizes, contains(size),
+              reason: '$size is playable but not offered');
+        }
       });
 
       test('picker grid sizes include all playable sizes', () {
@@ -102,18 +100,6 @@ void main() {
             greaterThan(AppConstants.coinsForStreak7));
         expect(AppConstants.coinsForStreak7,
             greaterThan(AppConstants.coinsPerSession));
-      });
-    });
-
-    group('RevenueCat', () {
-      test('product IDs are defined', () {
-        expect(AppConstants.productIdMonthly, 'brainy_pro_monthly');
-        expect(AppConstants.productIdYearly, 'brainy_pro_yearly');
-        expect(AppConstants.productIdFamily, 'brainy_pro_family');
-      });
-
-      test('entitlement is brainy_pro', () {
-        expect(AppConstants.revenueCatEntitlement, 'brainy_pro');
       });
     });
 

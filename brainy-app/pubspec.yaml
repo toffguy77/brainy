@@ -13,7 +13,6 @@ dependencies:
 
   # State management
   flutter_riverpod: ^2.6.1
-  riverpod_annotation: ^2.6.1
 
   # Navigation
   go_router: ^14.8.1
@@ -24,19 +23,9 @@ dependencies:
 
   # Firebase
   firebase_core: ^4.5.0
-  firebase_analytics: ^12.1.3
   firebase_crashlytics: ^5.0.8
 
-  # Subscriptions (RevenueCat — commented out, see YooKassa below)
-  # purchases_flutter: ^9.14.0
-  # purchases_ui_flutter: ^9.14.0
-
-  # YooKassa payments (Russian market)
-  cloud_functions: ^6.0.7
-  flutter_secure_storage: ^9.2.4
-  device_info_plus: ^11.0.0
-
-  # Game Center / Google Play Games
+  # Game Center
   games_services: ^5.0.0
 
   # Animations
@@ -66,8 +55,6 @@ dependencies:
 
   # Utils
   intl: ^0.20.2
-  shared_preferences: ^2.5.3
-  collection: ^1.19.1
   uuid: ^4.5.1
 
 dev_dependencies:
@@ -76,8 +63,6 @@ dev_dependencies:
   integration_test:
     sdk: flutter
   flutter_lints: ^5.0.0
-  build_runner: ^2.4.15
-  riverpod_generator: ^2.6.3
   # hive_generator incompatible with riverpod_generator (source_gen conflict)
   # Hive adapters are written manually
 

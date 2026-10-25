@@ -113,8 +113,6 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
         return progress.level >= (info.requiredLevel ?? 0);
       case UnlockType.streak:
         return progress.longestStreak >= (info.requiredStreak ?? 0);
-      case UnlockType.premium:
-        return false; // handled by subscription check
     }
   }
 }

@@ -93,7 +93,6 @@ const defaultAccessories = [
     slot: AccessorySlot.effect,
     price: 100,
     assetPath: 'assets/accessories/effect_fire.png',
-    isPremium: true,
   ),
   AccessoryInfo(
     id: 'effect_electric',
@@ -102,7 +101,6 @@ const defaultAccessories = [
     slot: AccessorySlot.effect,
     price: 100,
     assetPath: 'assets/accessories/effect_electric.png',
-    isPremium: true,
   ),
 
   // Capes (3)

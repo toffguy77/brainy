@@ -1,4 +1,3 @@
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import '../constants/app_constants.dart';
@@ -15,14 +14,11 @@ import '../features/parent/screens/parent_pin_screen.dart';
 import '../features/parent/screens/parent_dashboard_screen.dart';
 import '../features/parent/screens/parent_settings_screen.dart';
 import '../features/league/screens/league_screen.dart';
-import '../features/subscription/screens/paywall_screen.dart';
 import 'main_shell.dart';
 
-final analytics = FirebaseAnalytics.instance;
 
 final router = GoRouter(
   initialLocation: '/onboarding',
-  observers: [FirebaseAnalyticsObserver(analytics: analytics)],
   redirect: (context, state) {
     final box = Hive.box(AppConstants.userBox);
     final completed =
@@ -111,10 +107,6 @@ final router = GoRouter(
     GoRoute(
       path: '/parent/settings',
       builder: (context, state) => const ParentSettingsScreen(),
-    ),
-    GoRoute(
-      path: '/paywall',
-      builder: (context, state) => const PaywallScreen(),
     ),
   ],
 );

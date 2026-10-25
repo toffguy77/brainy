@@ -21,11 +21,10 @@ void main() {
       expect(smallSizes, isNotEmpty);
     });
 
-    test('all gorbov sizes are premium or available', () {
-      // All gorbov sizes >= 5 — sizes 6, 7, 9 are premium, 5 is free
-      expect(AppConstants.gorbovGridSizes.contains(5), isTrue);
-      for (final size in [6, 7, 9]) {
-        expect(AppConstants.premiumGridSizes.contains(size), isTrue);
+    test('every gorbov size is playable without any unlock', () {
+      expect(AppConstants.gorbovGridSizes, isNotEmpty);
+      for (final size in AppConstants.gorbovGridSizes) {
+        expect(AppConstants.allGridSizes, contains(size));
       }
     });
   });

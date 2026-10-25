@@ -1,5 +1,7 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../../l10n/app_localizations.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -14,47 +16,6 @@ class NotificationService {
   static const _notificationId = 100;
 
   // Motivational messages (streak <= 2 or no streak)
-  static const _motivationMessagesRu = [
-    'Время потренировать мозг!',
-    'Брейни ждёт тебя! Зайди на тренировку',
-    'Несколько минут — и мозг станет быстрее!',
-    'Зэп зовёт на тренировку!',
-    'Сегодня ещё не тренировались. Начнём?',
-    'Мозг любит тренировки. Не пропусти!',
-    'Пора размять мозг! Таблица Шульте ждёт',
-  ];
-
-  static const _motivationMessagesEn = [
-    'Time to train your brain!',
-    'Brainy is waiting for you! Start training',
-    'A few minutes and your brain gets faster!',
-    'Zap is calling you to practice!',
-    "Haven't trained today yet. Shall we start?",
-    "Your brain loves training. Don't skip it!",
-    'Time to exercise your brain! Schulte table awaits',
-  ];
-
-  // Streak warning messages (streak > 2, hasn't played today)
-  static const _streakMessagesRu = [
-    'Стрик {N} дней сгорит сегодня!',
-    'Не потеряй свой стрик {N} дней!',
-    '{N} дней подряд — не останавливайся!',
-    'Стрик в опасности! Сыграй сегодня',
-    'Осталось немного до конца дня. Сохрани стрик!',
-    'Твой стрик {N} дней на волоске!',
-    'Брейни переживает за стрик {N} дней!',
-  ];
-
-  static const _streakMessagesEn = [
-    'Your {N}-day streak expires today!',
-    "Don't lose your {N}-day streak!",
-    "{N} days in a row — don't stop now!",
-    'Streak in danger! Play today',
-    'Day is almost over. Save your streak!',
-    'Your {N}-day streak is hanging by a thread!',
-    'Brainy is worried about your {N}-day streak!',
-  ];
-
   static Future<void> initialize() async {
     tz.initializeTimeZones();
 
@@ -97,8 +58,8 @@ class NotificationService {
 
     final isStreakWarning = currentStreak > 2;
     final message = isStreakWarning
-        ? _pickStreakMessage(currentStreak, locale)
-        : _pickMotivationMessage(locale);
+        ? await _pickStreakMessage(currentStreak, locale)
+        : await _pickMotivationMessage(locale);
 
     await _plugin.zonedSchedule(
       id: _notificationId,
@@ -125,20 +86,46 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
-  static String _pickMotivationMessage(String locale) {
-    final messages =
-        locale == 'ru' ? _motivationMessagesRu : _motivationMessagesEn;
-    final index =
-        DateTime.now().difference(DateTime(2024)).inDays % messages.length;
-    return messages[index];
+  /// Number of variants in each pool. Both locales must define the same count,
+  /// because the index is computed once and used for whichever locale is active.
+  static const int variantCount = 7;
+
+  /// Deterministic per-day choice, so the text changes daily but not per call.
+  static int variantIndexFor(DateTime day) =>
+      day.difference(DateTime(2024)).inDays % variantCount;
+
+  static String motivationVariant(AppLocalizations l10n, int index) =>
+      switch (index % variantCount) {
+        0 => l10n.notificationMotivation1,
+        1 => l10n.notificationMotivation2,
+        2 => l10n.notificationMotivation3,
+        3 => l10n.notificationMotivation4,
+        4 => l10n.notificationMotivation5,
+        5 => l10n.notificationMotivation6,
+        _ => l10n.notificationMotivation7,
+      };
+
+  static String streakVariant(AppLocalizations l10n, int index, int days) =>
+      switch (index % variantCount) {
+        0 => l10n.notificationStreak1(days),
+        1 => l10n.notificationStreak2(days),
+        2 => l10n.notificationStreak3(days),
+        3 => l10n.notificationStreak4(days),
+        4 => l10n.notificationStreak5(days),
+        5 => l10n.notificationStreak6(days),
+        _ => l10n.notificationStreak7(days),
+      };
+
+  /// Resolves localizations without a widget tree — this service schedules from
+  /// background contexts where no BuildContext exists.
+  static Future<String> _pickMotivationMessage(String locale) async {
+    final l10n = await AppLocalizations.delegate.load(Locale(locale));
+    return motivationVariant(l10n, variantIndexFor(DateTime.now()));
   }
 
-  static String _pickStreakMessage(int streakDays, String locale) {
-    final messages =
-        locale == 'ru' ? _streakMessagesRu : _streakMessagesEn;
-    final index =
-        DateTime.now().difference(DateTime(2024)).inDays % messages.length;
-    return messages[index].replaceAll('{N}', '$streakDays');
+  static Future<String> _pickStreakMessage(int streakDays, String locale) async {
+    final l10n = await AppLocalizations.delegate.load(Locale(locale));
+    return streakVariant(l10n, variantIndexFor(DateTime.now()), streakDays);
   }
 
   static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {

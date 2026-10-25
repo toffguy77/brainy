@@ -33,9 +33,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get back => 'Назад';
 
   @override
-  String get comingSoon => 'Скоро';
-
-  @override
   String get result => 'Результат';
 
   @override
@@ -149,27 +146,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get onboardingRecommended => 'Рекомендуем';
 
   @override
-  String get onboardingPaywallTitle => 'Попробуй Premium бесплатно';
-
-  @override
-  String get onboardingPaywallBenefit1 => 'Все размеры таблиц (6×6, 7×7, 9×9)';
-
-  @override
-  String get onboardingPaywallBenefit2 => 'Эксклюзивный персонаж';
-
-  @override
-  String get onboardingPaywallBenefit3 => 'Полная статистика прогресса';
-
-  @override
-  String get onboardingPaywallBenefit4 => 'Без рекламы';
-
-  @override
-  String get onboardingTryFree => 'Начать 7 дней бесплатно';
-
-  @override
-  String get onboardingSkipPaywall => 'Продолжить без подписки';
-
-  @override
   String get onboardingSchulteTitle => 'Таблицы Шульте — тренажёр для мозга';
 
   @override
@@ -217,9 +193,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'достаточно для результата — не перегружает ребёнка';
 
   @override
-  String get onboardingAlreadySubscribed => 'Вы уже подписаны!';
-
-  @override
   String get onboardingLetsGo => 'Поехали!';
 
   @override
@@ -227,9 +200,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get selectGridSize => 'Размер таблицы';
-
-  @override
-  String get premiumGridLocked => 'Доступно в Premium';
 
   @override
   String lastResult(int gridSize, int seconds) {
@@ -259,9 +229,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get characterSelected => 'Выбран';
 
   @override
-  String get characterUnlockPremium => 'Открыть Premium';
-
-  @override
   String get accessoriesTitle => 'Кастомизация';
 
   @override
@@ -287,9 +254,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accessoriesRemove => 'Снять';
-
-  @override
-  String get accessoriesPremiumOnly => 'Premium';
 
   @override
   String get accessoriesNotEnoughCoins => 'Не хватает монет';
@@ -365,9 +329,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentNoRecord => '—';
 
   @override
-  String get parentPremiumOnly => 'Premium';
-
-  @override
   String get parentRecentSessions => 'Последние сессии';
 
   @override
@@ -392,24 +353,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentGridSizeFixed => 'Фиксированный';
 
   @override
-  String get parentMaxSessionTime => 'Макс. время сессии';
-
-  @override
-  String get parentNoLimit => 'Без ограничений';
-
-  @override
-  String parentMinutes(int min) {
-    return '$min мин';
-  }
-
-  @override
   String get parentNotifications => 'Уведомления';
 
   @override
   String get parentChangePin => 'Сменить PIN';
-
-  @override
-  String get parentManageSubscription => 'Управление подпиской';
 
   @override
   String parentShareCardTitle(int days) {
@@ -424,81 +371,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get parentStars => 'Звёзды';
-
-  @override
-  String get paywallTitle => 'Brainy Premium';
-
-  @override
-  String get paywallSubtitle => 'Открой всё и тренируйся без ограничений';
-
-  @override
-  String get paywallBenefit1 => 'Все размеры таблиц — до 9×9';
-
-  @override
-  String get paywallBenefit2 => 'Эксклюзивный персонаж';
-
-  @override
-  String get paywallBenefit3 => 'Панель прогресса для родителей';
-
-  @override
-  String get paywallBenefit4 => 'Без рекламы';
-
-  @override
-  String get paywallBenefit5 => 'Режим Горбова-Шульте';
-
-  @override
-  String get paywallPlanYear => 'Год';
-
-  @override
-  String get paywallPlanMonth => 'Месяц';
-
-  @override
-  String get paywallPlanFamily => 'Семейная';
-
-  @override
-  String get paywallBestPrice => 'Лучшая цена';
-
-  @override
-  String paywallPerMonth(String price) {
-    return '~$price/мес';
-  }
-
-  @override
-  String get paywallTryFree => 'Начать 7 дней бесплатно';
-
-  @override
-  String get paywallDisclaimer =>
-      'Отмена в любое время. Управление подпиской в App Store.';
-
-  @override
-  String get paywallRestore => 'Восстановить покупки';
-
-  @override
-  String get paywallTerms => 'Условия';
-
-  @override
-  String get paywallPrivacy => 'Конфиденциальность';
-
-  @override
-  String get paywallWelcome => 'Добро пожаловать в Premium!';
-
-  @override
-  String get paywallErrorTitle => 'Ошибка покупки';
-
-  @override
-  String get paywallErrorMessage => 'Что-то пошло не так. Попробуйте ещё раз.';
-
-  @override
-  String get paywallLoading => 'Загрузка планов...';
-
-  @override
-  String get premiumFeatureLocked => 'Это Premium фича';
-
-  @override
-  String get premiumUnlock => 'Открыть Premium';
-
-  @override
-  String get premiumTryFree => 'Попробовать бесплатно 7 дней';
 
   @override
   String get settingsSounds => 'Звуки';
@@ -784,18 +656,72 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get gorbovModeBadge => 'Горбов-Шульте';
+  String get gameModeReverse => 'Обратный';
 
   @override
-  String get parentPremiumGateTitle => 'Панель прогресса для родителей';
+  String get gameModeLetters => 'Буквенный';
 
   @override
-  String get parentPremiumGateSubtitle =>
-      'Следите за прогрессом ребёнка с подробной статистикой';
+  String get gameModeReverseHint => 'Нажимай числа по убыванию';
 
   @override
-  String get parentPremiumGateUnlock => 'Открыть с Premium';
+  String get gameModeLettersHint => 'Нажимай буквы по алфавиту';
 
   @override
-  String get parentPremiumGateSettings => 'Настройки';
+  String get notificationMotivation1 => 'Время потренировать мозг!';
+
+  @override
+  String notificationStreak1(int count) {
+    return 'Стрик $count дней сгорит сегодня!';
+  }
+
+  @override
+  String get notificationMotivation2 => 'Брейни ждёт тебя! Зайди на тренировку';
+
+  @override
+  String notificationStreak2(int count) {
+    return 'Не потеряй свой стрик $count дней!';
+  }
+
+  @override
+  String get notificationMotivation3 =>
+      'Несколько минут — и мозг станет быстрее!';
+
+  @override
+  String notificationStreak3(int count) {
+    return '$count дней подряд — не останавливайся!';
+  }
+
+  @override
+  String get notificationMotivation4 => 'Зэп зовёт на тренировку!';
+
+  @override
+  String notificationStreak4(int count) {
+    return 'Стрик в опасности! Сыграй сегодня';
+  }
+
+  @override
+  String get notificationMotivation5 => 'Сегодня ещё не тренировались. Начнём?';
+
+  @override
+  String notificationStreak5(int count) {
+    return 'Осталось немного до конца дня. Сохрани стрик!';
+  }
+
+  @override
+  String get notificationMotivation6 => 'Мозг любит тренировки. Не пропусти!';
+
+  @override
+  String notificationStreak6(int count) {
+    return 'Твой стрик $count дней на волоске!';
+  }
+
+  @override
+  String get notificationMotivation7 =>
+      'Пора размять мозг! Таблица Шульте ждёт';
+
+  @override
+  String notificationStreak7(int count) {
+    return 'Брейни переживает за стрик $count дней!';
+  }
 }

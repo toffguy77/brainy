@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum UnlockType { free, level, streak, premium }
+enum UnlockType { free, level, streak }
 
 class CharacterInfo {
   final String id;
@@ -81,9 +81,10 @@ const defaultCharacters = [
     nameEn: 'Pixel',
     descriptionRu: '8-битный герой из прошлого.',
     descriptionEn: '8-bit hero from the past.',
-    unlockConditionRu: 'Premium подписка',
-    unlockConditionEn: 'Premium subscription',
-    unlockType: UnlockType.premium,
+    unlockConditionRu: 'Стрик 14 дней',
+    unlockConditionEn: '14-day streak',
+    unlockType: UnlockType.streak,
+    requiredStreak: 14,
     assetPath: 'assets/characters/pixel.png',
     color: Color(0xFF00B894),
   ),

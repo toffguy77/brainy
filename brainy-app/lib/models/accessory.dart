@@ -7,7 +7,6 @@ class AccessoryInfo {
   final AccessorySlot slot;
   final int price;
   final String assetPath;
-  final bool isPremium;
 
   const AccessoryInfo({
     required this.id,
@@ -16,7 +15,6 @@ class AccessoryInfo {
     required this.slot,
     required this.price,
     required this.assetPath,
-    this.isPremium = false,
   });
 
   String name(String locale) => locale == 'ru' ? nameRu : nameEn;

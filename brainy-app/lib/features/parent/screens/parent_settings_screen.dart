@@ -53,7 +53,7 @@ class ParentSettingsScreen extends ConsumerWidget {
                 const SizedBox(height: 12),
                 Wrap(
                   spacing: 8,
-                  children: AppConstants.freeGridSizes.map((size) {
+                  children: AppConstants.pickerGridSizes.map((size) {
                     final isSelected = settings.fixedGridSize == size;
                     return ChoiceChip(
                       label: Text(
@@ -79,44 +79,6 @@ class ParentSettingsScreen extends ConsumerWidget {
                   }).toList(),
                 ),
               ],
-            ],
-          ),
-          const SizedBox(height: 12),
-          _SettingsCard(
-            children: [
-              _SettingsLabel(l10n.parentMaxSessionTime),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                children: [0, 5, 10, 15].map((minutes) {
-                  final isSelected =
-                      settings.maxSessionTimeMinutes == minutes;
-                  final label = minutes == 0
-                      ? l10n.parentNoLimit
-                      : l10n.parentMinutes(minutes);
-                  return ChoiceChip(
-                    label: Text(
-                      label,
-                      style: TextStyle(
-                        fontFamily: 'Nunito',
-                        fontWeight: FontWeight.w700,
-                        color: isSelected
-                            ? AppColors.textPrimary
-                            : AppColors.textSecondary,
-                      ),
-                    ),
-                    selected: isSelected,
-                    selectedColor: AppColors.primary,
-                    backgroundColor: AppColors.background,
-                    side: BorderSide.none,
-                    onSelected: (_) {
-                      ref
-                          .read(parentProvider.notifier)
-                          .setMaxSessionTime(minutes);
-                    },
-                  );
-                }).toList(),
-              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -274,12 +236,6 @@ class ParentSettingsScreen extends ConsumerWidget {
                 icon: Icons.lock_rounded,
                 label: l10n.parentChangePin,
                 onTap: () => context.go('/parent/pin?mode=change'),
-              ),
-              const Divider(color: AppColors.background, height: 1),
-              _SettingsButton(
-                icon: Icons.card_membership_rounded,
-                label: l10n.parentManageSubscription,
-                onTap: () => context.go('/paywall'),
               ),
             ],
           ),

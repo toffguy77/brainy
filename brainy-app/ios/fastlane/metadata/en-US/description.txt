@@ -5,7 +5,7 @@ Schulte tables are a proven method for developing peripheral vision, focus, and 
 
 WHAT'S INSIDE
 - Tables from 3×3 to 9×9 — easy to challenging
-- Multiple game modes: classic, reverse, letters
+- Two game modes: classic and Gorbov-Schulte
 - Levels and achievements system — daily motivation
 - Character collection — unlock new heroes through progress
 - Daily streaks — keep your training consistent
@@ -16,7 +16,8 @@ WHY BRAINY
 - Science-based: Schulte tables are used in neuropsychology
 - Game format: training feels like play
 - Short sessions: 2–5 minutes a day is enough
-- No ads: nothing distracts from training
+- Completely free: every mode, every table size, all statistics
+- No ads and no subscriptions: nothing distracts from training
 - Works offline
 
 Brainy helps improve focus, reading speed, and overall cognitive performance through play.

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 import '../../../models/character.dart';
 import '../../../models/user_progress.dart';
 import '../../game/providers/user_progress_provider.dart';
@@ -64,16 +63,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
       CurvedAnimation(parent: _bobController, curve: Curves.easeInOut),
     );
 
-    // Auto-unlock premium characters for subscribers
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final hasPremium = await ref.read(isPremiumProvider.future);
-      if (!hasPremium || !mounted) return;
-      for (final info in defaultCharacters) {
-        if (info.unlockType == UnlockType.premium) {
-          ref.read(characterProvider.notifier).unlockCharacter(info.id);
-        }
-      }
-    });
   }
 
   @override
@@ -173,24 +162,29 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                       width: double.infinity,
                       height: 48,
                       child: Material(
-                        color: AppColors.surface.withValues(alpha: 0.5),
+                        color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.auto_awesome_rounded,
-                                color: AppColors.textSecondary.withValues(alpha: 0.5), size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${l10n.accessoriesCustomize} — ${l10n.comingSoon}',
-                              style: TextStyle(
-                                fontFamily: 'Nunito',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                        child: InkWell(
+                          key: const Key('accessoriesButton'),
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => context.push('/accessories'),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.auto_awesome_rounded,
+                                  color: AppColors.primary, size: 20),
+                              const SizedBox(width: 8),
+                              Text(
+                                l10n.accessoriesCustomize,
+                                style: const TextStyle(
+                                  fontFamily: 'Nunito',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.textPrimary,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -286,13 +280,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
     String locale,
   ) {
     if (!data.isUnlocked) {
-      if (info.unlockType == UnlockType.premium) {
-        return _ActionButton(
-          label: l10n.characterUnlockPremium,
-          color: AppColors.accent,
-          onTap: () => context.go('/paywall'),
-        );
-      }
       return _ActionButton(
         label: info.unlockCondition(locale),
         color: AppColors.surface,
@@ -405,40 +392,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   ),
                 ),
               ),
-              if (info.unlockType == UnlockType.premium) ...[
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(16),
-                        onTap: () {
-                          Navigator.pop(context);
-                          this.context.go('/paywall');
-                        },
-                        child: Center(
-                          child: Text(
-                            l10n.characterUnlockPremium,
-                            style: const TextStyle(
-                              fontFamily: 'Nunito',
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
               const SizedBox(height: 16),
             ],
           ),

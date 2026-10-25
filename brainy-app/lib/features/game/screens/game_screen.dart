@@ -11,14 +11,12 @@ import '../widgets/game_header.dart';
 import '../widgets/countdown_overlay.dart';
 import '../../../models/game_state.dart';
 import '../../../constants/app_colors.dart';
-import '../../../constants/app_constants.dart';
 import '../../../shared/services/haptic_service.dart';
 import '../../../shared/services/notification_service.dart';
 import '../../league/providers/game_services_provider.dart';
 import '../../league/providers/league_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../../shared/services/sound_service.dart';
-import '../../../shared/services/subscription_service.dart' show isPremiumProvider;
 
 class GameScreen extends ConsumerStatefulWidget {
   final int gridSize;
@@ -40,19 +38,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // Guard: premium grid sizes require subscription
-      if (AppConstants.premiumGridSizes.contains(widget.gridSize)) {
-        final hasPremium = await ref.read(isPremiumProvider.future);
-        if (!hasPremium && mounted) {
-          context.go('/paywall');
-          return;
-        }
-      }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       ref.read(gameProvider.notifier).initGame(
             gridSize: widget.gridSize,
             mode: widget.mode,
+            locale: Localizations.localeOf(context).languageCode,
           );
     });
   }

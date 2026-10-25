@@ -36,7 +36,7 @@ class ShareCard extends StatelessWidget {
     final controller = ScreenshotController();
     final widget = ShareCard(
       streakDays: progress.currentStreak,
-      best5x5: records[5],
+      best5x5: records[recordKey('classic', 5)],
       l10n: l10n,
     );
 

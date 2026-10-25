@@ -366,7 +366,8 @@ class _ResultScreenState extends State<ResultScreen>
 
   Widget _buildStarHint() {
     final l10n = AppLocalizations.of(context)!;
-    final thresholds = AppConstants.starThresholds[session.gridSize];
+    final thresholds =
+        AppConstants.starThresholdsFor(session.mode, session.gridSize);
     if (thresholds == null) return const SizedBox.shrink();
 
     final nextStars = session.stars + 1;

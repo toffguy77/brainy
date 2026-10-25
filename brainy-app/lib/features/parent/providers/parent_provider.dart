@@ -16,7 +16,6 @@ class ParentSettings {
   final bool hasPin;
   final String gridSizeMode; // 'auto' | 'fixed'
   final int fixedGridSize;
-  final int maxSessionTimeMinutes; // 0 = no limit
   final bool notificationsEnabled;
   final bool hasCustomReminderTime;
   final int customReminderHour;
@@ -28,7 +27,6 @@ class ParentSettings {
     this.hasPin = false,
     this.gridSizeMode = 'auto',
     this.fixedGridSize = 5,
-    this.maxSessionTimeMinutes = 0,
     this.notificationsEnabled = false,
     this.hasCustomReminderTime = false,
     this.customReminderHour = 20,
@@ -41,7 +39,6 @@ class ParentSettings {
     bool? hasPin,
     String? gridSizeMode,
     int? fixedGridSize,
-    int? maxSessionTimeMinutes,
     bool? notificationsEnabled,
     bool? hasCustomReminderTime,
     int? customReminderHour,
@@ -53,8 +50,6 @@ class ParentSettings {
       hasPin: hasPin ?? this.hasPin,
       gridSizeMode: gridSizeMode ?? this.gridSizeMode,
       fixedGridSize: fixedGridSize ?? this.fixedGridSize,
-      maxSessionTimeMinutes:
-          maxSessionTimeMinutes ?? this.maxSessionTimeMinutes,
       notificationsEnabled:
           notificationsEnabled ?? this.notificationsEnabled,
       hasCustomReminderTime:
@@ -80,8 +75,6 @@ class ParentNotifier extends Notifier<ParentSettings> {
           _box.get(AppConstants.parentGridSizeModeKey) as String? ?? 'auto',
       fixedGridSize:
           _box.get(AppConstants.parentFixedGridSizeKey) as int? ?? 5,
-      maxSessionTimeMinutes:
-          _box.get(AppConstants.parentMaxSessionTimeKey) as int? ?? 0,
       notificationsEnabled:
           _box.get(AppConstants.notificationsEnabledKey) as bool? ?? false,
       hasCustomReminderTime:
@@ -131,10 +124,6 @@ class ParentNotifier extends Notifier<ParentSettings> {
     state = state.copyWith(fixedGridSize: size);
   }
 
-  Future<void> setMaxSessionTime(int minutes) async {
-    await _box.put(AppConstants.parentMaxSessionTimeKey, minutes);
-    state = state.copyWith(maxSessionTimeMinutes: minutes);
-  }
 
   Future<void> _rescheduleNotification() async {
     final sessions = Hive.box<GameSession>(AppConstants.sessionsBox);

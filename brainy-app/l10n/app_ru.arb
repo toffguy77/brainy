@@ -8,7 +8,6 @@
   "continue_": "Продолжить",
   "skip": "Пропустить",
   "back": "Назад",
-  "comingSoon": "Скоро",
   "result": "Результат",
   "newRecord": "Новый рекорд!",
   "greatResult": "Отличный результат!",
@@ -17,14 +16,20 @@
   "timeSec": "{seconds} сек",
   "@timeSec": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "timeMinSec": "{minutes}:{seconds}",
   "@timeMinSec": {
     "placeholders": {
-      "minutes": {"type": "int"},
-      "seconds": {"type": "String"}
+      "minutes": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "String"
+      }
     }
   },
   "coinsEarned": "Монеты",
@@ -32,7 +37,6 @@
   "personalRecord": "Рекорд",
   "playAgain": "Сыграть ещё",
   "home": "Домой",
-
   "onboardingWelcomeTitle": "Тренируем мозг играючи",
   "onboardingWelcomeSubtitle": "Таблицы Шульте для детей 6–14 лет",
   "onboardingStart": "Начать",
@@ -57,13 +61,6 @@
   "onboardingFreq15min": "15+ минут",
   "onboardingFreq15minDesc": "Интенсив",
   "onboardingRecommended": "Рекомендуем",
-  "onboardingPaywallTitle": "Попробуй Premium бесплатно",
-  "onboardingPaywallBenefit1": "Все размеры таблиц (6×6, 7×7, 9×9)",
-  "onboardingPaywallBenefit2": "Эксклюзивный персонаж",
-  "onboardingPaywallBenefit3": "Полная статистика прогресса",
-  "onboardingPaywallBenefit4": "Без рекламы",
-  "onboardingTryFree": "Начать 7 дней бесплатно",
-  "onboardingSkipPaywall": "Продолжить без подписки",
   "onboardingSchulteTitle": "Таблицы Шульте — тренажёр для мозга",
   "onboardingSchulteSubtitle": "Находи числа по порядку как можно быстрее. Чем больше таблица — тем сложнее!",
   "onboardingSchulteHint": "Найди числа по порядку: 1, 2, 3...",
@@ -78,38 +75,40 @@
   "onboardingScienceFact2Label": "для заметного улучшения скорости чтения при ежедневных занятиях",
   "onboardingScienceFact3Value": "5 мин/день",
   "onboardingScienceFact3Label": "достаточно для результата — не перегружает ребёнка",
-  "onboardingAlreadySubscribed": "Вы уже подписаны!",
   "onboardingLetsGo": "Поехали!",
-
   "playNow": "Играть",
   "selectGridSize": "Размер таблицы",
-  "premiumGridLocked": "Доступно в Premium",
   "lastResult": "Последний: {gridSize}×{gridSize} за {seconds}с",
   "@lastResult": {
     "placeholders": {
-      "gridSize": {"type": "int"},
-      "seconds": {"type": "int"}
+      "gridSize": {
+        "type": "int"
+      },
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "noSessionsYet": "Нет игр — начнём!",
   "streakDays": "Серия {count} дней",
   "@streakDays": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "levelLabel": "Уровень {level}",
   "@levelLabel": {
     "placeholders": {
-      "level": {"type": "int"}
+      "level": {
+        "type": "int"
+      }
     }
   },
-
   "characterScreenTitle": "Мои персонажи",
   "characterSelect": "Выбрать",
   "characterSelected": "Выбран",
-  "characterUnlockPremium": "Открыть Premium",
-
   "accessoriesTitle": "Кастомизация",
   "accessoriesTabHats": "Шляпы",
   "accessoriesTabGlasses": "Очки",
@@ -119,18 +118,20 @@
   "accessoriesEquip": "Надеть",
   "accessoriesEquipped": "Надето",
   "accessoriesRemove": "Снять",
-  "accessoriesPremiumOnly": "Premium",
   "accessoriesNotEnoughCoins": "Не хватает монет",
   "accessoriesNotEnoughCoinsMessage": "Нужно {price} монет, а у тебя {balance}",
   "@accessoriesNotEnoughCoinsMessage": {
     "placeholders": {
-      "price": {"type": "int"},
-      "balance": {"type": "int"}
+      "price": {
+        "type": "int"
+      },
+      "balance": {
+        "type": "int"
+      }
     }
   },
   "accessoriesCustomize": "Кастомизация",
   "accessoriesPurchased": "Куплено!",
-
   "parentTitle": "Прогресс ребёнка",
   "parentSetPin": "Установить PIN",
   "parentEnterPin": "Введите PIN",
@@ -140,7 +141,9 @@
   "parentLockedOut": "Слишком много попыток. Подождите {seconds}с",
   "@parentLockedOut": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "parentThisWeek": "Эта неделя",
@@ -155,11 +158,12 @@
   "parentBestTime": "Лучший: {seconds}с",
   "@parentBestTime": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "parentNoRecord": "—",
-  "parentPremiumOnly": "Premium",
   "parentRecentSessions": "Последние сессии",
   "parentNoSessions": "Нет сессий",
   "parentShare": "Поделиться",
@@ -168,64 +172,24 @@
   "parentGridSizeMode": "Размер таблицы",
   "parentGridSizeAuto": "Авто",
   "parentGridSizeFixed": "Фиксированный",
-  "parentMaxSessionTime": "Макс. время сессии",
-  "parentNoLimit": "Без ограничений",
-  "parentMinutes": "{min} мин",
-  "@parentMinutes": {
-    "placeholders": {
-      "min": {"type": "int"}
-    }
-  },
   "parentNotifications": "Уведомления",
   "parentChangePin": "Сменить PIN",
-  "parentManageSubscription": "Управление подпиской",
   "parentShareCardTitle": "тренируется уже {days} дней!",
   "@parentShareCardTitle": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "parentShareBest5x5": "Лучший результат 5×5",
   "parentShareDownload": "Скачай Brainy: brainyapp.io",
   "parentStars": "Звёзды",
-
-  "paywallTitle": "Brainy Premium",
-  "paywallSubtitle": "Открой всё и тренируйся без ограничений",
-  "paywallBenefit1": "Все размеры таблиц — до 9×9",
-  "paywallBenefit2": "Эксклюзивный персонаж",
-  "paywallBenefit3": "Панель прогресса для родителей",
-  "paywallBenefit4": "Без рекламы",
-  "paywallBenefit5": "Режим Горбова-Шульте",
-  "paywallPlanYear": "Год",
-  "paywallPlanMonth": "Месяц",
-  "paywallPlanFamily": "Семейная",
-  "paywallBestPrice": "Лучшая цена",
-  "paywallPerMonth": "~{price}/мес",
-  "@paywallPerMonth": {
-    "placeholders": {
-      "price": {"type": "String"}
-    }
-  },
-  "paywallTryFree": "Начать 7 дней бесплатно",
-
-  "paywallDisclaimer": "Отмена в любое время. Управление подпиской в App Store.",
-  "paywallRestore": "Восстановить покупки",
-  "paywallTerms": "Условия",
-  "paywallPrivacy": "Конфиденциальность",
-  "paywallWelcome": "Добро пожаловать в Premium!",
-  "paywallErrorTitle": "Ошибка покупки",
-  "paywallErrorMessage": "Что-то пошло не так. Попробуйте ещё раз.",
-  "paywallLoading": "Загрузка планов...",
-  "premiumFeatureLocked": "Это Premium фича",
-  "premiumUnlock": "Открыть Premium",
-  "premiumTryFree": "Попробовать бесплатно 7 дней",
-
   "settingsSounds": "Звуки",
   "settingsHaptic": "Вибрация",
   "settingsReminderTime": "Время напоминания",
   "settingsDefaultTime": "по умолчанию",
   "settingsResetTime": "Сбросить на 20:00",
-
   "progressTitle": "Мой прогресс",
   "progressTotalGames": "Игры",
   "progressTotalXp": "Опыт",
@@ -233,8 +197,12 @@
   "progressXpToNextLevel": "{xp} XP до уровня {level}",
   "@progressXpToNextLevel": {
     "placeholders": {
-      "xp": {"type": "int"},
-      "level": {"type": "int"}
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
     }
   },
   "progressMaxLevel": "Максимальный уровень!",
@@ -242,19 +210,25 @@
   "progressGoalReachLevel": "Достигни уровня {level}",
   "@progressGoalReachLevel": {
     "placeholders": {
-      "level": {"type": "int"}
+      "level": {
+        "type": "int"
+      }
     }
   },
   "progressGoalStreak": "Стрик {days} дней",
   "@progressGoalStreak": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "progressGoalUnlock": "Открой {name}",
   "@progressGoalUnlock": {
     "placeholders": {
-      "name": {"type": "String"}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "progressRecords": "Лучшее время",
@@ -263,15 +237,20 @@
   "starHintNext": "Пройди за {seconds} сек для {stars}★",
   "@starHintNext": {
     "placeholders": {
-      "seconds": {"type": "int"},
-      "stars": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      },
+      "stars": {
+        "type": "int"
+      }
     }
   },
-
   "gridDetailTitle": "Таблица {size}×{size}",
   "@gridDetailTitle": {
     "placeholders": {
-      "size": {"type": "int"}
+      "size": {
+        "type": "int"
+      }
     }
   },
   "periodWeek": "Нед",
@@ -286,20 +265,25 @@
   "gridDetailNoData": "Ещё нет данных для {size}×{size}",
   "@gridDetailNoData": {
     "placeholders": {
-      "size": {"type": "int"}
+      "size": {
+        "type": "int"
+      }
     }
   },
   "gridDetailPlayMore": "Сыграйте несколько раз, чтобы увидеть прогресс",
   "legendDailyBest": "Daily best",
   "legendAllAttempts": "Все попытки",
   "legendRecord": "Рекорд",
-
   "achievementsTitle": "Достижения",
   "achievementsCount": "{unlocked} / {total}",
   "@achievementsCount": {
     "placeholders": {
-      "unlocked": {"type": "int"},
-      "total": {"type": "int"}
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "achievementUnlocked": "Новое достижение!",
@@ -323,7 +307,6 @@
   "achievementNightOwlDesc": "Сыграй сессию после 22:00",
   "achievementCoinHoarder": "Копилка",
   "achievementCoinHoarderDesc": "Накопи 500 монет",
-
   "league": "Лига",
   "leagueTitle": "Недельная лига",
   "leagueBronze": "Бронза",
@@ -333,14 +316,20 @@
   "leagueWeeklyXp": "{xp} XP за неделю",
   "@leagueWeeklyXp": {
     "placeholders": {
-      "xp": {"type": "int"}
+      "xp": {
+        "type": "int"
+      }
     }
   },
   "leagueNextTier": "{xp} XP до {tier}",
   "@leagueNextTier": {
     "placeholders": {
-      "xp": {"type": "int"},
-      "tier": {"type": "String"}
+      "xp": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
     }
   },
   "leagueMaxTier": "Высшая лига достигнута!",
@@ -357,7 +346,6 @@
   "leagueEditNameHint": "Введи своё имя",
   "leagueEditNameSave": "Сохранить",
   "leagueEditNameCancel": "Отмена",
-
   "appVersionLabel": "Версия {version} ({buildNumber})",
   "versionCopied": "Версия скопирована",
   "gameModeClassic": "Классика",
@@ -365,18 +353,84 @@
   "gorbovHintWhite": "Найди: белую {number}",
   "@gorbovHintWhite": {
     "placeholders": {
-      "number": {"type": "int"}
+      "number": {
+        "type": "int"
+      }
     }
   },
   "gorbovHintRed": "Найди: красную {number}",
   "@gorbovHintRed": {
     "placeholders": {
-      "number": {"type": "int"}
+      "number": {
+        "type": "int"
+      }
     }
   },
-  "gorbovModeBadge": "Горбов-Шульте",
-  "parentPremiumGateTitle": "Панель прогресса для родителей",
-  "parentPremiumGateSubtitle": "Следите за прогрессом ребёнка с подробной статистикой",
-  "parentPremiumGateUnlock": "Открыть с Premium",
-  "parentPremiumGateSettings": "Настройки"
+  "gameModeReverse": "Обратный",
+  "gameModeLetters": "Буквенный",
+  "gameModeReverseHint": "Нажимай числа по убыванию",
+  "gameModeLettersHint": "Нажимай буквы по алфавиту",
+  "notificationMotivation1": "Время потренировать мозг!",
+  "notificationStreak1": "Стрик {count} дней сгорит сегодня!",
+  "@notificationStreak1": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation2": "Брейни ждёт тебя! Зайди на тренировку",
+  "notificationStreak2": "Не потеряй свой стрик {count} дней!",
+  "@notificationStreak2": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation3": "Несколько минут — и мозг станет быстрее!",
+  "notificationStreak3": "{count} дней подряд — не останавливайся!",
+  "@notificationStreak3": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation4": "Зэп зовёт на тренировку!",
+  "notificationStreak4": "Стрик в опасности! Сыграй сегодня",
+  "@notificationStreak4": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation5": "Сегодня ещё не тренировались. Начнём?",
+  "notificationStreak5": "Осталось немного до конца дня. Сохрани стрик!",
+  "@notificationStreak5": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation6": "Мозг любит тренировки. Не пропусти!",
+  "notificationStreak6": "Твой стрик {count} дней на волоске!",
+  "@notificationStreak6": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationMotivation7": "Пора размять мозг! Таблица Шульте ждёт",
+  "notificationStreak7": "Брейни переживает за стрик {count} дней!",
+  "@notificationStreak7": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

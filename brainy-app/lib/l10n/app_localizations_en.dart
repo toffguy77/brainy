@@ -33,9 +33,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get back => 'Back';
 
   @override
-  String get comingSoon => 'Coming soon';
-
-  @override
   String get result => 'Result';
 
   @override
@@ -148,27 +145,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get onboardingRecommended => 'Recommended';
 
   @override
-  String get onboardingPaywallTitle => 'Try Premium for free';
-
-  @override
-  String get onboardingPaywallBenefit1 => 'All table sizes (6×6, 7×7, 9×9)';
-
-  @override
-  String get onboardingPaywallBenefit2 => 'Exclusive character';
-
-  @override
-  String get onboardingPaywallBenefit3 => 'Full progress statistics';
-
-  @override
-  String get onboardingPaywallBenefit4 => 'No ads';
-
-  @override
-  String get onboardingTryFree => 'Start 7-day free trial';
-
-  @override
-  String get onboardingSkipPaywall => 'Continue without subscription';
-
-  @override
   String get onboardingSchulteTitle => 'Schulte Tables — Brain Trainer';
 
   @override
@@ -216,9 +192,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'enough for results — won\'t overwhelm your child';
 
   @override
-  String get onboardingAlreadySubscribed => 'You\'re already subscribed!';
-
-  @override
   String get onboardingLetsGo => 'Let\'s go!';
 
   @override
@@ -226,9 +199,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectGridSize => 'Select table size';
-
-  @override
-  String get premiumGridLocked => 'Unlock with Premium';
 
   @override
   String lastResult(int gridSize, int seconds) {
@@ -258,9 +228,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get characterSelected => 'Selected';
 
   @override
-  String get characterUnlockPremium => 'Unlock with Premium';
-
-  @override
   String get accessoriesTitle => 'Customization';
 
   @override
@@ -286,9 +253,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessoriesRemove => 'Remove';
-
-  @override
-  String get accessoriesPremiumOnly => 'Premium';
 
   @override
   String get accessoriesNotEnoughCoins => 'Not enough coins';
@@ -364,9 +328,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentNoRecord => '—';
 
   @override
-  String get parentPremiumOnly => 'Premium';
-
-  @override
   String get parentRecentSessions => 'Recent Sessions';
 
   @override
@@ -391,24 +352,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentGridSizeFixed => 'Fixed';
 
   @override
-  String get parentMaxSessionTime => 'Max Session Time';
-
-  @override
-  String get parentNoLimit => 'No limit';
-
-  @override
-  String parentMinutes(int min) {
-    return '$min min';
-  }
-
-  @override
   String get parentNotifications => 'Notifications';
 
   @override
   String get parentChangePin => 'Change PIN';
-
-  @override
-  String get parentManageSubscription => 'Manage Subscription';
 
   @override
   String parentShareCardTitle(int days) {
@@ -423,81 +370,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentStars => 'Stars';
-
-  @override
-  String get paywallTitle => 'Brainy Premium';
-
-  @override
-  String get paywallSubtitle => 'Unlock everything and train without limits';
-
-  @override
-  String get paywallBenefit1 => 'All table sizes — up to 9×9';
-
-  @override
-  String get paywallBenefit2 => 'Exclusive character';
-
-  @override
-  String get paywallBenefit3 => 'Parent progress panel';
-
-  @override
-  String get paywallBenefit4 => 'No ads';
-
-  @override
-  String get paywallBenefit5 => 'Gorbov-Schulte mode';
-
-  @override
-  String get paywallPlanYear => 'Year';
-
-  @override
-  String get paywallPlanMonth => 'Month';
-
-  @override
-  String get paywallPlanFamily => 'Family';
-
-  @override
-  String get paywallBestPrice => 'Best price';
-
-  @override
-  String paywallPerMonth(String price) {
-    return '~$price/mo';
-  }
-
-  @override
-  String get paywallTryFree => 'Start 7-day free trial';
-
-  @override
-  String get paywallDisclaimer =>
-      'Cancel anytime. Manage subscription in App Store.';
-
-  @override
-  String get paywallRestore => 'Restore purchases';
-
-  @override
-  String get paywallTerms => 'Terms';
-
-  @override
-  String get paywallPrivacy => 'Privacy';
-
-  @override
-  String get paywallWelcome => 'Welcome to Premium!';
-
-  @override
-  String get paywallErrorTitle => 'Purchase failed';
-
-  @override
-  String get paywallErrorMessage => 'Something went wrong. Please try again.';
-
-  @override
-  String get paywallLoading => 'Loading plans...';
-
-  @override
-  String get premiumFeatureLocked => 'This is a Premium feature';
-
-  @override
-  String get premiumUnlock => 'Unlock Premium';
-
-  @override
-  String get premiumTryFree => 'Try free for 7 days';
 
   @override
   String get settingsSounds => 'Sounds';
@@ -782,18 +654,75 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get gorbovModeBadge => 'Gorbov-Schulte';
+  String get gameModeReverse => 'Reverse';
 
   @override
-  String get parentPremiumGateTitle => 'Parent Progress Panel';
+  String get gameModeLetters => 'Letters';
 
   @override
-  String get parentPremiumGateSubtitle =>
-      'Track your child\'s progress with detailed statistics';
+  String get gameModeReverseHint => 'Tap numbers in descending order';
 
   @override
-  String get parentPremiumGateUnlock => 'Unlock with Premium';
+  String get gameModeLettersHint => 'Tap letters in alphabetical order';
 
   @override
-  String get parentPremiumGateSettings => 'Settings';
+  String get notificationMotivation1 => 'Time to train your brain!';
+
+  @override
+  String notificationStreak1(int count) {
+    return 'Your $count-day streak expires today!';
+  }
+
+  @override
+  String get notificationMotivation2 =>
+      'Brainy is waiting for you! Start training';
+
+  @override
+  String notificationStreak2(int count) {
+    return 'Don\'t lose your $count-day streak!';
+  }
+
+  @override
+  String get notificationMotivation3 =>
+      'A few minutes and your brain gets faster!';
+
+  @override
+  String notificationStreak3(int count) {
+    return '$count days in a row — don\'t stop now!';
+  }
+
+  @override
+  String get notificationMotivation4 => 'Zap is calling you to practice!';
+
+  @override
+  String notificationStreak4(int count) {
+    return 'Streak in danger! Play today';
+  }
+
+  @override
+  String get notificationMotivation5 =>
+      'Haven\'t trained today yet. Shall we start?';
+
+  @override
+  String notificationStreak5(int count) {
+    return 'Day is almost over. Save your streak!';
+  }
+
+  @override
+  String get notificationMotivation6 =>
+      'Your brain loves training. Don\'t skip it!';
+
+  @override
+  String notificationStreak6(int count) {
+    return 'Your $count-day streak is hanging by a thread!';
+  }
+
+  @override
+  String get notificationMotivation7 =>
+      'Time to exercise your brain! Schulte table awaits';
+
+  @override
+  String notificationStreak7(int count) {
+    return 'Brainy is worried about your $count-day streak!';
+  }
 }

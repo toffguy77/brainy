@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import '../../../constants/app_constants.dart';
 import '../../../models/game_state.dart';
 import '../../../models/session.dart';
 import '../../../shared/services/haptic_service.dart';
@@ -18,6 +19,62 @@ List<List<GridCell>> generateClassicGrid(int size) {
     for (int col = 0; col < size; col++) {
       rowCells.add(GridCell(
         number: numbers[row * size + col],
+        row: row,
+        col: col,
+      ));
+    }
+    grid.add(rowCells);
+  }
+  return grid;
+}
+
+/// Generate a reverse Schulte grid.
+///
+/// Cells carry their tap-sequence position in [GridCell.number] (1..size²) and
+/// display the descending value, so the player taps size² first and 1 last
+/// while validation reuses the classic ascending rule.
+List<List<GridCell>> generateReverseGrid(int size) {
+  final total = size * size;
+  final order = List.generate(total, (i) => i + 1)..shuffle(_random);
+  final grid = <List<GridCell>>[];
+  for (int row = 0; row < size; row++) {
+    final rowCells = <GridCell>[];
+    for (int col = 0; col < size; col++) {
+      final ordinal = order[row * size + col];
+      rowCells.add(GridCell(
+        number: ordinal,
+        label: '${total - ordinal + 1}',
+        row: row,
+        col: col,
+      ));
+    }
+    grid.add(rowCells);
+  }
+  return grid;
+}
+
+/// Generate a letters grid for [locale].
+///
+/// Uses a contiguous prefix of the alphabet so the target sequence is always
+/// A, B, C… — a random sample would leave the player unable to know what comes
+/// next without scanning the whole grid.
+List<List<GridCell>> generateLettersGrid(int size, String locale) {
+  final alphabet = AppConstants.alphabetFor(locale);
+  final total = size * size;
+  if (total > alphabet.length) {
+    throw ArgumentError(
+      'Grid ${size}x$size needs $total letters, alphabet has ${alphabet.length}',
+    );
+  }
+  final order = List.generate(total, (i) => i + 1)..shuffle(_random);
+  final grid = <List<GridCell>>[];
+  for (int row = 0; row < size; row++) {
+    final rowCells = <GridCell>[];
+    for (int col = 0; col < size; col++) {
+      final ordinal = order[row * size + col];
+      rowCells.add(GridCell(
+        number: ordinal,
+        label: alphabet[ordinal - 1],
         row: row,
         col: col,
       ));
@@ -54,6 +111,7 @@ List<List<GridCell>> generateGorbovGrid(int size) {
       final cell = allCells[idx];
       rowCells.add(GridCell(
         number: cell.number,
+        label: cell.label,
         row: row,
         col: col,
         color: cell.color,
@@ -136,6 +194,7 @@ List<List<GridCell>> _copyGridStatic(List<List<GridCell>> grid) {
       .map((row) => row
           .map((cell) => GridCell(
                 number: cell.number,
+                label: cell.label,
                 row: cell.row,
                 col: cell.col,
                 color: cell.color,
@@ -154,13 +213,20 @@ class GameNotifier extends Notifier<GameState> {
   @override
   GameState build() => const GameState();
 
-  void initGame({int gridSize = 5, String mode = 'classic'}) {
+  void initGame({
+    int gridSize = 5,
+    String mode = 'classic',
+    String locale = 'ru',
+  }) {
     _timer?.cancel();
     _countdownTimer?.cancel();
 
-    final grid = mode == 'gorbov'
-        ? generateGorbovGrid(gridSize)
-        : generateClassicGrid(gridSize);
+    final grid = switch (mode) {
+      'gorbov' => generateGorbovGrid(gridSize),
+      'reverse' => generateReverseGrid(gridSize),
+      'letters' => generateLettersGrid(gridSize, locale),
+      _ => generateClassicGrid(gridSize),
+    };
 
     final whiteCount = (gridSize * gridSize + 1) ~/ 2;
     final redCount = gridSize * gridSize ~/ 2;
@@ -339,6 +405,7 @@ class GameNotifier extends Notifier<GameState> {
         .map((row) => row
             .map((cell) => GridCell(
                   number: cell.number,
+                  label: cell.label,
                   row: cell.row,
                   col: cell.col,
                   color: cell.color,
