@@ -32,5 +32,5 @@ Paths below are relative to `brainy-app/` unless they start with `.github/` or `
 
 ## 5. Gate on it
 
-- [ ] 5.1 External: confirm the `flutter` job in `.github/workflows/ci.yml` passes on GitHub against the fixed suite — the workflow has not run on GitHub yet.
-- [ ] 5.2 External: make that job a required status check on `main` (branch protection; also tracked as `openspec/changes/ci-quality-gate/tasks.md:19`).
+- [x] 5.1 External: confirm the `flutter` job in `.github/workflows/ci.yml` passes on GitHub against the fixed suite — the workflow has not run on GitHub yet. — done: green on GitHub: runs 40215196878, 40215497201, 40216569963
+- [x] 5.2 External: make that job a required status check on `main` (branch protection; also tracked as `openspec/changes/ci-quality-gate/tasks.md:19`). — done: required status check on main since 2026-10-25

@@ -15,7 +15,7 @@ on GitHub: the branch is not pushed.
   — done in a changed form: `ci.yml:20-22`, group `${{ github.workflow }}-ci-${{ github.ref }}`, `cancel-in-progress` only when the ref is not `refs/heads/main`. Runs on `main` are never cancelled, and a gate run from deploy/release never cancels the standalone CI run (comment `:17-19`)
 - [x] 1.5 Confirm no step interpolates untrusted `github.event.*` input into a `run:` block
   — no `github.event` anywhere in `.github/workflows/`; the only `${{ }}` in `run:`-adjacent code goes through `env:` (`ci.yml:80-81`, `deploy-testflight.yml:65-79`, `release.yml:58-72`, `monitor.yml:79-82`)
-- [ ] 1.6 External: push the branch / open a scratch pull request and confirm both `Flutter analyze + test` and `Secret scan` trigger, pass, and finish within the 10-minute budget. This first green run is the evidence still missing for 2.1-2.4. Expect a red `Secret scan` first time — see the risk in design.md (historical Firebase key outside the allowlist)
+- [x] 1.6 External: push the branch / open a scratch pull request and confirm both `Flutter analyze + test` and `Secret scan` trigger, pass, and finish within the 10-minute budget. This first green run is the evidence still missing for 2.1-2.4. Expect a red `Secret scan` first time — see the risk in design.md (historical Firebase key outside the allowlist) — done: CI run 40215196878 on PR #21: both jobs green (Flutter 2m30s, Secret scan 7s), after making the repo public (Actions billing had blocked every job)
 - [x] 1.7 Add explicit least-privilege permissions
   — `permissions: contents: read` in `ci.yml:11-12`, `deploy-testflight.yml:15-16`, `release.yml:8-9`
 - [x] 1.8 Add a gitleaks secret scan
@@ -36,7 +36,7 @@ on GitHub: the branch is not pushed.
 
 ## 3. Enforce it
 
-- [ ] 3.1 External: in branch protection for `main`, add the required status check named exactly `Flutter analyze + test` (job name, `ci.yml:26`), and optionally `Secret scan` (`ci.yml:69`)
+- [x] 3.1 External: in branch protection for `main`, add the required status check named exactly `Flutter analyze + test` (job name, `ci.yml:26`), and optionally `Secret scan` (`ci.yml:69`) — done: branch protection on main requires `Flutter analyze + test` and `Secret scan` (set 2026-10-25)
 - [ ] 3.2 External: verify a pull request with a deliberately failing test cannot be merged
 - [x] 3.3 Decide how `deploy-testflight.yml` depends on the gate (`workflow_run` versus an inlined `needs:` job)
   — decided: reusable workflow + `needs:`. `ci.yml` is called as job `verify` and the build job `needs: verify`. Reasons in design.md, Decision

@@ -23,7 +23,7 @@
 - [x] 4.3 Remove the `REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}` env entry from `.github/workflows/deploy-testflight.yml` and `.github/workflows/release.yml` — removed in `9180bab`; remaining `secrets.*` are signing and App Store Connect only (`deploy-testflight.yml:66-79`, `release.yml:59-72`)
 - [ ] 4.4 External: delete the `REVENUECAT_API_KEY` GitHub repository secret
 - [ ] 4.5 External: revoke the API key in the RevenueCat dashboard (it was committed to history and must be treated as leaked)
-- [ ] 4.6 External: confirm a TestFlight build succeeds without the secret (needs a `deploy-testflight.yml` run on `main`)
+- [x] 4.6 External: confirm a TestFlight build succeeds without the secret (needs a `deploy-testflight.yml` run on `main`) — done: deploy-testflight run 40216725096 on main uploaded 1.2.0 (16) without the secret; build VALID in App Store Connect
 
 ## 5. Verify
 
