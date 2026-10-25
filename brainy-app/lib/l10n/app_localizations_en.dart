@@ -21,21 +21,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get progress => 'Progress';
 
   @override
-  String get settings => 'Settings';
-
-  @override
-  String get continue_ => 'Continue';
-
-  @override
-  String get skip => 'Skip';
-
-  @override
-  String get back => 'Back';
-
-  @override
-  String get result => 'Result';
-
-  @override
   String get newRecord => 'New Record!';
 
   @override
@@ -192,9 +177,6 @@ class AppLocalizationsEn extends AppLocalizations {
       'enough for results — won\'t overwhelm your child';
 
   @override
-  String get onboardingLetsGo => 'Let\'s go!';
-
-  @override
   String get playNow => 'Play Now';
 
   @override
@@ -241,9 +223,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessoriesTabCapes => 'Capes';
-
-  @override
-  String get accessoriesBuy => 'Buy';
 
   @override
   String get accessoriesEquip => 'Equip';
@@ -334,12 +313,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentNoSessions => 'No sessions yet';
 
   @override
-  String get parentShare => 'Share';
-
-  @override
-  String get parentSettings => 'Settings';
-
-  @override
   String get parentSettingsTitle => 'Parent Settings';
 
   @override
@@ -367,9 +340,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get parentShareDownload => 'Download Brainy: brainyapp.io';
-
-  @override
-  String get parentStars => 'Stars';
 
   @override
   String get settingsSounds => 'Sounds';
@@ -429,9 +399,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get progressNoRecords => 'Play to set records!';
-
-  @override
-  String get progressStartPlaying => 'Start playing to track progress!';
 
   @override
   String starHintNext(int seconds, int stars) {
@@ -615,9 +582,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueError => 'Could not load leaderboard';
 
   @override
-  String get leagueNotConnected => 'Game Center not connected';
-
-  @override
   String get leagueEditName => 'Edit name';
 
   @override
@@ -630,7 +594,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leagueEditNameCancel => 'Cancel';
 
   @override
-  String appVersionLabel(Object buildNumber, Object version) {
+  String appVersionLabel(Object version, Object buildNumber) {
     return 'Version $version ($buildNumber)';
   }
 

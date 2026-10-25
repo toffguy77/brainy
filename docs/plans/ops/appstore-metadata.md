@@ -11,15 +11,18 @@ tags: [appstore, metadata, screenshots, keywords, description, review]
 
 ## Название и подзаголовок
 
+Источник истины — файлы `metadata/<locale>/name.txt` и `subtitle.txt`. Формулировки «для детей /
+for kids» убраны после отказа по guideline 2.3.8 (коммит `1253576`).
+
 | Поле | RU | EN |
 |------|----|----|
-| Название | Brainy -- Таблицы Шульте | Brainy -- Brain Training |
-| Подзаголовок | Тренажёр внимания для детей | Focus Trainer for Kids |
+| Название | Brainy — тренажёр мозга | Brainy: Schulte Table Trainer |
+| Подзаголовок | Тренажёр на таблицах Шульте | Schulte Table Brain Trainer |
 
 ## Ключевые слова (до 100 символов)
 
-- **RU:** таблица шульте,тренировка внимания,скорочтение,развитие ребёнка,концентрация,память
-- **EN:** schulte table,brain training,focus kids,speed reading,attention,cognitive
+- **RU:** таблицы шульте,тренажер мозга,внимание,скорочтение,концентрация,развитие,память
+- **EN:** schulte table,brain training,attention,speed reading,focus,concentration,cognitive,education,memory
 
 ## Категория и рейтинг
 
@@ -33,6 +36,7 @@ tags: [appstore, metadata, screenshots, keywords, description, review]
 Требуемые размеры:
 - iPhone 6.7" (1290x2796) — обязательно
 - iPhone 6.5" (1284x2778) — рекомендуется
+- iPad 13" — файлы `ipad-13_*`
 
 Экраны для скриншотов (6 штук):
 1. Главный экран с персонажем
@@ -54,31 +58,35 @@ tags: [appstore, metadata, screenshots, keywords, description, review]
 
 ## Описание приложения
 
-### RU (краткое содержание)
-
-Brainy -- игровой тренажёр внимания для детей 6-14 лет. Таблицы от 3x3 до 9x9 с адаптивной сложностью. Звёзды, монеты, достижения, персонажи, стрики. Панель родителя с PIN и статистикой. Brainy Pro: расширенные таблицы, режим Горбова-Шульте, эксклюзивный персонаж, без рекламы.
-
-### EN (краткое содержание)
-
-Brainy is a gamified attention trainer for kids 6-14, based on Schulte tables. Tables 3x3 to 9x9, adaptive difficulty, stars, coins, achievements, characters, streaks. Parent panel with PIN and analytics. Brainy Pro: extended tables, Gorbov-Schulte mode, exclusive character, ad-free.
+Полный текст — `metadata/<locale>/description.txt`. Содержание: таблицы от 3×3 до 9×9; четыре
+режима (классический, обратный, буквенный, Горбова-Шульте); уровни, достижения, коллекция
+персонажей и магазин аксессуаров за монеты; стрики и дневная цель; адаптивная сложность;
+статистика по режимам и панель родителя с PIN. Приложение полностью бесплатное: без встроенных
+покупок, подписок и рекламы; работает офлайн.
 
 ## Privacy Nutrition Labels
 
-Данные, собираемые приложением:
-- Crash Data (Firebase Crashlytics)
+Данные, собираемые приложением (только Firebase Crashlytics):
+- Diagnostics → Crash Data
+- Diagnostics → Other Diagnostic Data (метаданные устройства и ОС в отчётах о сбоях)
+- Identifiers → Device ID (installation UUID Crashlytics)
+
+Все — не связаны с личностью пользователя и не используются для трекинга. Сверять с таблицей
+«Apple privacy details» в документации Firebase при обновлении SDK.
 
 Analytics не собирается: Firebase Analytics удалён (решение 2026-08-01). В App Store Connect
 категория Analytics должна быть снята с декларации.
 
 ## App Review Information
 
-- Демо-инструкции: «Приложение не требует входа. Пройдите онбординг. Для панели родителя создайте PIN.»
+- Заметки для ревьюера — `metadata/review_information/notes.txt`: четыре режима, вход не нужен,
+  работает офлайн, всё бесплатно (без IAP, подписок и рекламы), PIN родителя создаётся при первом входе.
 - IDFA: не используется (add_id_info_uses_idfa: false)
 
 ## Что нового (текущий релиз)
 
-- RU: Первый релиз Brainy! Тренируйте внимание с помощью таблиц Шульте.
-- EN: First release of Brainy! Train your focus with Schulte tables.
+Файлы `metadata/<locale>/release_notes.txt`: новые режимы обратный и буквенный; всё бесплатно;
+дневная цель и адаптивная сложность; магазин аксессуаров; статистика по режимам.
 
 ## Fastlane deliver
 

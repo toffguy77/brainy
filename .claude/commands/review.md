@@ -26,6 +26,9 @@ Review current changes against feature plans and coding standards.
    - [ ] Riverpod for state (no setState in business logic)
    - [ ] Feature-first structure respected
    - [ ] No security issues (no secrets in code, no SQL injection, no XSS)
+   - [ ] Every identifier, path, constant and key a touched plan names exists in code (grep each one)
+   - [ ] No unreferenced Dart files in `lib/` — every new file is imported or routed; delete or wire up
+   - [ ] Every new setting/control has a consumer that changes observable behaviour
 
 4. **Output:**
    - If issues found: list each issue with file:line, what's wrong, and how to fix

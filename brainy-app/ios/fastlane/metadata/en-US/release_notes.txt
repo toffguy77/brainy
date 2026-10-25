@@ -1,5 +1,6 @@
-- New characters and achievements system
-- Parent progress dashboard
-- Daily streaks for motivation
-- Improved stats and charts
+- Two new game modes: reverse and letters
+- Everything is free: all modes and table sizes
+- Daily goal and adaptive difficulty
+- Accessory shop: spend coins to dress up your character
+- Stats for every game mode
 - Bug fixes and performance improvements

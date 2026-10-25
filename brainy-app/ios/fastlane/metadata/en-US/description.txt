@@ -5,12 +5,14 @@ Schulte tables are a proven method for developing peripheral vision, focus, and 
 
 WHAT'S INSIDE
 - Tables from 3×3 to 9×9 — easy to challenging
-- Two game modes: classic and Gorbov-Schulte
+- Four game modes: classic, reverse, letters and Gorbov-Schulte
 - Levels and achievements system — daily motivation
 - Character collection — unlock new heroes through progress
 - Daily streaks — keep your training consistent
 - Detailed stats and progress charts
-- Parent dashboard — track training progress
+- Parent dashboard — track progress in every mode
+- Daily goal and adaptive difficulty that grows with you
+- Collect coins and dress up your character
 
 WHY BRAINY
 - Science-based: Schulte tables are used in neuropsychology

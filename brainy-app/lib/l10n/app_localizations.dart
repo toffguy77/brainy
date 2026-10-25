@@ -122,36 +122,6 @@ abstract class AppLocalizations {
   /// **'Прогресс'**
   String get progress;
 
-  /// No description provided for @settings.
-  ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get settings;
-
-  /// No description provided for @continue_.
-  ///
-  /// In ru, this message translates to:
-  /// **'Продолжить'**
-  String get continue_;
-
-  /// No description provided for @skip.
-  ///
-  /// In ru, this message translates to:
-  /// **'Пропустить'**
-  String get skip;
-
-  /// No description provided for @back.
-  ///
-  /// In ru, this message translates to:
-  /// **'Назад'**
-  String get back;
-
-  /// No description provided for @result.
-  ///
-  /// In ru, this message translates to:
-  /// **'Результат'**
-  String get result;
-
   /// No description provided for @newRecord.
   ///
   /// In ru, this message translates to:
@@ -446,12 +416,6 @@ abstract class AppLocalizations {
   /// **'достаточно для результата — не перегружает ребёнка'**
   String get onboardingScienceFact3Label;
 
-  /// No description provided for @onboardingLetsGo.
-  ///
-  /// In ru, this message translates to:
-  /// **'Поехали!'**
-  String get onboardingLetsGo;
-
   /// No description provided for @playNow.
   ///
   /// In ru, this message translates to:
@@ -535,12 +499,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Плащи'**
   String get accessoriesTabCapes;
-
-  /// No description provided for @accessoriesBuy.
-  ///
-  /// In ru, this message translates to:
-  /// **'Купить'**
-  String get accessoriesBuy;
 
   /// No description provided for @accessoriesEquip.
   ///
@@ -704,18 +662,6 @@ abstract class AppLocalizations {
   /// **'Нет сессий'**
   String get parentNoSessions;
 
-  /// No description provided for @parentShare.
-  ///
-  /// In ru, this message translates to:
-  /// **'Поделиться'**
-  String get parentShare;
-
-  /// No description provided for @parentSettings.
-  ///
-  /// In ru, this message translates to:
-  /// **'Настройки'**
-  String get parentSettings;
-
   /// No description provided for @parentSettingsTitle.
   ///
   /// In ru, this message translates to:
@@ -769,12 +715,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Скачай Brainy: brainyapp.io'**
   String get parentShareDownload;
-
-  /// No description provided for @parentStars.
-  ///
-  /// In ru, this message translates to:
-  /// **'Звёзды'**
-  String get parentStars;
 
   /// No description provided for @settingsSounds.
   ///
@@ -877,12 +817,6 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Играй, чтобы установить рекорды!'**
   String get progressNoRecords;
-
-  /// No description provided for @progressStartPlaying.
-  ///
-  /// In ru, this message translates to:
-  /// **'Начни играть, чтобы видеть прогресс!'**
-  String get progressStartPlaying;
 
   /// No description provided for @starHintNext.
   ///
@@ -1220,12 +1154,6 @@ abstract class AppLocalizations {
   /// **'Не удалось загрузить рейтинг'**
   String get leagueError;
 
-  /// No description provided for @leagueNotConnected.
-  ///
-  /// In ru, this message translates to:
-  /// **'Game Center не подключён'**
-  String get leagueNotConnected;
-
   /// No description provided for @leagueEditName.
   ///
   /// In ru, this message translates to:
@@ -1254,7 +1182,7 @@ abstract class AppLocalizations {
   ///
   /// In ru, this message translates to:
   /// **'Версия {version} ({buildNumber})'**
-  String appVersionLabel(Object buildNumber, Object version);
+  String appVersionLabel(Object version, Object buildNumber);
 
   /// No description provided for @versionCopied.
   ///

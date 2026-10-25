@@ -4,11 +4,6 @@
   "play": "Играть",
   "character": "Персонаж",
   "progress": "Прогресс",
-  "settings": "Настройки",
-  "continue_": "Продолжить",
-  "skip": "Пропустить",
-  "back": "Назад",
-  "result": "Результат",
   "newRecord": "Новый рекорд!",
   "greatResult": "Отличный результат!",
   "goodResult": "Хороший результат!",
@@ -75,7 +70,6 @@
   "onboardingScienceFact2Label": "для заметного улучшения скорости чтения при ежедневных занятиях",
   "onboardingScienceFact3Value": "5 мин/день",
   "onboardingScienceFact3Label": "достаточно для результата — не перегружает ребёнка",
-  "onboardingLetsGo": "Поехали!",
   "playNow": "Играть",
   "selectGridSize": "Размер таблицы",
   "lastResult": "Последний: {gridSize}×{gridSize} за {seconds}с",
@@ -114,7 +108,6 @@
   "accessoriesTabGlasses": "Очки",
   "accessoriesTabEffects": "Эффекты",
   "accessoriesTabCapes": "Плащи",
-  "accessoriesBuy": "Купить",
   "accessoriesEquip": "Надеть",
   "accessoriesEquipped": "Надето",
   "accessoriesRemove": "Снять",
@@ -166,8 +159,6 @@
   "parentNoRecord": "—",
   "parentRecentSessions": "Последние сессии",
   "parentNoSessions": "Нет сессий",
-  "parentShare": "Поделиться",
-  "parentSettings": "Настройки",
   "parentSettingsTitle": "Настройки родителя",
   "parentGridSizeMode": "Размер таблицы",
   "parentGridSizeAuto": "Авто",
@@ -184,7 +175,6 @@
   },
   "parentShareBest5x5": "Лучший результат 5×5",
   "parentShareDownload": "Скачай Brainy: brainyapp.io",
-  "parentStars": "Звёзды",
   "settingsSounds": "Звуки",
   "settingsHaptic": "Вибрация",
   "settingsReminderTime": "Время напоминания",
@@ -233,7 +223,6 @@
   },
   "progressRecords": "Лучшее время",
   "progressNoRecords": "Играй, чтобы установить рекорды!",
-  "progressStartPlaying": "Начни играть, чтобы видеть прогресс!",
   "starHintNext": "Пройди за {seconds} сек для {stars}★",
   "@starHintNext": {
     "placeholders": {
@@ -341,12 +330,21 @@
   "leagueFullRanking": "Полный рейтинг",
   "leagueLoading": "Загрузка рейтинга...",
   "leagueError": "Не удалось загрузить рейтинг",
-  "leagueNotConnected": "Game Center не подключён",
   "leagueEditName": "Изменить имя",
   "leagueEditNameHint": "Введи своё имя",
   "leagueEditNameSave": "Сохранить",
   "leagueEditNameCancel": "Отмена",
   "appVersionLabel": "Версия {version} ({buildNumber})",
+  "@appVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "Object"
+      },
+      "buildNumber": {
+        "type": "Object"
+      }
+    }
+  },
   "versionCopied": "Версия скопирована",
   "gameModeClassic": "Классика",
   "gameModeGorbov": "Горбов",

@@ -21,21 +21,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get progress => 'Прогресс';
 
   @override
-  String get settings => 'Настройки';
-
-  @override
-  String get continue_ => 'Продолжить';
-
-  @override
-  String get skip => 'Пропустить';
-
-  @override
-  String get back => 'Назад';
-
-  @override
-  String get result => 'Результат';
-
-  @override
   String get newRecord => 'Новый рекорд!';
 
   @override
@@ -193,9 +178,6 @@ class AppLocalizationsRu extends AppLocalizations {
       'достаточно для результата — не перегружает ребёнка';
 
   @override
-  String get onboardingLetsGo => 'Поехали!';
-
-  @override
   String get playNow => 'Играть';
 
   @override
@@ -242,9 +224,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get accessoriesTabCapes => 'Плащи';
-
-  @override
-  String get accessoriesBuy => 'Купить';
 
   @override
   String get accessoriesEquip => 'Надеть';
@@ -335,12 +314,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentNoSessions => 'Нет сессий';
 
   @override
-  String get parentShare => 'Поделиться';
-
-  @override
-  String get parentSettings => 'Настройки';
-
-  @override
   String get parentSettingsTitle => 'Настройки родителя';
 
   @override
@@ -368,9 +341,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get parentShareDownload => 'Скачай Brainy: brainyapp.io';
-
-  @override
-  String get parentStars => 'Звёзды';
 
   @override
   String get settingsSounds => 'Звуки';
@@ -430,9 +400,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get progressNoRecords => 'Играй, чтобы установить рекорды!';
-
-  @override
-  String get progressStartPlaying => 'Начни играть, чтобы видеть прогресс!';
 
   @override
   String starHintNext(int seconds, int stars) {
@@ -617,9 +584,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueError => 'Не удалось загрузить рейтинг';
 
   @override
-  String get leagueNotConnected => 'Game Center не подключён';
-
-  @override
   String get leagueEditName => 'Изменить имя';
 
   @override
@@ -632,7 +596,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leagueEditNameCancel => 'Отмена';
 
   @override
-  String appVersionLabel(Object buildNumber, Object version) {
+  String appVersionLabel(Object version, Object buildNumber) {
     return 'Версия $version ($buildNumber)';
   }
 

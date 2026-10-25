@@ -61,7 +61,7 @@ Future<void> _takeScreenshot(
   await binding.takeScreenshot('raw/$_deviceName/$_locale/$name');
 }
 
-/// Create a test GoRouter without FirebaseAnalyticsObserver
+/// Create a test GoRouter mirroring the app routes, without redirects
 GoRouter _createTestRouter() {
   return GoRouter(
     initialLocation: '/home',
