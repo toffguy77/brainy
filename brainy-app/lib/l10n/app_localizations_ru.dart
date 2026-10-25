@@ -332,6 +332,14 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsPrivacyPolicy => 'Политика конфиденциальности';
 
   @override
+  String get settingsDailyGoal => 'Дневная цель';
+
+  @override
+  String settingsMinutes(int minutes) {
+    return '$minutes мин';
+  }
+
+  @override
   String get settingsTerms => 'Условия использования';
 
   @override
@@ -672,6 +680,19 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get gameModeGorbovHint =>
       'Чередуй: белые по возрастанию, красные по убыванию';
+
+  @override
+  String homeDailyGoal(int played, int goal) {
+    return 'Сегодня: $played из $goal мин';
+  }
+
+  @override
+  String get homeDailyGoalDone => 'Цель дня выполнена!';
+
+  @override
+  String homeSuggestNextSize(int size) {
+    return 'Готов к $size×$size? Попробуй!';
+  }
 
   @override
   String get characterBrainyName => 'Брейни';

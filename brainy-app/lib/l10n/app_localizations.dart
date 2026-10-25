@@ -698,6 +698,18 @@ abstract class AppLocalizations {
   /// **'Политика конфиденциальности'**
   String get settingsPrivacyPolicy;
 
+  /// No description provided for @settingsDailyGoal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Дневная цель'**
+  String get settingsDailyGoal;
+
+  /// No description provided for @settingsMinutes.
+  ///
+  /// In ru, this message translates to:
+  /// **'{minutes} мин'**
+  String settingsMinutes(int minutes);
+
   /// No description provided for @settingsTerms.
   ///
   /// In ru, this message translates to:
@@ -1291,6 +1303,24 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Чередуй: белые по возрастанию, красные по убыванию'**
   String get gameModeGorbovHint;
+
+  /// No description provided for @homeDailyGoal.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сегодня: {played} из {goal} мин'**
+  String homeDailyGoal(int played, int goal);
+
+  /// No description provided for @homeDailyGoalDone.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цель дня выполнена!'**
+  String get homeDailyGoalDone;
+
+  /// No description provided for @homeSuggestNextSize.
+  ///
+  /// In ru, this message translates to:
+  /// **'Готов к {size}×{size}? Попробуй!'**
+  String homeSuggestNextSize(int size);
 
   /// No description provided for @characterBrainyName.
   ///

@@ -331,6 +331,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsPrivacyPolicy => 'Privacy Policy';
 
   @override
+  String get settingsDailyGoal => 'Daily goal';
+
+  @override
+  String settingsMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
   String get settingsTerms => 'Terms of Use';
 
   @override
@@ -668,6 +676,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameModeGorbovHint => 'Alternate: white ascending, red descending';
+
+  @override
+  String homeDailyGoal(int played, int goal) {
+    return 'Today: $played of $goal min';
+  }
+
+  @override
+  String get homeDailyGoalDone => 'Daily goal reached!';
+
+  @override
+  String homeSuggestNextSize(int size) {
+    return 'Ready for $size×$size? Give it a go!';
+  }
 
   @override
   String get characterBrainyName => 'Brainy';

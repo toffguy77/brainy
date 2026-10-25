@@ -165,6 +165,15 @@
   "parentNotifications": "Уведомления",
   "parentChangePin": "Сменить PIN",
   "settingsPrivacyPolicy": "Политика конфиденциальности",
+  "settingsDailyGoal": "Дневная цель",
+  "settingsMinutes": "{minutes} мин",
+  "@settingsMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTerms": "Условия использования",
   "privacyPolicyUrl": "https://toffguy77.github.io/brainy-legal/privacy-policy-ru.html",
   "termsUrl": "https://toffguy77.github.io/brainy-legal/terms-ru.html",
@@ -394,6 +403,26 @@
   },
   "gameModeClassicHint": "Нажимай числа по возрастанию",
   "gameModeGorbovHint": "Чередуй: белые по возрастанию, красные по убыванию",
+  "homeDailyGoal": "Сегодня: {played} из {goal} мин",
+  "@homeDailyGoal": {
+    "placeholders": {
+      "played": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyGoalDone": "Цель дня выполнена!",
+  "homeSuggestNextSize": "Готов к {size}×{size}? Попробуй!",
+  "@homeSuggestNextSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "characterBrainyName": "Брейни",
   "characterBrainyDescription": "Мозг с характером. Стартовый герой!",
   "characterBrainyUnlock": "Доступен бесплатно",

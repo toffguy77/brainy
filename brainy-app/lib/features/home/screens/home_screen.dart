@@ -10,7 +10,9 @@ import '../../game/providers/user_progress_provider.dart';
 import '../../parent/providers/parent_provider.dart';
 import '../../character/data/characters_data.dart';
 import '../../character/widgets/dressed_avatar.dart';
+import '../providers/training_goals_provider.dart';
 import '../../../constants/game_modes.dart';
+import '../../../models/session.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -29,8 +31,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   @override
   void initState() {
     super.initState();
-    final savedMode = Hive.box(AppConstants.userBox)
-        .get(AppConstants.lastSelectedModeKey) as String?;
+    final savedMode =
+        Hive.box(AppConstants.userBox).get(AppConstants.lastSelectedModeKey)
+            as String?;
     if (savedMode != null && GameModes.all.contains(savedMode)) {
       _selectedMode = savedMode;
     }
@@ -71,43 +74,76 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 16),
-              _buildTopBar(progress, l10n),
-              const Spacer(flex: 1),
-              _buildCharacterPlaceholder(),
-              const SizedBox(height: 8),
-              Text(
-                l10n.levelLabel(progress.level),
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+        // Scrolls only when the screen is too short (iPhone SE, large text).
+        // Otherwise the min-height box plus spaceBetween spreads the three
+        // groups over the screen, as the Spacers used to.
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: _buildTopBar(progress, l10n),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Column(
+                        children: [
+                          _buildCharacterPlaceholder(),
+                          const SizedBox(height: 8),
+                          Text(
+                            l10n.levelLabel(progress.level),
+                            style: const TextStyle(
+                              fontFamily: 'Nunito',
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _DailyGoalBar(
+                            playedSeconds: ref.watch(todayPlaySecondsProvider),
+                            goalMinutes: progress.dailyGoalMinutes,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: [
+                        _buildModeToggle(l10n),
+                        Text(
+                          _modeHint(_selectedMode, l10n),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontFamily: 'Nunito',
+                            fontSize: 13,
+                            color: AppColors.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        _buildGridSizePicker(
+                          l10n,
+                          isFixedMode,
+                          effectiveGridSize,
+                        ),
+                        if (!isFixedMode)
+                          _buildSuggestion(l10n, sessions, effectiveGridSize),
+                        const SizedBox(height: 24),
+                        _buildPlayButton(l10n, effectiveGridSize),
+                        const SizedBox(height: 16),
+                        _buildLastResult(sessions, l10n),
+                        const SizedBox(height: 24),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const Spacer(flex: 1),
-              _buildModeToggle(l10n),
-              Text(
-                _modeHint(_selectedMode, l10n),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontFamily: 'Nunito',
-                  fontSize: 13,
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 16),
-              _buildGridSizePicker(l10n, isFixedMode, effectiveGridSize),
-              const SizedBox(height: 24),
-              _buildPlayButton(l10n, effectiveGridSize),
-              const SizedBox(height: 16),
-              _buildLastResult(sessions, l10n),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
         ),
       ),
@@ -123,9 +159,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       children: [
         _CoinsDisplay(coins: progress.coins),
         const Spacer(),
-        _StreakDisplay(
-          streak: progress.currentStreak,
-          label: l10n.streakDays(progress.currentStreak),
+        Flexible(
+          child: _StreakDisplay(
+            streak: progress.currentStreak,
+            label: l10n.streakDays(progress.currentStreak),
+          ),
         ),
         const SizedBox(width: 8),
         GestureDetector(
@@ -183,7 +221,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: DressedAvatar(
-              characterId: progress.activeCharacterId, size: 112),
+            characterId: progress.activeCharacterId,
+            size: 112,
+          ),
         ),
       ),
     );
@@ -192,18 +232,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   static const _modes = GameModes.all;
 
   String _modeLabel(String mode, AppLocalizations l10n) => switch (mode) {
-        GameModes.reverse => l10n.gameModeReverse,
-        GameModes.gorbov => l10n.gameModeGorbov,
-        GameModes.letters => l10n.gameModeLetters,
-        _ => l10n.gameModeClassic,
-      };
+    GameModes.reverse => l10n.gameModeReverse,
+    GameModes.gorbov => l10n.gameModeGorbov,
+    GameModes.letters => l10n.gameModeLetters,
+    _ => l10n.gameModeClassic,
+  };
 
   String _modeHint(String mode, AppLocalizations l10n) => switch (mode) {
-        GameModes.reverse => l10n.gameModeReverseHint,
-        GameModes.gorbov => l10n.gameModeGorbovHint,
-        GameModes.letters => l10n.gameModeLettersHint,
-        _ => l10n.gameModeClassicHint,
-      };
+    GameModes.reverse => l10n.gameModeReverseHint,
+    GameModes.gorbov => l10n.gameModeGorbovHint,
+    GameModes.letters => l10n.gameModeLettersHint,
+    _ => l10n.gameModeClassicHint,
+  };
 
   /// Four modes no longer fit a two-segment toggle at these font sizes, so the
   /// selector is a 2x2 grid of chips.
@@ -240,9 +280,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           color: isSelected ? null : AppColors.surface,
           gradient: isSelected
               ? (mode == GameModes.gorbov
-                  ? const LinearGradient(
-                      colors: [Color(0xFFE17055), Color(0xFFFDCB6E)])
-                  : AppColors.primaryGradient)
+                    ? const LinearGradient(
+                        colors: [Color(0xFFE17055), Color(0xFFFDCB6E)],
+                      )
+                    : AppColors.primaryGradient)
               : null,
           borderRadius: BorderRadius.circular(12),
         ),
@@ -267,14 +308,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     setState(() {
       _selectedMode = mode;
       // A size valid in the previous mode may not exist in the new one.
-      _selectedGridSize =
-          AppConstants.clampGridSizeForMode(mode, _selectedGridSize);
+      _selectedGridSize = AppConstants.clampGridSizeForMode(
+        mode,
+        _selectedGridSize,
+      );
     });
     Hive.box(AppConstants.userBox).put(AppConstants.lastSelectedModeKey, mode);
   }
 
   Widget _buildGridSizePicker(
-      AppLocalizations l10n, bool isFixedMode, int effectiveGridSize) {
+    AppLocalizations l10n,
+    bool isFixedMode,
+    int effectiveGridSize,
+  ) {
     if (isFixedMode) {
       return Column(
         children: [
@@ -325,6 +371,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
+  /// Adaptive difficulty: once recent games at this size meet the target,
+  /// offer the next size. Only in the parent's "auto" mode.
+  Widget _buildSuggestion(
+    AppLocalizations l10n,
+    List<GameSession> sessions,
+    int currentSize,
+  ) {
+    final next = suggestNextGridSize(
+      mode: _selectedMode,
+      currentSize: currentSize,
+      sessions: sessions,
+    );
+    if (next == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: GestureDetector(
+        key: const Key('adaptiveSuggestion'),
+        onTap: () => _onGridSizeTap(next),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.success.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.trending_up_rounded,
+                size: 18,
+                color: AppColors.success,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  l10n.homeSuggestNextSize(next),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.success,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _onGridSizeTap(int size) {
     setState(() => _selectedGridSize = size);
     ref.read(userProgressProvider.notifier).setSelectedGridSize(size);
@@ -363,7 +461,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     );
   }
 
-  Widget _buildLastResult(List sessions, AppLocalizations l10n) {
+  Widget _buildLastResult(List<GameSession> sessions, AppLocalizations l10n) {
     if (sessions.isEmpty) {
       return Text(
         l10n.noSessionsYet,
@@ -382,6 +480,54 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
         fontFamily: 'Nunito',
         fontSize: 14,
         color: AppColors.textSecondary,
+      ),
+    );
+  }
+}
+
+/// Today's play time against the daily goal chosen in onboarding.
+class _DailyGoalBar extends StatelessWidget {
+  final int playedSeconds;
+  final int goalMinutes;
+  const _DailyGoalBar({required this.playedSeconds, required this.goalMinutes});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final goalSeconds = goalMinutes * 60;
+    final progress = goalSeconds == 0
+        ? 1.0
+        : (playedSeconds / goalSeconds).clamp(0.0, 1.0);
+    final done = progress >= 1.0;
+    return SizedBox(
+      width: 220,
+      child: Column(
+        children: [
+          Text(
+            done
+                ? l10n.homeDailyGoalDone
+                : l10n.homeDailyGoal(playedSeconds ~/ 60, goalMinutes),
+            key: const Key('dailyGoalLabel'),
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: done ? AppColors.success : AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 6,
+              backgroundColor: AppColors.surface,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                done ? AppColors.success : AppColors.primary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -445,13 +591,17 @@ class _StreakDisplay extends StatelessWidget {
             size: 20,
           ),
           const SizedBox(width: 6),
-          Text(
-            label,
-            style: TextStyle(
-              fontFamily: 'Nunito',
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: streak > 0 ? Colors.orange : AppColors.textSecondary,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: streak > 0 ? Colors.orange : AppColors.textSecondary,
+              ),
             ),
           ),
         ],

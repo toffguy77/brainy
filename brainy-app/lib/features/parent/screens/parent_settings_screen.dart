@@ -8,6 +8,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
 import '../providers/parent_provider.dart';
+import '../../game/providers/user_progress_provider.dart';
 
 class ParentSettingsScreen extends ConsumerWidget {
   const ParentSettingsScreen({super.key});
@@ -83,6 +84,24 @@ class ParentSettingsScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 12),
+          _SettingsCard(
+            children: [
+              _SettingsLabel(l10n.settingsDailyGoal),
+              const SizedBox(height: 8),
+              _SegmentedControl(
+                options: [
+                  for (final m in AppConstants.frequencyOptions)
+                    l10n.settingsMinutes(m),
+                ],
+                selectedIndex: AppConstants.frequencyOptions
+                    .indexOf(ref.watch(userProgressProvider).dailyGoalMinutes)
+                    .clamp(0, AppConstants.frequencyOptions.length - 1),
+                onChanged: (index) => ref
+                    .read(userProgressProvider.notifier)
+                    .setDailyGoalMinutes(AppConstants.frequencyOptions[index]),
+              ),
+            ],
+          ),          const SizedBox(height: 12),
           _SettingsCard(
             children: [
               Row(

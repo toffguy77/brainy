@@ -165,6 +165,15 @@
   "parentNotifications": "Notifications",
   "parentChangePin": "Change PIN",
   "settingsPrivacyPolicy": "Privacy Policy",
+  "settingsDailyGoal": "Daily goal",
+  "settingsMinutes": "{minutes} min",
+  "@settingsMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTerms": "Terms of Use",
   "privacyPolicyUrl": "https://toffguy77.github.io/brainy-legal/privacy-policy-en.html",
   "termsUrl": "https://toffguy77.github.io/brainy-legal/terms-en.html",
@@ -394,6 +403,26 @@
   },
   "gameModeClassicHint": "Tap numbers in ascending order",
   "gameModeGorbovHint": "Alternate: white ascending, red descending",
+  "homeDailyGoal": "Today: {played} of {goal} min",
+  "@homeDailyGoal": {
+    "placeholders": {
+      "played": {
+        "type": "int"
+      },
+      "goal": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDailyGoalDone": "Daily goal reached!",
+  "homeSuggestNextSize": "Ready for {size}×{size}? Give it a go!",
+  "@homeSuggestNextSize": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
   "characterBrainyName": "Brainy",
   "characterBrainyDescription": "A brain with personality. Starter hero!",
   "characterBrainyUnlock": "Available for free",

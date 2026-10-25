@@ -114,6 +114,11 @@ class UserProgressNotifier extends Notifier<UserProgress> {
     await _persist();
   }
 
+  Future<void> setDailyGoalMinutes(int minutes) async {
+    state.dailyGoalMinutes = minutes;
+    await _persist();
+  }
+
   Future<void> setActiveCharacter(String characterId) async {
     state.activeCharacterId = characterId;
     await _persist();

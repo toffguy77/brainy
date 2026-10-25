@@ -77,8 +77,22 @@ class AppConstants {
     20: 6000,
   };
 
-  // Streak
+  // Adaptive difficulty: suggest the next size once the average of the last
+  // [sessionsForAdaptive] games at the current size and mode meets the target.
   static const int sessionsForAdaptive = 5;
+
+  /// Target time for adaptive difficulty. Letters and Gorbov are slower
+  /// searches than digits (recognising a letter; alternating two sequences),
+  /// so their targets are deliberately loose multiples of the digit target.
+  static int? adaptiveTargetSeconds(String mode, int gridSize) {
+    final base = targetTimes[gridSize];
+    if (base == null) return null;
+    return switch (mode) {
+      GameModes.letters => (base * 3) ~/ 2,
+      GameModes.gorbov => base * 2,
+      _ => base,
+    };
+  }
 
   // Parent PIN
   static const int parentPinLength = 4;
