@@ -45,11 +45,7 @@ class DressedAvatar extends ConsumerWidget {
     final worn = character == null
         ? const <AccessorySlot, AccessoryInfo>{}
         : equippedAccessories(character);
-    return DressedAvatarView(
-      characterId: characterId,
-      size: size,
-      worn: worn,
-    );
+    return DressedAvatarView(characterId: characterId, size: size, worn: worn);
   }
 }
 
@@ -69,6 +65,19 @@ class DressedAvatarView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // A parent may force a different (tight) size than [size]; place the
+    // layers against the size actually laid out, or they drift off the face.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final side = constraints.hasBoundedWidth && constraints.hasBoundedHeight
+            ? constraints.biggest.shortestSide
+            : size;
+        return _layers(side == 0 ? size : side);
+      },
+    );
+  }
+
+  Widget _layers(double size) {
     final cape = worn[AccessorySlot.cape];
     final glasses = worn[AccessorySlot.glasses];
     final hat = worn[AccessorySlot.hat];
@@ -81,7 +90,7 @@ class DressedAvatarView extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.center,
         children: [
-          if (cape != null) ..._capeLayers(cape),
+          if (cape != null) ..._capeLayers(cape, size),
           characterAvatar(characterId, size: size),
           if (glasses?.glyph != null)
             Positioned(
@@ -95,13 +104,13 @@ class DressedAvatarView extends StatelessWidget {
               top: -size * 0.28,
               child: _Glyph(hat!.glyph!, size * 0.42),
             ),
-          if (effect?.glyph != null) ..._effectLayers(effect!),
+          if (effect?.glyph != null) ..._effectLayers(effect!, size),
         ],
       ),
     );
   }
 
-  List<Widget> _capeLayers(AccessoryInfo cape) {
+  List<Widget> _capeLayers(AccessoryInfo cape, double size) {
     if (cape.glyph != null) {
       // Wings: one glyph per side, the left one mirrored.
       return [
@@ -109,7 +118,10 @@ class DressedAvatarView extends StatelessWidget {
           key: const ValueKey('worn-cape'),
           left: -size * 0.30,
           top: size * 0.15,
-          child: Transform.flip(flipX: true, child: _Glyph(cape.glyph!, size * 0.45)),
+          child: Transform.flip(
+            flipX: true,
+            child: _Glyph(cape.glyph!, size * 0.45),
+          ),
         ),
         Positioned(
           right: -size * 0.30,
@@ -130,15 +142,16 @@ class DressedAvatarView extends StatelessWidget {
     ];
   }
 
-  List<Widget> _effectLayers(AccessoryInfo effect) {
+  List<Widget> _effectLayers(AccessoryInfo effect, double size) {
     final g = effect.glyph!;
     final s = size * 0.24;
     return [
       Positioned(
-          key: const ValueKey('worn-effect'),
-          left: -s * 0.4,
-          top: size * 0.05,
-          child: _Glyph(g, s)),
+        key: const ValueKey('worn-effect'),
+        left: -s * 0.4,
+        top: size * 0.05,
+        child: _Glyph(g, s),
+      ),
       Positioned(right: -s * 0.4, top: size * 0.45, child: _Glyph(g, s * 0.8)),
       Positioned(left: size * 0.1, bottom: -s * 0.3, child: _Glyph(g, s * 0.7)),
     ];
@@ -149,7 +162,11 @@ class DressedAvatarView extends StatelessWidget {
 class AccessoryGlyph extends StatelessWidget {
   final AccessoryInfo accessory;
   final double size;
-  const AccessoryGlyph({super.key, required this.accessory, required this.size});
+  const AccessoryGlyph({
+    super.key,
+    required this.accessory,
+    required this.size,
+  });
 
   @override
   Widget build(BuildContext context) {
