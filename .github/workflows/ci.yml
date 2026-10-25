@@ -5,20 +5,27 @@ on:
   push:
     branches:
       - main
+  # Deploy and release call this workflow as a gate, so nothing ships red.
+  workflow_call:
+
+permissions:
+  contents: read
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
-# A newer push to the same branch supersedes an in-flight run.
+# github.workflow is the caller's name under workflow_call, so a gate run from
+# deploy never cancels the standalone CI run on the same ref. Runs on main are
+# never cancelled: each commit there must finish its verification.
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   flutter:
     name: Flutter analyze + test
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: brainy-app
@@ -27,10 +34,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: ARB key parity (ru vs en)
+        working-directory: brainy-app/l10n
+        run: |
+          diff <(jq -r 'keys[] | select(startswith("@@") | not)' app_ru.arb | sort) \
+               <(jq -r 'keys[] | select(startswith("@@") | not)' app_en.arb | sort)
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: stable
+          flutter-version: 3.47.6
           cache: true
 
       - name: Get Flutter dependencies
@@ -40,4 +54,32 @@ jobs:
         run: flutter analyze --fatal-infos
 
       - name: Test
-        run: flutter test --reporter expanded
+        run: flutter test --reporter expanded --timeout 60s --coverage
+
+      # Visibility only — no coverage threshold is enforced.
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: brainy-app/coverage/lcov.info
+          if-no-files-found: ignore
+
+  secrets-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Gitleaks
+        env:
+          GITLEAKS_VERSION: 8.30.1
+        run: |
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz gitleaks
+          ./gitleaks git --redact --no-banner --config .gitleaks.toml .

@@ -1,0 +1,13 @@
+# Secret scanning config for gitleaks (run in CI by .github/workflows/ci.yml).
+[extend]
+useDefault = true
+
+# Firebase iOS config keys are public app identifiers, not secrets: they ship
+# inside every build. Restrict them in Google Cloud instead of hiding them.
+[[allowlists]]
+description = "Public Firebase client configuration"
+targetRules = ["gcp-api-key", "generic-api-key"]
+paths = [
+  '''brainy-app/lib/firebase_options\.dart''',
+  '''brainy-app/ios/Runner/GoogleService-Info\.plist''',
+]
