@@ -65,8 +65,8 @@ Status as of 2026-10-25 (branch `chore/finish-audit-changes`, commits f0e1ec8..1
 
 ## 8. Verify and document
 
-- [ ] 8.1 Manual (CI): confirm `flutter analyze` is clean. It is gated in `.github/workflows/ci.yml` (9180bab). The latest PR run, 40211260997 on 10f3158, failed in 4 s with no steps executed, which is a runner or infra failure and not an analyzer result. Re-run it and confirm green.
-- [ ] 8.2 Manual (CI): confirm `flutter test` is green within the wall-clock budget, in the same CI re-run. All tests cited in this file exist, but this audit did not run them.
+- [x] 8.1 Manual (CI): confirm `flutter analyze` is clean. It is gated in `.github/workflows/ci.yml` (9180bab). The latest PR run, 40211260997 on 10f3158, failed in 4 s with no steps executed, which is a runner or infra failure and not an analyzer result. Re-run it and confirm green. — done: `flutter analyze --fatal-infos` green on GitHub CI
+- [x] 8.2 Manual (CI): confirm `flutter test` is green within the wall-clock budget, in the same CI re-run. All tests cited in this file exist, but this audit did not run them. — done: `flutter test` green on GitHub CI in 1m26s–2m30s
 - [ ] 8.3 Manual (device): play reverse at 3×3 and 9×9, and letters at 3×3 and 5×5 in both ru and en. Check that the "find" badge shows N² first in reverse and a letter in letters, and that the grid hides while paused.
 - [x] 8.4 Update `docs/plans/features/game-modes.md` to describe four modes. Done; it covers `processOrdinalTap`, `lettersGridSizes` and the `{mode}_{size}` records.
 - [x] 8.5 Confirm the App Store description's claim of multiple modes is now accurate. `ios/fastlane/metadata/{ru,en-US}/description.txt:8` lists four modes.

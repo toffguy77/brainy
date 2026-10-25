@@ -40,7 +40,7 @@ Legend: `[x]` done (evidence given), `[~]` dropped / not applicable, `[ ]` open 
 - [x] 4.3 Remove the `subscriptions` index from `firestore.indexes.json` — superseded: `firestore.indexes.json` and `firestore.rules` deleted in 9180bab
 - [x] 4.4 Remove the `functions` job from `.github/workflows/ci.yml` — jobs are `flutter` and `secrets-scan` only (`ci.yml:24-68`)
 - [x] 4.5 Review the `deploy-testflight.yml` path filter for stale references — `deploy-testflight.yml:7-13` lists only `brainy-app/` paths; no change needed. `REVENUECAT_API_KEY` removed from Fastfile and all workflows in 9180bab
-- [ ] 4.6 External: close the open dependabot PRs and delete all 13 remote branches `origin/dependabot/npm_and_yarn/functions/*` (axios, fast-xml-builder, fast-xml-parser, follow-redirects, grpc/grpc-js, handlebars, multi-f792d6d6d9, node-forge, path-to-regexp, picomatch, protobufjs, protobufjs/utf8, tootallnate/once) — all target the deleted `functions/`. No `.github/dependabot.yml` exists, so nothing to change in the repo
+- [x] 4.6 External: close the open dependabot PRs and delete all 13 remote branches `origin/dependabot/npm_and_yarn/functions/*` (axios, fast-xml-builder, fast-xml-parser, follow-redirects, grpc/grpc-js, handlebars, multi-f792d6d6d9, node-forge, path-to-regexp, picomatch, protobufjs, protobufjs/utf8, tootallnate/once) — all target the deleted `functions/`. No `.github/dependabot.yml` exists, so nothing to change in the repo — done: all dependabot PRs for functions/ closed with branches deleted (#3–#20, #22–#27), 2026-10-25
 - [x] 4.7 Confirm no npm advisories remain anywhere in the repository — no `package.json` outside the untracked `brainy-app/build/` cache
 
 ## 5. Update the published description of the app
@@ -48,7 +48,7 @@ Legend: `[x]` done (evidence given), `[~]` dropped / not applicable, `[ ]` open 
 - [x] 5.1 Remove the "Brainy Pro" paragraph from both descriptions — gone; both now say "completely free" and list four modes (`metadata/en-US/description.txt:8,21-22`, `metadata/ru/description.txt:8,21`); `review_information/notes.txt:1` says completely free, four modes
 - [x] 5.2 Verify the edits reintroduce no kids/children wording that caused the 2.3.8 rejection — no `kid|child|дети|детск|ребён` in either description
 - [x] 5.3 Check `promotional_text.txt` and `keywords.txt` for paid-tier references — none
-- [ ] 5.4 External: confirm the App Store Connect listing declares no in-app purchases and remove the old Brainy Pro subscription products / group. In-repo side done: `Products.storekit` and its scheme reference deleted (9180bab, faf276b); `Fastfile:99,182` set `precheck_include_in_app_purchases: false`
+- [x] 5.4 External: confirm the App Store Connect listing declares no in-app purchases and remove the old Brainy Pro subscription products / group. In-repo side done: `Products.storekit` and its scheme reference deleted (9180bab, faf276b); `Fastfile:99,182` set `precheck_include_in_app_purchases: false` — done: App Store Connect API: no in-app purchases and no subscription groups for app 6760589477 (2026-10-25)
 
 ## 6. Update the plans
 

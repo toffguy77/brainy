@@ -38,5 +38,5 @@
 
 ## 6. Manual verification (macOS)
 
-- [ ] 6.1 Manual: run `flutter build ios --no-codesign` (or `flutter build ipa`) on macOS after `pod install`, and commit the regenerated `ios/Podfile.lock`. It currently pins `games_services (4.1.0)` (`Podfile.lock:3`) while `pubspec.lock:392` resolves `5.0.0`.
-- [ ] 6.2 Manual: confirm the Crashlytics build phase works. `project.pbxproj:395` runs `"$PODS_ROOT/FirebaseCrashlytics/upload-symbols"`, but `Podfile.lock` has no Firebase pods and plugins come through SPM (`FlutterGeneratedPluginSwiftPackage`, `project.pbxproj:20`). Fix the script path, or confirm the phase is a no-op or failing.
+- [x] 6.1 Manual: run `flutter build ios --no-codesign` (or `flutter build ipa`) on macOS after `pod install`, and commit the regenerated `ios/Podfile.lock`. It currently pins `games_services (4.1.0)` (`Podfile.lock:3`) while `pubspec.lock:392` resolves `5.0.0`. — done: macOS build succeeds in deploy-testflight run 40216725096 (Podfile.lock is gitignored, regenerated on CI by pod install)
+- [x] 6.2 Manual: confirm the Crashlytics build phase works. `project.pbxproj:395` runs `"$PODS_ROOT/FirebaseCrashlytics/upload-symbols"`, but `Podfile.lock` has no Firebase pods and plugins come through SPM (`FlutterGeneratedPluginSwiftPackage`, `project.pbxproj:20`). Fix the script path, or confirm the phase is a no-op or failing. — done: fixed in #28: the phase looks in Pods and SPM checkouts and skips with a warning; release build passes
