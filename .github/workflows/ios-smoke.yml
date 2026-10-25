@@ -1,0 +1,61 @@
+name: iOS smoke test
+
+# Plays a round of every mode on an iOS simulator with the real plugins
+# (integration_test/game_flow_test.dart): catches platform-only failures,
+# such as a plugin call blocking the result screen, that unit tests stub.
+on:
+  pull_request:
+    paths:
+      - 'brainy-app/lib/**'
+      - 'brainy-app/integration_test/**'
+      - 'brainy-app/pubspec.yaml'
+      - 'brainy-app/pubspec.lock'
+      - 'brainy-app/ios/**'
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: ${{ github.workflow }}-smoke-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  smoke:
+    name: iOS simulator smoke
+    runs-on: macos-15
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: brainy-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.6
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Run on a simulator
+        run: |
+          set -euo pipefail
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          type=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; t=[d['identifier'] for d in json.load(sys.stdin)['devicetypes'] if d['name'].startswith('iPhone') and 'Pro' in d['name']]; print(t[-1])")
+          udid=$(xcrun simctl create smoke "$type" "$runtime")
+          xcrun simctl boot "$udid"
+          xcrun simctl bootstatus "$udid" -b
+          flutter test integration_test/game_flow_test.dart -d "$udid" --reporter expanded

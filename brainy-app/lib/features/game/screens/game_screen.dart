@@ -1,3 +1,4 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -191,8 +192,15 @@ class _GameScreenState extends ConsumerState<GameScreen>
 
   Future<void> _handleGameFinished(GameState gameState) async {
     HapticService.gameComplete();
-    final outcome =
-        await ref.read(sessionCompleterProvider).complete(gameState);
+    final SessionOutcome outcome;
+    try {
+      outcome = await ref.read(sessionCompleterProvider).complete(gameState);
+    } catch (error, stack) {
+      // Never strand the child on a finished grid: report and go home.
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
+      if (mounted) context.go('/home');
+      return;
+    }
 
     if (outcome.isRecord) {
       HapticService.recordBroken();

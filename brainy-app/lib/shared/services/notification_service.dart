@@ -143,12 +143,10 @@ class NotificationService {
             : motivationVariant(l10n, slot.variantIndex),
         scheduledDate: tz.TZDateTime(tz.local, slot.at.year, slot.at.month,
             slot.at.day, slot.at.hour, slot.at.minute),
-        notificationDetails: NotificationDetails(
-          iOS: DarwinNotificationDetails(
-            interruptionLevel: slot.isStreakWarning
-                ? InterruptionLevel.timeSensitive
-                : InterruptionLevel.active,
-          ),
+        // Plain 'active' level: time-sensitive needs an entitlement the
+        // app does not have.
+        notificationDetails: const NotificationDetails(
+          iOS: DarwinNotificationDetails(),
         ),
         androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       );

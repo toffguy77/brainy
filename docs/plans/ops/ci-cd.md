@@ -14,7 +14,7 @@ Flutter; сборок для него нет и не планируется.
 
 ## Workflows
 
-Четыре файла в `.github/workflows/`.
+Файлы в `.github/workflows/`.
 
 ### ci.yml — проверка
 
@@ -36,6 +36,19 @@ Job `secrets-scan`: полная история (`fetch-depth: 0`), gitleaks 8.3
 
 `concurrency` группируется по `github.workflow` + ref: вызов из деплоя не отменяет самостоятельный
 прогон CI. `cancel-in-progress` работает только вне `main` — каждый коммит в `main` проверяется до конца.
+
+### ios-smoke.yml — смоук на iOS-симуляторе
+
+Триггер: PR с изменениями в `brainy-app/lib`, `integration_test`, `ios`, pubspec; вручную.
+`macos-15`, Xcode 26.3: на симуляторе iPhone с реальными плагинами проходит по раунду каждого
+режима до экрана результата и проверяет, что планирование напоминаний завершается
+(`integration_test/game_flow_test.dart`).
+
+### screenshots.yml — скриншоты App Store
+
+Вручную. Снимает 6 экранов на симуляторах 6.7", 6.5" и iPad 13" в ru/en
+(`integration_test/screenshot_test.dart`), компонует подписи (`scripts/compose_screenshots.py`) и
+выгружает набор для `fastlane/screenshots` артефактом.
 
 ### deploy-testflight.yml — деплой в TestFlight
 

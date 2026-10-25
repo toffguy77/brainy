@@ -87,8 +87,9 @@ EN: «Your {N}-day streak expires today!», «Don't lose your {N}-day streak!» 
 
 ## Приоритет уведомлений (iOS)
 
-- Стрик-предупреждения: `InterruptionLevel.timeSensitive`
-- Мотивационные: `InterruptionLevel.active`
+Обычный уровень (`active`) для всех: `timeSensitive` требует entitlement, которого у приложения нет.
+Ошибки планирования не блокируют игру — `SessionCompleter` вызывает `rescheduleFromStorage()` без
+ожидания и отправляет ошибки в Crashlytics.
 
 ## Ключевые файлы
 

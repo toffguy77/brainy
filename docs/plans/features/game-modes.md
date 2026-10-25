@@ -121,7 +121,11 @@ Brainy предлагает четыре игровых режима на осн
 
 Рекорды хранятся в Hive box `records` с ключами вида `"classic_5"`, `"reverse_5"`, `"gorbov_7"`, `"letters_4"` (формат `{mode}_{gridSize}`, идентификаторы режимов — `GameModes`). При загрузке читаются все ключи бокса, так что рекорд любого режима переживает перезапуск. При первом запуске после обновления выполняется миграция старых ключей (`"5"` -> `"classic_5"`). Рекорд — только строго лучшее время; равное или худшее не перезаписывает.
 
-Сохранение результата — `SessionCompleter.complete(gameState)` (`session_completion_provider.dart`): рекорд, сессия, стрик, монеты (`coinsPerSession` + `coinsForRecord`), XP, разблокировка персонажей, достижения, отправка в Game Center (рекорды по времени — только classic) и перепланирование напоминания.
+Сохранение результата — `SessionCompleter.complete(gameState)`. Побочные эффекты (отправка в Game
+Center, перепланирование напоминаний) не ждутся: их ошибки уходят в Crashlytics и никогда не
+задерживают экран результата; если сбоит само сохранение, экран игры уходит на главную, а не
+остаётся на заполненной сетке (регрессия 1.2.0 (16) — `game_finish_navigation_test.dart`,
+`integration_test/game_flow_test.dart` на симуляторе в workflow `ios-smoke.yml`). Подробно — (`session_completion_provider.dart`): рекорд, сессия, стрик, монеты (`coinsPerSession` + `coinsForRecord`), XP, разблокировка персонажей, достижения, отправка в Game Center (рекорды по времени — только classic) и перепланирование напоминания.
 
 Файл: `brainy-app/lib/features/game/providers/records_provider.dart`
 

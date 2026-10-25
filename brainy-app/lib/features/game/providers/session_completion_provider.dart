@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/game_modes.dart';
 import '../../../models/achievement.dart';
@@ -40,11 +42,18 @@ class SessionCompleter {
   /// notification plugin.
   final Future<void> Function() _rescheduleReminder;
 
+  /// Where failures of side effects go; Crashlytics in the app.
+  final void Function(Object error, StackTrace stack) _onSideEffectError;
+
   SessionCompleter(
     this._ref, {
     Future<void> Function()? rescheduleReminder,
-  }) : _rescheduleReminder =
-            rescheduleReminder ?? NotificationService.rescheduleFromStorage;
+    void Function(Object error, StackTrace stack)? onSideEffectError,
+  })  : _rescheduleReminder =
+            rescheduleReminder ?? NotificationService.rescheduleFromStorage,
+        _onSideEffectError = onSideEffectError ??
+            ((e, s) =>
+                FirebaseCrashlytics.instance.recordError(e, s, fatal: false));
 
   Future<SessionOutcome> complete(GameState game) async {
     final records = _ref.read(recordsProvider.notifier);
@@ -74,8 +83,10 @@ class SessionCompleter {
     final newAchievements =
         await checkAchievements(session: session, ref: _ref);
 
+    // Side effects must never hold up the result screen: a platform call
+    // that throws or never returns would leave the child on a finished grid.
     _submitScores(session, isRecord);
-    await _rescheduleReminder();
+    unawaited(_rescheduleReminder().catchError(_reportSideEffectError));
 
     return SessionOutcome(
       session: session,
@@ -86,17 +97,25 @@ class SessionCompleter {
     );
   }
 
+  void _reportSideEffectError(Object error, StackTrace stack) {
+    _onSideEffectError(error, stack);
+  }
+
   /// Game Center boards are per grid size with no mode component, so only
   /// classic times are posted — other modes would pollute the classic boards.
   void _submitScores(GameSession session, bool isRecord) {
     final gameServices = _ref.read(gameServicesProvider);
     if (!gameServices.isSignedIn) return;
-    gameServices.submitWeeklyXp(_ref.read(weeklyXpProvider));
+    unawaited(gameServices
+        .submitWeeklyXp(_ref.read(weeklyXpProvider))
+        .catchError(_reportSideEffectError));
     if (isRecord && session.mode == GameModes.classic) {
-      gameServices.submitBestTime(
-        gridSize: session.gridSize,
-        timeMs: session.durationSeconds * 1000,
-      );
+      unawaited(gameServices
+          .submitBestTime(
+            gridSize: session.gridSize,
+            timeMs: session.durationSeconds * 1000,
+          )
+          .catchError(_reportSideEffectError));
     }
   }
 }
