@@ -332,6 +332,20 @@ class AppLocalizationsRu extends AppLocalizations {
   String get parentChangePin => 'Сменить PIN';
 
   @override
+  String get settingsPrivacyPolicy => 'Политика конфиденциальности';
+
+  @override
+  String get settingsTerms => 'Условия использования';
+
+  @override
+  String get privacyPolicyUrl =>
+      'https://toffguy77.github.io/brainy-legal/privacy-policy-ru.html';
+
+  @override
+  String get termsUrl =>
+      'https://toffguy77.github.io/brainy-legal/terms-ru.html';
+
+  @override
   String parentShareCardTitle(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
@@ -661,6 +675,99 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get gameModeGorbovHint =>
       'Чередуй: белые по возрастанию, красные по убыванию';
+
+  @override
+  String get characterBrainyName => 'Брейни';
+
+  @override
+  String get characterBrainyDescription =>
+      'Мозг с характером. Стартовый герой!';
+
+  @override
+  String get characterBrainyUnlock => 'Доступен бесплатно';
+
+  @override
+  String get characterZapName => 'Зэп';
+
+  @override
+  String get characterZapDescription =>
+      'Электрический роботёнок. Быстрый как молния!';
+
+  @override
+  String get characterZapUnlock => 'Достигни уровня 10';
+
+  @override
+  String get characterVortexName => 'Вортекс';
+
+  @override
+  String get characterVortexDescription =>
+      'Загадочный и странный. Любит вихри.';
+
+  @override
+  String get characterVortexUnlock => 'Стрик 30 дней';
+
+  @override
+  String get characterPixelName => 'Пиксель';
+
+  @override
+  String get characterPixelDescription => '8-битный герой из прошлого.';
+
+  @override
+  String get characterPixelUnlock => 'Стрик 14 дней';
+
+  @override
+  String get characterGlitchName => 'Глитч';
+
+  @override
+  String get characterGlitchDescription => 'Сломан, но не сломлен.';
+
+  @override
+  String get characterGlitchUnlock => 'Стрик 60 дней';
+
+  @override
+  String get accessoryHatScientistName => 'Колпак учёного';
+
+  @override
+  String get accessoryHatCrownName => 'Корона';
+
+  @override
+  String get accessoryHatCapName => 'Кепка';
+
+  @override
+  String get accessoryHatHelmetName => 'Шлем';
+
+  @override
+  String get accessoryHatTophatName => 'Цилиндр';
+
+  @override
+  String get accessoryGlassesSmartName => 'Умные очки';
+
+  @override
+  String get accessoryGlassesSunName => 'Солнцезащитные';
+
+  @override
+  String get accessoryGlassesPixelName => 'Пиксельные';
+
+  @override
+  String get accessoryGlassesVrName => 'VR-шлем';
+
+  @override
+  String get accessoryEffectStarsName => 'Звёзды';
+
+  @override
+  String get accessoryEffectFireName => 'Огонь';
+
+  @override
+  String get accessoryEffectElectricName => 'Электричество';
+
+  @override
+  String get accessoryCapeMantleName => 'Мантия';
+
+  @override
+  String get accessoryCapeNinjaName => 'Плащ ниндзя';
+
+  @override
+  String get accessoryCapeWingsName => 'Крылья';
 
   @override
   String get notificationMotivation1 => 'Время потренировать мозг!';

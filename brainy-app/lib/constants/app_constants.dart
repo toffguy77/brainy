@@ -193,13 +193,4 @@ class AppConstants {
     if (sizes.contains(size)) return size;
     return sizes.reduce((a, b) => (a - size).abs() <= (b - size).abs() ? a : b);
   }
-
-  // Legal URLs
-  static const String legalBaseUrl = 'https://toffguy77.github.io/brainy-legal';
-  static const String privacyPolicyUrlRu =
-      '$legalBaseUrl/privacy-policy-ru.html';
-  static const String privacyPolicyUrlEn =
-      '$legalBaseUrl/privacy-policy-en.html';
-  static const String termsUrlRu = '$legalBaseUrl/terms-ru.html';
-  static const String termsUrlEn = '$legalBaseUrl/terms-en.html';
 }

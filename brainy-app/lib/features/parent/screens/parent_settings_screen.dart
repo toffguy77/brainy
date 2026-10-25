@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_constants.dart';
 import '../../../l10n/app_localizations.dart';
@@ -245,6 +246,21 @@ class ParentSettingsScreen extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 12),
+          _SettingsCard(
+            children: [
+              _SettingsButton(
+                icon: Icons.privacy_tip_rounded,
+                label: l10n.settingsPrivacyPolicy,
+                onTap: () => _openLink(l10n.privacyPolicyUrl),
+              ),
+              _SettingsButton(
+                icon: Icons.description_rounded,
+                label: l10n.settingsTerms,
+                onTap: () => _openLink(l10n.termsUrl),
+              ),
+            ],
+          ),
           const SizedBox(height: 24),
           FutureBuilder<PackageInfo>(
             future: PackageInfo.fromPlatform(),
@@ -418,3 +434,8 @@ class _SettingsButton extends StatelessWidget {
     );
   }
 }
+
+/// Open a legal page in the system browser. The URL is per-language and
+/// comes from ARB.
+Future<void> _openLink(String url) =>
+    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);

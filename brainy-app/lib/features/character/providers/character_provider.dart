@@ -20,8 +20,9 @@ class CharacterNotifier extends Notifier<List<CharacterData>> {
     for (final info in defaultCharacters) {
       final data = CharacterData(
         id: info.id,
-        nameRu: info.nameRu,
-        nameEn: info.nameEn,
+        // Legacy Hive fields, never read: names come from ARB via the id.
+        nameRu: info.id,
+        nameEn: info.id,
         isUnlocked: info.unlockType == UnlockType.free,
       );
       _box.put(info.id, data);

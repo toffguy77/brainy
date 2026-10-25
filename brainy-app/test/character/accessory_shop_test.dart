@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brainy/l10n/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:brainy/constants/app_constants.dart';
@@ -36,9 +38,20 @@ void main() {
   }
 
   group('accessory catalogue', () {
-    test('no accessory requires anything but coins', () {
+    test('every accessory has a positive coin price and something to draw',
+        () {
       for (final a in defaultAccessories) {
-        expect(a.price, greaterThanOrEqualTo(0), reason: a.id);
+        expect(a.price, greaterThan(0), reason: a.id);
+        expect(a.glyph != null || a.tint != null, isTrue, reason: a.id);
+      }
+    });
+
+    test('every accessory is named in both locales', () async {
+      for (final code in ['ru', 'en']) {
+        final l10n = await AppLocalizations.delegate.load(Locale(code));
+        for (final a in defaultAccessories) {
+          expect(a.name(l10n), isNot(a.id), reason: '${a.id} $code');
+        }
       }
     });
 

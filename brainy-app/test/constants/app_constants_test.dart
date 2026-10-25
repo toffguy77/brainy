@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brainy/l10n/app_localizations.dart';
 import 'package:brainy/constants/app_constants.dart';
 
 void main() {
@@ -104,11 +106,16 @@ void main() {
     });
 
     group('legal URLs', () {
-      test('all legal URLs use the same base', () {
-        expect(AppConstants.privacyPolicyUrlRu, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.privacyPolicyUrlEn, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.termsUrlRu, startsWith(AppConstants.legalBaseUrl));
-        expect(AppConstants.termsUrlEn, startsWith(AppConstants.legalBaseUrl));
+      test('each locale links to its own https legal pages', () async {
+        final ru = await AppLocalizations.delegate.load(const Locale('ru'));
+        final en = await AppLocalizations.delegate.load(const Locale('en'));
+        for (final url in [ru.privacyPolicyUrl, ru.termsUrl, en.privacyPolicyUrl, en.termsUrl]) {
+          expect(Uri.parse(url).scheme, 'https');
+        }
+        expect(ru.privacyPolicyUrl, endsWith('-ru.html'));
+        expect(en.privacyPolicyUrl, endsWith('-en.html'));
+        expect(ru.termsUrl, endsWith('-ru.html'));
+        expect(en.termsUrl, endsWith('-en.html'));
       });
     });
   });

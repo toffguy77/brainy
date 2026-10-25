@@ -207,8 +207,8 @@ Future<void> _seedMockData() async {
   for (final info in defaultCharacters) {
     final data = CharacterData(
       id: info.id,
-      nameRu: info.nameRu,
-      nameEn: info.nameEn,
+      nameRu: info.id,
+      nameEn: info.id,
       isUnlocked: info.id == 'brainy' || info.id == 'zap',
     );
     await characterBox.put(info.id, data);

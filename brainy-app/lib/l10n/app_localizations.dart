@@ -698,6 +698,30 @@ abstract class AppLocalizations {
   /// **'Сменить PIN'**
   String get parentChangePin;
 
+  /// No description provided for @settingsPrivacyPolicy.
+  ///
+  /// In ru, this message translates to:
+  /// **'Политика конфиденциальности'**
+  String get settingsPrivacyPolicy;
+
+  /// No description provided for @settingsTerms.
+  ///
+  /// In ru, this message translates to:
+  /// **'Условия использования'**
+  String get settingsTerms;
+
+  /// No description provided for @privacyPolicyUrl.
+  ///
+  /// In ru, this message translates to:
+  /// **'https://toffguy77.github.io/brainy-legal/privacy-policy-ru.html'**
+  String get privacyPolicyUrl;
+
+  /// No description provided for @termsUrl.
+  ///
+  /// In ru, this message translates to:
+  /// **'https://toffguy77.github.io/brainy-legal/terms-ru.html'**
+  String get termsUrl;
+
   /// No description provided for @parentShareCardTitle.
   ///
   /// In ru, this message translates to:
@@ -1273,6 +1297,186 @@ abstract class AppLocalizations {
   /// In ru, this message translates to:
   /// **'Чередуй: белые по возрастанию, красные по убыванию'**
   String get gameModeGorbovHint;
+
+  /// No description provided for @characterBrainyName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Брейни'**
+  String get characterBrainyName;
+
+  /// No description provided for @characterBrainyDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мозг с характером. Стартовый герой!'**
+  String get characterBrainyDescription;
+
+  /// No description provided for @characterBrainyUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Доступен бесплатно'**
+  String get characterBrainyUnlock;
+
+  /// No description provided for @characterZapName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Зэп'**
+  String get characterZapName;
+
+  /// No description provided for @characterZapDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Электрический роботёнок. Быстрый как молния!'**
+  String get characterZapDescription;
+
+  /// No description provided for @characterZapUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Достигни уровня 10'**
+  String get characterZapUnlock;
+
+  /// No description provided for @characterVortexName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Вортекс'**
+  String get characterVortexName;
+
+  /// No description provided for @characterVortexDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Загадочный и странный. Любит вихри.'**
+  String get characterVortexDescription;
+
+  /// No description provided for @characterVortexUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик 30 дней'**
+  String get characterVortexUnlock;
+
+  /// No description provided for @characterPixelName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пиксель'**
+  String get characterPixelName;
+
+  /// No description provided for @characterPixelDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'8-битный герой из прошлого.'**
+  String get characterPixelDescription;
+
+  /// No description provided for @characterPixelUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик 14 дней'**
+  String get characterPixelUnlock;
+
+  /// No description provided for @characterGlitchName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Глитч'**
+  String get characterGlitchName;
+
+  /// No description provided for @characterGlitchDescription.
+  ///
+  /// In ru, this message translates to:
+  /// **'Сломан, но не сломлен.'**
+  String get characterGlitchDescription;
+
+  /// No description provided for @characterGlitchUnlock.
+  ///
+  /// In ru, this message translates to:
+  /// **'Стрик 60 дней'**
+  String get characterGlitchUnlock;
+
+  /// No description provided for @accessoryHatScientistName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Колпак учёного'**
+  String get accessoryHatScientistName;
+
+  /// No description provided for @accessoryHatCrownName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Корона'**
+  String get accessoryHatCrownName;
+
+  /// No description provided for @accessoryHatCapName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Кепка'**
+  String get accessoryHatCapName;
+
+  /// No description provided for @accessoryHatHelmetName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Шлем'**
+  String get accessoryHatHelmetName;
+
+  /// No description provided for @accessoryHatTophatName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Цилиндр'**
+  String get accessoryHatTophatName;
+
+  /// No description provided for @accessoryGlassesSmartName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Умные очки'**
+  String get accessoryGlassesSmartName;
+
+  /// No description provided for @accessoryGlassesSunName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Солнцезащитные'**
+  String get accessoryGlassesSunName;
+
+  /// No description provided for @accessoryGlassesPixelName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Пиксельные'**
+  String get accessoryGlassesPixelName;
+
+  /// No description provided for @accessoryGlassesVrName.
+  ///
+  /// In ru, this message translates to:
+  /// **'VR-шлем'**
+  String get accessoryGlassesVrName;
+
+  /// No description provided for @accessoryEffectStarsName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Звёзды'**
+  String get accessoryEffectStarsName;
+
+  /// No description provided for @accessoryEffectFireName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Огонь'**
+  String get accessoryEffectFireName;
+
+  /// No description provided for @accessoryEffectElectricName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Электричество'**
+  String get accessoryEffectElectricName;
+
+  /// No description provided for @accessoryCapeMantleName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Мантия'**
+  String get accessoryCapeMantleName;
+
+  /// No description provided for @accessoryCapeNinjaName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Плащ ниндзя'**
+  String get accessoryCapeNinjaName;
+
+  /// No description provided for @accessoryCapeWingsName.
+  ///
+  /// In ru, this message translates to:
+  /// **'Крылья'**
+  String get accessoryCapeWingsName;
 
   /// No description provided for @notificationMotivation1.
   ///

@@ -181,7 +181,7 @@ class _CharacterPreview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).languageCode;
+    final l10n = AppLocalizations.of(context)!;
     final hat = _findAccessory(equippedHat);
     final glasses = _findAccessory(equippedGlasses);
     final effect = _findAccessory(equippedEffect);
@@ -223,7 +223,7 @@ class _CharacterPreview extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  a.name(locale),
+                  a.name(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 11,
@@ -275,7 +275,6 @@ class _AccessoryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
     final activeId = progress.activeCharacterId;
@@ -320,7 +319,7 @@ class _AccessoryCard extends ConsumerWidget {
                 _buildIcon(isOwned),
                 const SizedBox(height: 10),
                 Text(
-                  accessory.name(locale),
+                  accessory.name(l10n),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,

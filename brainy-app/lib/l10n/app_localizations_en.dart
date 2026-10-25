@@ -331,6 +331,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get parentChangePin => 'Change PIN';
 
   @override
+  String get settingsPrivacyPolicy => 'Privacy Policy';
+
+  @override
+  String get settingsTerms => 'Terms of Use';
+
+  @override
+  String get privacyPolicyUrl =>
+      'https://toffguy77.github.io/brainy-legal/privacy-policy-en.html';
+
+  @override
+  String get termsUrl =>
+      'https://toffguy77.github.io/brainy-legal/terms-en.html';
+
+  @override
   String parentShareCardTitle(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,
@@ -657,6 +671,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get gameModeGorbovHint => 'Alternate: white ascending, red descending';
+
+  @override
+  String get characterBrainyName => 'Brainy';
+
+  @override
+  String get characterBrainyDescription =>
+      'A brain with personality. Starter hero!';
+
+  @override
+  String get characterBrainyUnlock => 'Available for free';
+
+  @override
+  String get characterZapName => 'Zap';
+
+  @override
+  String get characterZapDescription =>
+      'Electric little robot. Fast as lightning!';
+
+  @override
+  String get characterZapUnlock => 'Reach level 10';
+
+  @override
+  String get characterVortexName => 'Vortex';
+
+  @override
+  String get characterVortexDescription =>
+      'Mysterious and strange. Loves whirlwinds.';
+
+  @override
+  String get characterVortexUnlock => '30-day streak';
+
+  @override
+  String get characterPixelName => 'Pixel';
+
+  @override
+  String get characterPixelDescription => '8-bit hero from the past.';
+
+  @override
+  String get characterPixelUnlock => '14-day streak';
+
+  @override
+  String get characterGlitchName => 'Glitch';
+
+  @override
+  String get characterGlitchDescription => 'Broken, but not defeated.';
+
+  @override
+  String get characterGlitchUnlock => '60-day streak';
+
+  @override
+  String get accessoryHatScientistName => 'Scientist Cap';
+
+  @override
+  String get accessoryHatCrownName => 'Crown';
+
+  @override
+  String get accessoryHatCapName => 'Baseball Cap';
+
+  @override
+  String get accessoryHatHelmetName => 'Helmet';
+
+  @override
+  String get accessoryHatTophatName => 'Top Hat';
+
+  @override
+  String get accessoryGlassesSmartName => 'Smart Glasses';
+
+  @override
+  String get accessoryGlassesSunName => 'Sunglasses';
+
+  @override
+  String get accessoryGlassesPixelName => 'Pixel Glasses';
+
+  @override
+  String get accessoryGlassesVrName => 'VR Headset';
+
+  @override
+  String get accessoryEffectStarsName => 'Stars';
+
+  @override
+  String get accessoryEffectFireName => 'Fire';
+
+  @override
+  String get accessoryEffectElectricName => 'Electricity';
+
+  @override
+  String get accessoryCapeMantleName => 'Mantle';
+
+  @override
+  String get accessoryCapeNinjaName => 'Ninja Cloak';
+
+  @override
+  String get accessoryCapeWingsName => 'Wings';
 
   @override
   String get notificationMotivation1 => 'Time to train your brain!';

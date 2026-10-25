@@ -83,7 +83,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
     final activeInfo = defaultCharacters[_currentPage];
@@ -112,7 +111,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                 _buildCharacterPreview(activeInfo, activeData),
                 const SizedBox(height: 12),
                 Text(
-                  activeInfo.name(locale),
+                  activeInfo.name(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 24,
@@ -122,7 +121,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  activeInfo.description(locale),
+                  activeInfo.description(l10n),
                   style: const TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 14,
@@ -145,9 +144,8 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                         info: info,
                         isUnlocked: data.isUnlocked,
                         isActive: isActive,
-                        locale: locale,
                         onTap: () =>
-                            _onCharacterTap(info, data, progress, l10n, locale),
+                            _onCharacterTap(info, data, progress, l10n),
                       );
                     },
                   ),
@@ -192,7 +190,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   const SizedBox(height: 12),
                 ],
                 _buildActionButton(
-                    activeInfo, activeData, progress, l10n, locale),
+                    activeInfo, activeData, progress, l10n),
                 const SizedBox(height: 24),
               ],
             ),
@@ -277,11 +275,10 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
     CharacterData data,
     UserProgress progress,
     AppLocalizations l10n,
-    String locale,
   ) {
     if (!data.isUnlocked) {
       return _ActionButton(
-        label: info.unlockCondition(locale),
+        label: info.unlockCondition(l10n),
         color: AppColors.surface,
         onTap: null,
       );
@@ -308,10 +305,9 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
     CharacterData data,
     UserProgress progress,
     AppLocalizations l10n,
-    String locale,
   ) {
     if (!data.isUnlocked) {
-      _showLockedBottomSheet(info, l10n, locale);
+      _showLockedBottomSheet(info, l10n);
       return;
     }
     if (progress.activeCharacterId != info.id) {
@@ -322,7 +318,6 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
   void _showLockedBottomSheet(
     CharacterInfo info,
     AppLocalizations l10n,
-    String locale,
   ) {
     showModalBottomSheet(
       context: context,
@@ -356,7 +351,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
               ),
               const SizedBox(height: 16),
               Text(
-                info.name(locale),
+                info.name(l10n),
                 style: const TextStyle(
                   fontFamily: 'Nunito',
                   fontSize: 22,
@@ -366,7 +361,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
               ),
               const SizedBox(height: 8),
               Text(
-                info.description(locale),
+                info.description(l10n),
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   fontFamily: 'Nunito',
@@ -383,7 +378,7 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  info.unlockCondition(locale),
+                  info.unlockCondition(l10n),
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 16,
@@ -405,19 +400,18 @@ class _CharacterCard extends StatelessWidget {
   final CharacterInfo info;
   final bool isUnlocked;
   final bool isActive;
-  final String locale;
   final VoidCallback onTap;
 
   const _CharacterCard({
     required this.info,
     required this.isUnlocked,
     required this.isActive,
-    required this.locale,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -457,7 +451,7 @@ class _CharacterCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              info.name(locale),
+              info.name(l10n),
               style: TextStyle(
                 fontFamily: 'Nunito',
                 fontSize: 16,
@@ -479,7 +473,7 @@ class _CharacterCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    info.unlockCondition(locale),
+                    info.unlockCondition(l10n),
                     style: const TextStyle(
                       fontFamily: 'Nunito',
                       fontSize: 11,

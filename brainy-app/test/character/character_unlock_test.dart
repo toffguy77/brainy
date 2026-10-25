@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:brainy/l10n/app_localizations.dart';
 import 'package:brainy/features/character/data/characters_data.dart';
 
 CharacterInfo _byId(String id) =>
@@ -57,10 +59,20 @@ void main() {
       }
     });
 
-    test('unlock conditions are described in both locales', () {
-      for (final info in defaultCharacters) {
-        expect(info.unlockConditionRu, isNotEmpty, reason: info.id);
-        expect(info.unlockConditionEn, isNotEmpty, reason: info.id);
+    test('every character has a name, description and unlock text in both locales',
+        () async {
+      for (final code in ['ru', 'en']) {
+        final l10n = await AppLocalizations.delegate.load(Locale(code));
+        for (final info in defaultCharacters) {
+          for (final text in [
+            info.name(l10n),
+            info.description(l10n),
+            info.unlockCondition(l10n),
+          ]) {
+            expect(text, isNotEmpty, reason: '${info.id} $code');
+            expect(text, isNot(info.id), reason: '${info.id} $code falls back');
+          }
+        }
       }
     });
   });

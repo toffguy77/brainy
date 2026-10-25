@@ -361,7 +361,7 @@ class _NextGoalsSection extends StatelessWidget {
         String description = l10n.progressGoalReachLevel(entry.key);
         if (charAtLevel.isNotEmpty) {
           description +=
-              ' → ${l10n.progressGoalUnlock(charAtLevel.first.name(locale))}';
+              ' → ${l10n.progressGoalUnlock(charAtLevel.first.name(l10n))}';
         }
 
         goals.add(_GoalTile(
@@ -387,7 +387,7 @@ class _NextGoalsSection extends StatelessWidget {
           icon: Icons.local_fire_department_rounded,
           iconColor: Colors.orange,
           title:
-              '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(locale))}',
+              '${l10n.progressGoalStreak(char.requiredStreak!)} → ${l10n.progressGoalUnlock(char.name(l10n))}',
           progress: streakProgress,
           progressLabel:
               '${progress.longestStreak} / ${char.requiredStreak} ${l10n.parentDays}',
