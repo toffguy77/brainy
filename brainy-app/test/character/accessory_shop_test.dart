@@ -161,6 +161,19 @@ void main() {
       expect(characters.getEquipped('brainy', AccessorySlot.cape), cape.id);
     });
 
+    test('each character keeps its own equipment', () async {
+      final characters = container.read(characterProvider.notifier);
+      final crown = defaultAccessories.firstWhere((a) => a.id == 'hat_crown');
+      final cap = defaultAccessories.firstWhere((a) => a.id == 'hat_cap');
+
+      await characters.equipAccessory('brainy', crown.id, AccessorySlot.hat);
+      await characters.equipAccessory('zap', cap.id, AccessorySlot.hat);
+
+      expect(characters.getEquipped('brainy', AccessorySlot.hat), crown.id);
+      expect(characters.getEquipped('zap', AccessorySlot.hat), cap.id);
+      expect(characters.getEquipped('pixel', AccessorySlot.hat), isNull);
+    });
+
     test('unequipping clears only its own slot', () async {
       final characters = container.read(characterProvider.notifier);
       final hat = defaultAccessories.firstWhere((a) => a.slot == AccessorySlot.hat);

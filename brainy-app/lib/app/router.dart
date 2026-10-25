@@ -77,7 +77,9 @@ final router = GoRouter(
         ),
         GoRoute(
           path: '/accessories',
-          builder: (context, state) => const AccessoriesScreen(),
+          builder: (context, state) => AccessoriesScreen(
+            characterId: state.uri.queryParameters['character'],
+          ),
         ),
         GoRoute(
           path: '/progress',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../constants/app_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../constants/app_colors.dart';
 import '../../../l10n/app_localizations.dart';
@@ -13,9 +14,9 @@ class AgePage extends ConsumerWidget {
     final selectedAge = ref.watch(onboardingProvider).childAge;
 
     final options = [
-      ('6-9', l10n.onboardingAge69, '🧒'),
-      ('10-12', l10n.onboardingAge1012, '👦'),
-      ('13-14', l10n.onboardingAge1314, '👨‍🎓'),
+      (AppConstants.ageOptions[0], l10n.onboardingAge69, '🧒'),
+      (AppConstants.ageOptions[1], l10n.onboardingAge1012, '👦'),
+      (AppConstants.ageOptions[2], l10n.onboardingAge1314, '👨‍🎓'),
     ];
 
     return Padding(

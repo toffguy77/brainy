@@ -177,6 +177,7 @@
   "settingsTerms": "Условия использования",
   "privacyPolicyUrl": "https://toffguy77.github.io/brainy-legal/privacy-policy-ru.html",
   "termsUrl": "https://toffguy77.github.io/brainy-legal/terms-ru.html",
+  "settingsLinkFailed": "Не удалось открыть ссылку",
   "parentShareCardTitle": "{days, plural, =0{Начинаем тренировки!} one{{days} день тренировок подряд!} few{{days} дня тренировок подряд!} other{{days} дней тренировок подряд!}}",
   "@parentShareCardTitle": {
     "placeholders": {

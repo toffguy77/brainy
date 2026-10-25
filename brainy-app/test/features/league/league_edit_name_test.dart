@@ -122,7 +122,12 @@ void main() {
 
       await _openEditNameDialog(tester);
       await _enterName(tester, 'NewPlayer');
-      await tester.tap(find.text('Save'));
+      // The save awaits a Hive write, which never completes inside the
+      // fake-async zone: run the tap in the real zone.
+      await tester.runAsync(() async {
+        await tester.tap(find.text('Save'));
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      });
       await _pumpDialogDismissal(tester);
 
       final box = Hive.box(AppConstants.userBox);

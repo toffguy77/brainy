@@ -101,7 +101,8 @@ class ParentSettingsScreen extends ConsumerWidget {
                     .setDailyGoalMinutes(AppConstants.frequencyOptions[index]),
               ),
             ],
-          ),          const SizedBox(height: 12),
+          ),
+          const SizedBox(height: 12),
           _SettingsCard(
             children: [
               Row(
@@ -271,12 +272,12 @@ class ParentSettingsScreen extends ConsumerWidget {
               _SettingsButton(
                 icon: Icons.privacy_tip_rounded,
                 label: l10n.settingsPrivacyPolicy,
-                onTap: () => _openLink(l10n.privacyPolicyUrl),
+                onTap: () => _openLink(context, l10n.privacyPolicyUrl),
               ),
               _SettingsButton(
                 icon: Icons.description_rounded,
                 label: l10n.settingsTerms,
-                onTap: () => _openLink(l10n.termsUrl),
+                onTap: () => _openLink(context, l10n.termsUrl),
               ),
             ],
           ),
@@ -456,5 +457,15 @@ class _SettingsButton extends StatelessWidget {
 
 /// Open a legal page in the system browser. The URL is per-language and
 /// comes from ARB.
-Future<void> _openLink(String url) =>
-    launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+Future<void> _openLink(BuildContext context, String url) async {
+  final messenger = ScaffoldMessenger.of(context);
+  final failed = AppLocalizations.of(context)!.settingsLinkFailed;
+  var opened = false;
+  try {
+    opened = await launchUrl(Uri.parse(url),
+        mode: LaunchMode.externalApplication);
+  } catch (_) {
+    opened = false;
+  }
+  if (!opened) messenger.showSnackBar(SnackBar(content: Text(failed)));
+}

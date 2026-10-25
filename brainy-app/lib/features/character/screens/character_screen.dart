@@ -166,7 +166,10 @@ class _CharacterScreenState extends ConsumerState<CharacterScreen>
                         child: InkWell(
                           key: const Key('accessoriesButton'),
                           borderRadius: BorderRadius.circular(16),
-                          onTap: () => context.push('/accessories'),
+                          // Dress the character on screen, which may not be
+                          // the active one.
+                          onTap: () => context.push(
+                              '/accessories?character=${activeInfo.id}'),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

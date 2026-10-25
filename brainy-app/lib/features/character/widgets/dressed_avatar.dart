@@ -83,19 +83,19 @@ class DressedAvatarView extends StatelessWidget {
         children: [
           if (cape != null) ..._capeLayers(cape),
           characterAvatar(characterId, size: size),
-          if (glasses != null)
+          if (glasses?.glyph != null)
             Positioned(
               key: const ValueKey('worn-glasses'),
               top: size * 0.30,
-              child: _Glyph(glasses.glyph!, size * 0.30),
+              child: _Glyph(glasses!.glyph!, size * 0.30),
             ),
-          if (hat != null)
+          if (hat?.glyph != null)
             Positioned(
               key: const ValueKey('worn-hat'),
               top: -size * 0.28,
-              child: _Glyph(hat.glyph!, size * 0.42),
+              child: _Glyph(hat!.glyph!, size * 0.42),
             ),
-          if (effect != null) ..._effectLayers(effect),
+          if (effect?.glyph != null) ..._effectLayers(effect!),
         ],
       ),
     );

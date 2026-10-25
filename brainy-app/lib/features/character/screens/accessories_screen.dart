@@ -12,7 +12,10 @@ import '../../../shared/services/haptic_service.dart';
 import '../widgets/dressed_avatar.dart';
 
 class AccessoriesScreen extends ConsumerStatefulWidget {
-  const AccessoriesScreen({super.key});
+  /// The character to dress; defaults to the active one.
+  final String? characterId;
+
+  const AccessoriesScreen({super.key, this.characterId});
 
   @override
   ConsumerState<AccessoriesScreen> createState() => _AccessoriesScreenState();
@@ -49,7 +52,7 @@ class _AccessoriesScreenState extends ConsumerState<AccessoriesScreen>
     final l10n = AppLocalizations.of(context)!;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = widget.characterId ?? progress.activeCharacterId;
     final activeCharacter = characters.firstWhere(
       (c) => c.id == activeId,
       orElse: () => characters.first,
@@ -118,6 +121,7 @@ class _AccessoriesScreenState extends ConsumerState<AccessoriesScreen>
                 return _AccessoryGrid(
                   accessories: _accessoriesForSlot(slot),
                   slot: slot,
+                  characterId: activeCharacter.id,
                 );
               }).toList(),
             ),
@@ -244,10 +248,12 @@ class _CharacterPreview extends StatelessWidget {
 class _AccessoryGrid extends ConsumerWidget {
   final List<AccessoryInfo> accessories;
   final AccessorySlot slot;
+  final String characterId;
 
   const _AccessoryGrid({
     required this.accessories,
     required this.slot,
+    required this.characterId,
   });
 
   @override
@@ -262,7 +268,10 @@ class _AccessoryGrid extends ConsumerWidget {
       ),
       itemCount: accessories.length,
       itemBuilder: (context, index) {
-        return _AccessoryCard(accessory: accessories[index]);
+        return _AccessoryCard(
+          accessory: accessories[index],
+          characterId: characterId,
+        );
       },
     );
   }
@@ -270,15 +279,16 @@ class _AccessoryGrid extends ConsumerWidget {
 
 class _AccessoryCard extends ConsumerWidget {
   final AccessoryInfo accessory;
+  final String characterId;
 
-  const _AccessoryCard({required this.accessory});
+  const _AccessoryCard({required this.accessory, required this.characterId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final progress = ref.watch(userProgressProvider);
     final characters = ref.watch(characterProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = characterId;
     final activeCharacter = characters.firstWhere(
       (c) => c.id == activeId,
       orElse: () => characters.first,
@@ -444,8 +454,7 @@ class _AccessoryCard extends ConsumerWidget {
     bool isEquipped,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final progress = ref.read(userProgressProvider);
-    final activeId = progress.activeCharacterId;
+    final activeId = characterId;
 
     if (isEquipped) {
       // Unequip

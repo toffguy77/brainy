@@ -350,6 +350,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'https://toffguy77.github.io/brainy-legal/terms-en.html';
 
   @override
+  String get settingsLinkFailed => 'Couldn\'t open the link';
+
+  @override
   String parentShareCardTitle(int days) {
     String _temp0 = intl.Intl.pluralLogic(
       days,

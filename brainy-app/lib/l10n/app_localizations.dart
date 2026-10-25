@@ -728,6 +728,12 @@ abstract class AppLocalizations {
   /// **'https://toffguy77.github.io/brainy-legal/terms-ru.html'**
   String get termsUrl;
 
+  /// No description provided for @settingsLinkFailed.
+  ///
+  /// In ru, this message translates to:
+  /// **'Не удалось открыть ссылку'**
+  String get settingsLinkFailed;
+
   /// No description provided for @parentShareCardTitle.
   ///
   /// In ru, this message translates to:

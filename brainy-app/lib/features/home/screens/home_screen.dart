@@ -478,7 +478,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
   }
 }
 
-/// Today's play time against the daily goal chosen in onboarding.
+/// Today's play time against the daily goal (set in onboarding, editable by
+/// the parent).
 class _DailyGoalBar extends StatelessWidget {
   final int playedSeconds;
   final int goalMinutes;
