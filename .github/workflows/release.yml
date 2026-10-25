@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - 'v*'
+  # Re-submit the current main (e.g. after new screenshots) without moving a tag.
+  workflow_dispatch:
 
 permissions:
   contents: read
