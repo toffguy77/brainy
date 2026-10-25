@@ -27,9 +27,11 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 Структура:
 - AppBar: «Мои персонажи»
-- Большой превью активного персонажа (центр, анимированный)
-- PageView с карточками: разблокированные цветные с кнопкой [Выбрать], заблокированные затемнённые с условием
-- Кнопка [Настроить аксессуары] -> `/accessories` (активна для разблокированного персонажа)
+- Большое превью персонажа текущей карточки PageView (центр, покачивание), имя и описание
+- PageView с карточками: разблокированные цветные, заблокированные затемнённые. Тап по
+  разблокированной карточке выбирает персонажа активным
+- Кнопка [Настроить аксессуары] -> `/accessories` (видна, если персонаж текущей карточки разблокирован)
+- Кнопка действия под карточками: [Выбрать] / «Выбран» / условие разблокировки (неактивна)
 
 При тапе на заблокированного — BottomSheet с условием разблокировки.
 
@@ -52,7 +54,9 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 
 ## Экран аксессуаров
 
-Путь: через кнопку на экране персонажа.
+Путь: через кнопку на экране персонажа — `/accessories?character=<id>` того персонажа, чья карточка
+сейчас на экране (он может не быть активным). Без параметра — активный персонаж
+(`UserProgress.activeCharacterId`).
 
 - Превью персонажа с надетыми аксессуарами (`DressedAvatar`) и чипы с названиями надетого
 - Табы по категориям: Шляпы | Очки | Эффекты | Плащи
@@ -84,3 +88,5 @@ tags: [character, accessories, coins, cosmetics, shop, pixel, brainy, zap, vorte
 - `brainy-app/lib/features/character/data/accessories_data.dart` — каталог аксессуаров
 - `brainy-app/lib/features/character/widgets/dressed_avatar.dart` — DressedAvatar, CapePainter
 - `brainy-app/lib/features/character/screens/character_screen.dart`
+- `brainy-app/lib/features/character/screens/accessories_screen.dart`
+- `brainy-app/lib/features/character/providers/character_provider.dart` — CharacterNotifier (выбор, надевание, `unlockEligible`)

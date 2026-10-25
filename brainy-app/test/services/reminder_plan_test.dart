@@ -2,55 +2,81 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:brainy/constants/app_constants.dart';
 import 'package:brainy/shared/services/notification_service.dart';
 
-ReminderPlan? _plan({
+final _noon = DateTime(2026, 10, 25, 12);
+
+List<ReminderSlot> _plan({
   bool enabled = true,
   bool hasCustomTime = false,
   int hour = 7,
   int minute = 30,
   int streak = 0,
   bool playedToday = false,
+  DateTime? now,
 }) =>
-    NotificationService.planReminder(
+    NotificationService.planReminders(
       enabled: enabled,
       hasCustomTime: hasCustomTime,
       hour: hour,
       minute: minute,
       currentStreak: streak,
       hasPlayedToday: playedToday,
-      now: DateTime(2026, 10, 25, 12),
+      now: now ?? _noon,
     );
 
 void main() {
+  const days = AppConstants.reminderDaysAhead;
+
   test('disabled reminders schedule nothing', () {
-    expect(_plan(enabled: false), isNull);
-    expect(_plan(enabled: false, playedToday: false, streak: 10), isNull);
+    expect(_plan(enabled: false), isEmpty);
+    expect(_plan(enabled: false, streak: 10), isEmpty);
   });
 
-  test('having played today schedules nothing, even on a long streak', () {
-    expect(_plan(playedToday: true), isNull);
-    expect(_plan(playedToday: true, streak: 10), isNull);
+  test('not having played: today plus the following days, at the default time',
+      () {
+    final slots = _plan();
+    expect(slots, hasLength(days));
+    expect(slots.first.at,
+        DateTime(2026, 10, 25, AppConstants.defaultReminderHour,
+            AppConstants.defaultReminderMinute));
+    expect(slots.last.at.day, 25 + days - 1);
   });
 
-  test('not having played schedules at the default time', () {
-    final p = _plan()!;
-    expect(p.hour, AppConstants.defaultReminderHour);
-    expect(p.minute, AppConstants.defaultReminderMinute);
+  test('having played today skips today but keeps reminding from tomorrow', () {
+    final slots = _plan(playedToday: true);
+    expect(slots, hasLength(days - 1));
+    expect(slots.first.at, DateTime(2026, 10, 26, AppConstants.defaultReminderHour));
+  });
+
+  test("today's time already passed: start tomorrow", () {
+    final late = DateTime(2026, 10, 25, 21);
+    expect(_plan(now: late).first.at.day, 26);
   });
 
   test('a custom time wins only when the custom flag is set', () {
-    final custom = _plan(hasCustomTime: true, hour: 7, minute: 30)!;
-    expect((custom.hour, custom.minute), (7, 30));
-    final ignored = _plan(hasCustomTime: false, hour: 7, minute: 30)!;
+    final custom = _plan(hasCustomTime: true, hour: 13, minute: 30).first.at;
+    expect((custom.hour, custom.minute), (13, 30));
+    final ignored = _plan(hasCustomTime: false, hour: 13, minute: 30).first.at;
     expect((ignored.hour, ignored.minute),
         (AppConstants.defaultReminderHour, AppConstants.defaultReminderMinute));
   });
 
-  test('the streak-warning pool starts above the threshold', () {
+  test('only the first reminder warns about a streak above the threshold', () {
     const t = AppConstants.streakWarningThreshold;
-    expect(_plan(streak: 0)!.isStreakWarning, isFalse);
-    expect(_plan(streak: t)!.isStreakWarning, isFalse);
-    expect(_plan(streak: t + 1)!.isStreakWarning, isTrue);
-    expect(_plan(streak: 100)!.isStreakWarning, isTrue);
+    expect(_plan(streak: t).any((s) => s.isStreakWarning), isFalse);
+    final slots = _plan(streak: t + 1);
+    expect(slots.first.isStreakWarning, isTrue);
+    expect(slots.skip(1).any((s) => s.isStreakWarning), isFalse);
+  });
+
+  test('each day gets its own text variant', () {
+    final slots = _plan();
+    final indices = slots.map((s) => s.variantIndex).toSet();
+    expect(indices.length, slots.length);
+  });
+
+  test('reminders cross a month boundary', () {
+    final slots = _plan(now: DateTime(2026, 10, 30, 12));
+    expect(slots.last.at, DateTime(2026, 11, 5, AppConstants.defaultReminderHour));
   });
 
   test('variant index is pinned to the calendar date', () {

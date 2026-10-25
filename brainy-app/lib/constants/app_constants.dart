@@ -154,6 +154,11 @@ class AppConstants {
   /// motivating a fresh start.
   static const int streakWarningThreshold = 2;
 
+  /// Reminders are scheduled as one-off notifications this many days ahead,
+  /// so they keep coming when the app is not opened, and today can be skipped
+  /// once the child has played.
+  static const int reminderDaysAhead = 7;
+
   // Grid sizes for home screen picker
   static const List<int> pickerGridSizes = [3, 4, 5, 6, 7, 9];
 

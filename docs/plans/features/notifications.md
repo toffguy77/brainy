@@ -18,14 +18,22 @@ tags: [notifications, reminders, schedule, permissions]
 3. После онбординга, если разрешение получено (`onboarding_provider.dart`)
 4. При изменении настроек уведомлений (`parent_provider.dart`)
 
-Решение принимает чистая функция `NotificationService.planReminder(...)` (покрыта тестами):
-1. `notificationsEnabled` выключены -> `null` (ничего не планируется, прежнее отменено)
-2. Уже играл сегодня (`hasPlayedOn(sessions, now)`) -> `null`
-3. Иначе -> `ReminderPlan` (час, минута, пул, индекс варианта)
+Решение принимает чистая функция `NotificationService.planReminders(...)` (покрыта тестами) и
+возвращает разовые напоминания (`ReminderSlot`) на `AppConstants.reminderDaysAhead` (7) дней вперёд
+в одно и то же время:
+1. `notificationsEnabled` выключены -> пустой список
+2. Сегодняшний слот пропускается, если ребёнок уже играл (`hasPlayedOn(sessions, now)`) или время
+   уже прошло — напоминания продолжаются с завтрашнего дня
+3. «Стрик горит» — только у первого слота и только при `currentStreak >
+   AppConstants.streakWarningThreshold` (2); если его пропустить, стрик всё равно сгорит, поэтому
+   дальше идёт пул «мотивация»
+4. Вариант текста — по дате слота (`variantIndexFor`), у каждого дня свой
 
-Параметры:
-- Время: кастомное, если `hasCustomReminderTime`, иначе `AppConstants.defaultReminderHour/Minute` (20:00)
-- Пул: `currentStreak > AppConstants.streakWarningThreshold` (2) -> «стрик горит», иначе «мотивация»
+Время: кастомное, если `hasCustomReminderTime`, иначе `AppConstants.defaultReminderHour/Minute` (20:00).
+
+Перед планированием отменяются все id `100..106` (id = 100 + смещение дня). Разовые уведомления,
+а не одно повторяющееся: так напоминания приходят, даже если приложение не открывали несколько
+дней, сегодняшнее можно пропустить после игры, а число дней стрика не «застывает» в тексте.
 
 ## Часовой пояс и язык
 
@@ -37,7 +45,7 @@ tags: [notifications, reminders, schedule, permissions]
 
 ## Текст уведомлений
 
-Один notification ID: `_notificationId = 100`.
+ID: `100 + день` (0..6), см. «Логика пересчёта».
 
 ### Мотивация (стрик <= 2, 7 вариантов)
 

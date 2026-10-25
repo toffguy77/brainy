@@ -10,16 +10,15 @@ import '../../l10n/app_localizations.dart';
 import '../../models/session.dart';
 import '../../models/user_progress.dart';
 
-/// What to schedule: the daily reminder time and which message pool to use.
-class ReminderPlan {
-  final int hour;
-  final int minute;
+/// One scheduled reminder: when it fires (device wall-clock time) and which
+/// message pool and variant it uses.
+class ReminderSlot {
+  final DateTime at;
   final bool isStreakWarning;
   final int variantIndex;
 
-  const ReminderPlan({
-    required this.hour,
-    required this.minute,
+  const ReminderSlot({
+    required this.at,
     required this.isStreakWarning,
     required this.variantIndex,
   });
@@ -31,7 +30,8 @@ class NotificationService {
   static final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
 
-  static const _notificationId = 100;
+  /// Reminder ids are [_firstNotificationId] + day offset.
+  static const _firstNotificationId = 100;
 
   static Future<void> initialize() async {
     tz.initializeTimeZones();
@@ -58,9 +58,12 @@ class NotificationService {
     return status.isGranted;
   }
 
-  /// Pure scheduling decision. Returns null when nothing should be scheduled:
-  /// reminders are off, or the player already trained today.
-  static ReminderPlan? planReminder({
+  /// Pure scheduling decision: one-off reminders for the next
+  /// [AppConstants.reminderDaysAhead] days at the reminder time. Today is
+  /// skipped when the child already played or the time has passed. Only the
+  /// first reminder can warn about the streak — if it is missed the streak is
+  /// gone, so later days fall back to motivation.
+  static List<ReminderSlot> planReminders({
     required bool enabled,
     required bool hasCustomTime,
     required int hour,
@@ -69,13 +72,22 @@ class NotificationService {
     required bool hasPlayedToday,
     required DateTime now,
   }) {
-    if (!enabled || hasPlayedToday) return null;
-    return ReminderPlan(
-      hour: hasCustomTime ? hour : AppConstants.defaultReminderHour,
-      minute: hasCustomTime ? minute : AppConstants.defaultReminderMinute,
-      isStreakWarning: currentStreak > AppConstants.streakWarningThreshold,
-      variantIndex: variantIndexFor(now),
-    );
+    if (!enabled) return const [];
+    final h = hasCustomTime ? hour : AppConstants.defaultReminderHour;
+    final m = hasCustomTime ? minute : AppConstants.defaultReminderMinute;
+    final streakAtRisk = currentStreak > AppConstants.streakWarningThreshold;
+
+    final slots = <ReminderSlot>[];
+    for (var d = 0; d < AppConstants.reminderDaysAhead; d++) {
+      final at = DateTime(now.year, now.month, now.day + d, h, m);
+      if (d == 0 && (hasPlayedToday || !at.isAfter(now))) continue;
+      slots.add(ReminderSlot(
+        at: at,
+        isStreakWarning: streakAtRisk && slots.isEmpty,
+        variantIndex: variantIndexFor(at),
+      ));
+    }
+    return slots;
   }
 
   /// Whether any of [playedAt] falls on the same calendar day as [now].
@@ -93,7 +105,8 @@ class NotificationService {
     final sessions = Hive.box<GameSession>(AppConstants.sessionsBox);
     final now = DateTime.now();
 
-    final plan = planReminder(
+    final streak = progress?.currentStreak ?? 0;
+    final slots = planReminders(
       enabled: box.get(AppConstants.notificationsEnabledKey) as bool? ?? false,
       hasCustomTime:
           box.get(AppConstants.hasCustomReminderTimeKey) as bool? ?? false,
@@ -101,38 +114,45 @@ class NotificationService {
           AppConstants.defaultReminderHour,
       minute: box.get(AppConstants.customReminderMinuteKey) as int? ??
           AppConstants.defaultReminderMinute,
-      currentStreak: progress?.currentStreak ?? 0,
+      currentStreak: streak,
       hasPlayedToday: hasPlayedOn(sessions.values.map((s) => s.playedAt), now),
       now: now,
     );
 
-    await _plugin.cancel(id: _notificationId);
-    if (plan == null) return;
+    for (var d = 0; d < AppConstants.reminderDaysAhead; d++) {
+      await _plugin.cancel(id: _firstNotificationId + d);
+    }
+    if (slots.isEmpty) return;
 
     final language = AppConstants.resolveLanguage(
       WidgetsBinding.instance.platformDispatcher.locale.languageCode,
     );
     final l10n = await AppLocalizations.delegate.load(Locale(language));
-    final streak = progress?.currentStreak ?? 0;
-    final message = plan.isStreakWarning
-        ? streakVariant(l10n, plan.variantIndex, streak)
-        : motivationVariant(l10n, plan.variantIndex);
+    final today = DateTime(now.year, now.month, now.day);
 
-    await _plugin.zonedSchedule(
-      id: _notificationId,
-      title: l10n.appName,
-      body: message,
-      scheduledDate: _nextInstanceOfTime(plan.hour, plan.minute),
-      notificationDetails: NotificationDetails(
-        iOS: DarwinNotificationDetails(
-          interruptionLevel: plan.isStreakWarning
-              ? InterruptionLevel.timeSensitive
-              : InterruptionLevel.active,
+    for (final slot in slots) {
+      final dayOffset =
+          DateTime(slot.at.year, slot.at.month, slot.at.day)
+              .difference(today)
+              .inDays;
+      await _plugin.zonedSchedule(
+        id: _firstNotificationId + dayOffset,
+        title: l10n.appName,
+        body: slot.isStreakWarning
+            ? streakVariant(l10n, slot.variantIndex, streak)
+            : motivationVariant(l10n, slot.variantIndex),
+        scheduledDate: tz.TZDateTime(tz.local, slot.at.year, slot.at.month,
+            slot.at.day, slot.at.hour, slot.at.minute),
+        notificationDetails: NotificationDetails(
+          iOS: DarwinNotificationDetails(
+            interruptionLevel: slot.isStreakWarning
+                ? InterruptionLevel.timeSensitive
+                : InterruptionLevel.active,
+          ),
         ),
-      ),
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
-    );
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      );
+    }
   }
 
   static Future<void> cancelAll() async {
@@ -172,14 +192,4 @@ class NotificationService {
         5 => l10n.notificationStreak6(days),
         _ => l10n.notificationStreak7(days),
       };
-
-  static tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
-    final now = tz.TZDateTime.now(tz.local);
-    var scheduled =
-        tz.TZDateTime(tz.local, now.year, now.month, now.day, hour, minute);
-    if (scheduled.isBefore(now)) {
-      scheduled = scheduled.add(const Duration(days: 1));
-    }
-    return scheduled;
-  }
 }

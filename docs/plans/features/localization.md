@@ -42,7 +42,9 @@ tags: [l10n, i18n, russian, english, arb, intl]
   `AppConstants.resolveLanguage` (`ru` -> русский, любой другой -> английский)
 - Приложение использует то же правило: `localeResolutionCallback` в `main.dart` даёт английский
   для языков, кроме русского и английского
-- Числа со словами склоняются через ICU plural (`{days, plural, one{...} few{...} other{...}}`)
+- Числа со словами склоняются через ICU plural (`{days, plural, one{...} few{...} other{...}}`):
+  `parentShareCardTitle`, `streakDays`, `progressGoalStreak`, `progressStreakProgress`,
+  `notificationStreak1..3,6,7`, `accessoriesNotEnoughCoinsMessage` (тест `test/l10n/plurals_test.dart`)
 - Паритет ключей ru/en проверяется в CI (`ci.yml`, шаг «ARB key parity»)
 
 ## Области локализации
