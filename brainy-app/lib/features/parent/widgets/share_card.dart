@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -81,7 +82,9 @@ class ShareCard extends StatelessWidget {
           sharePositionOrigin: sharePosition,
         ),
       );
-    } catch (_) {
+    } catch (error, stack) {
+      // Reported, not fatal: the parent sees the snackbar and can retry.
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: false);
       messenger?.showSnackBar(SnackBar(content: Text(l10n.shareFailed)));
     }
   }

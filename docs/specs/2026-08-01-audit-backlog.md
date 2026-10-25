@@ -6,6 +6,11 @@ date: 2026-08-01
 
 # Ревизия Brainy — план доделок и улучшений
 
+> **Статус (2026-10-25):** документ исторический. Все пункты закрыты или переведены во внешние
+> действия в ветке `chore/finish-audit-changes`; актуальная сводка и решения —
+> [`2026-10-25-openspec-verification.md`](2026-10-25-openspec-verification.md), статус по задачам —
+> `tasks.md` каждого change в `openspec/`.
+
 Дата: 2026-08-01. Ветка: `main` @ `1253576`.
 
 Проверено: `flutter analyze`, `flutter test` (полный прогон), `npm test` + `npm audit` в `functions/`,
