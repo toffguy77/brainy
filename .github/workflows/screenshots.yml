@@ -1,0 +1,100 @@
+name: App Store screenshots
+
+# Runs the app on iOS simulators, captures the six App Store screens in ru
+# and en (integration_test/screenshot_test.dart), composes them with
+# captions (scripts/compose_screenshots.py) and uploads the fastlane-ready
+# set as an artifact. Doubles as a smoke test of the real app on iOS.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  screenshots:
+    runs-on: macos-15
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: brainy-app
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Select Xcode 26
+        run: sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.6
+          cache: true
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Capture on simulators
+        run: |
+          set -euo pipefail
+          runtime=$(xcrun simctl list runtimes -j | python3 -c "import json,sys; r=[x for x in json.load(sys.stdin)['runtimes'] if x['platform']=='iOS' and x['isAvailable']]; print(r[-1]['identifier'])")
+          echo "Runtime: $runtime"
+          capture() {
+            local folder="$1"; shift
+            local udid=""
+            for type in "$@"; do
+              id=$(xcrun simctl list devicetypes -j | python3 -c "import json,sys; t=[d['identifier'] for d in json.load(sys.stdin)['devicetypes'] if d['name']==sys.argv[1]]; print(t[0] if t else '')" "$type")
+              if [ -n "$id" ]; then udid=$(xcrun simctl create "shot-$folder" "$id" "$runtime") && break; fi
+            done
+            if [ -z "$udid" ]; then echo "::error::no simulator type for $folder ($*)"; exit 1; fi
+            xcrun simctl boot "$udid"
+            xcrun simctl bootstatus "$udid" -b
+            for locale in ru en; do
+              flutter drive \
+                --driver=test_driver/integration_test.dart \
+                --target=integration_test/screenshot_test.dart \
+                -d "$udid" \
+                --dart-define=LOCALE=$locale \
+                --dart-define=DEVICE=$folder
+            done
+            xcrun simctl shutdown "$udid"
+          }
+          capture 6.7 "iPhone 15 Pro Max" "iPhone 16 Plus" "iPhone 16 Pro Max" "iPhone 17 Pro Max"
+          capture 6.5 "iPhone 11 Pro Max" "iPhone XS Max"
+          capture ipad-13 "iPad Pro 13-inch (M4)" "iPad Pro 13-inch (M5)" "iPad Pro (12.9-inch) (6th generation)"
+          find screenshots/raw -name '*.png' | sort
+
+      - name: Compose and arrange for fastlane
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet -r scripts/requirements.txt
+          python3 scripts/compose_screenshots.py
+          python3 - <<'EOF'
+          import shutil
+          from pathlib import Path
+          screens = ["home", "game", "result", "characters", "progress", "parent"]
+          # fastlane files: <device>_<global index>_<screen>.png per locale
+          offsets = {"6.7": 1, "6.5": 7, "ipad-13": 13}
+          out = Path("fastlane-screenshots")
+          for device, start in offsets.items():
+              for locale, dest in (("ru", "ru"), ("en", "en-US")):
+                  for i, screen in enumerate(screens):
+                      src = Path("screenshots/final") / device / locale / f"{screen}.png"
+                      if not src.exists():
+                          raise SystemExit(f"missing {src}")
+                      target = out / dest / f"{device}_{start + i:02d}_{screen}.png"
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      shutil.copy(src, target)
+          print(sorted(str(p) for p in out.rglob("*.png")))
+          EOF
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-store-screenshots
+          path: brainy-app/fastlane-screenshots
+          if-no-files-found: error

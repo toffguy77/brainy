@@ -34,8 +34,10 @@ import 'package:brainy/app/main_shell.dart';
 /// Locale passed via --dart-define=LOCALE=ru (default: ru)
 const _locale = String.fromEnvironment('LOCALE', defaultValue: 'ru');
 
-/// Device name for output path (detected from screen size at runtime)
-String _deviceName = 'unknown';
+/// Device folder for output: '6.7', '6.5' or 'ipad-13'. Passed by the
+/// screenshots workflow via --dart-define=DEVICE=...; detected otherwise.
+const _deviceDefine = String.fromEnvironment('DEVICE');
+String _deviceName = _deviceDefine;
 
 /// Save a screenshot to screenshots/raw/{device}/{locale}/{name}.png
 /// Pump enough frames for the UI to render without waiting for all
@@ -169,6 +171,7 @@ Future<void> _seedMockData() async {
     dailyGoalMinutes: 10,
     activeCharacterId: 'brainy',
     lastSelectedGridSize: 5,
+    unlockedAccessories: ['hat_crown', 'glasses_sun', 'cape_mantle'],
     unlockedAchievements: [
       'first_game',
       'personal_record',
@@ -190,7 +193,7 @@ Future<void> _seedMockData() async {
       durationSeconds: 15 + (i * 2) % 20,
       mistakesCount: i % 3,
       isPersonalRecord: i == 0,
-      mode: 'classic',
+      mode: const ['classic', 'reverse', 'letters', 'classic'][i % 4],
       coinsEarned: 10 + (i % 3) * 5,
     );
     await sessionsBox.put(session.id, session);
@@ -198,9 +201,12 @@ Future<void> _seedMockData() async {
 
   // Records
   final recordsBox = Hive.box<int>(AppConstants.recordsBox);
-  await recordsBox.put('3', 7);
-  await recordsBox.put('4', 14);
-  await recordsBox.put('5', 18);
+  await recordsBox.put('classic_3', 7);
+  await recordsBox.put('classic_4', 14);
+  await recordsBox.put('classic_5', 18);
+  await recordsBox.put('classic_6', 31);
+  await recordsBox.put('reverse_5', 21);
+  await recordsBox.put('letters_4', 19);
 
   // Characters — Brainy + Zap unlocked
   final characterBox = Hive.box<CharacterData>(AppConstants.characterBox);
@@ -210,6 +216,10 @@ Future<void> _seedMockData() async {
       nameRu: info.id,
       nameEn: info.id,
       isUnlocked: info.id == 'brainy' || info.id == 'zap',
+      // Show the accessory shop's result on the avatar.
+      equippedHat: info.id == 'brainy' ? 'hat_crown' : null,
+      equippedGlasses: info.id == 'brainy' ? 'glasses_sun' : null,
+      equippedCape: info.id == 'brainy' ? 'cape_mantle' : null,
     );
     await characterBox.put(info.id, data);
   }
@@ -245,11 +255,11 @@ void main() {
 
   testWidgets('Capture App Store screenshots ($_locale)', (tester) async {
     // Detect device name from screen size
-    final size = tester.view.physicalSize;
-    if (size.width >= 1290) {
-      _deviceName = '6.7';
-    } else {
-      _deviceName = '6.5';
+    if (_deviceName.isEmpty) {
+      final size = tester.view.physicalSize;
+      _deviceName = size.width / size.height > 0.7
+          ? 'ipad-13'
+          : (size.width >= 1290 ? '6.7' : '6.5');
     }
 
     await _seedMockData();

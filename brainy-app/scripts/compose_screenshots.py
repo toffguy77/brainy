@@ -28,17 +28,17 @@ SCREENS = ["home", "game", "result", "characters", "progress", "parent"]
 CAPTIONS = {
     "ru": {
         "home": "Тренируй внимание каждый день",
-        "game": "Таблицы Шульте от 3×3 до 9×9",
+        "game": "4 режима: цифры, обратный, буквы",
         "result": "Ставь рекорды и получай звёзды",
-        "characters": "Собирай персонажей",
+        "characters": "Наряжай персонажа за монеты",
         "progress": "Следи за прогрессом",
         "parent": "Контроль для родителей",
     },
     "en": {
         "home": "Train your focus daily",
-        "game": "Schulte tables from 3×3 to 9×9",
+        "game": "4 modes: numbers, reverse, letters",
         "result": "Set records and earn stars",
-        "characters": "Collect characters",
+        "characters": "Dress up your character",
         "progress": "Track your progress",
         "parent": "Parent controls",
     },
