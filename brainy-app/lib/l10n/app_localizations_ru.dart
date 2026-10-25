@@ -682,6 +682,15 @@ class AppLocalizationsRu extends AppLocalizations {
       'Чередуй: белые по возрастанию, красные по убыванию';
 
   @override
+  String get gameModeReverseBadge => 'Обр';
+
+  @override
+  String get gameModeGorbovBadge => 'Горб';
+
+  @override
+  String get gameModeLettersBadge => 'Букв';
+
+  @override
   String homeDailyGoal(int played, int goal) {
     return 'Сегодня: $played из $goal мин';
   }

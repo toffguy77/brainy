@@ -11,6 +11,10 @@ import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../widgets/share_card.dart';
 import '../../../constants/game_modes.dart';
+import '../../../models/session.dart';
+import '../../game/game_mode_text.dart';
+import '../../home/providers/training_goals_provider.dart';
+import '../../progress/widgets/mode_filter.dart';
 
 class ParentDashboardScreen extends ConsumerWidget {
   const ParentDashboardScreen({super.key});
@@ -21,6 +25,8 @@ class ParentDashboardScreen extends ConsumerWidget {
     final progress = ref.watch(userProgressProvider);
     final sessions = ref.watch(sessionsProvider);
     final records = ref.watch(recordsProvider);
+    final mode = ref.watch(statsModeProvider);
+    final todaySeconds = ref.watch(todayPlaySecondsProvider);
 
     final now = DateTime.now();
     final weekAgo = now.subtract(const Duration(days: 7));
@@ -75,12 +81,19 @@ class ParentDashboardScreen extends ConsumerWidget {
             streak: progress.currentStreak,
             avgTime: avgTime,
             sessionCount: weekSessions.length,
+            todayMinutes: todaySeconds ~/ 60,
+            goalMinutes: progress.dailyGoalMinutes,
             l10n: l10n,
           ),
           const SizedBox(height: 16),
-          _ProgressChart(sessions: sessions, l10n: l10n),
+          const ModeFilterChips(),
           const SizedBox(height: 16),
-          _BestResultsCard(records: records, l10n: l10n),
+          _ProgressChart(
+            sessions: sessions.where((s) => s.mode == mode).toList(),
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+          _BestResultsCard(records: records, mode: mode, l10n: l10n),
           const SizedBox(height: 16),
           _RecentSessionsList(sessions: sessions, l10n: l10n),
         ],
@@ -93,12 +106,16 @@ class _WeekSummaryCard extends StatelessWidget {
   final int streak;
   final int avgTime;
   final int sessionCount;
+  final int todayMinutes;
+  final int goalMinutes;
   final AppLocalizations l10n;
 
   const _WeekSummaryCard({
     required this.streak,
     required this.avgTime,
     required this.sessionCount,
+    required this.todayMinutes,
+    required this.goalMinutes,
     required this.l10n,
   });
 
@@ -153,6 +170,20 @@ class _WeekSummaryCard extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            todayMinutes >= goalMinutes
+                ? l10n.homeDailyGoalDone
+                : l10n.homeDailyGoal(todayMinutes, goalMinutes),
+            style: TextStyle(
+              fontFamily: 'Nunito',
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: todayMinutes >= goalMinutes
+                  ? AppColors.success
+                  : AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -222,8 +253,10 @@ class _StatItem extends StatelessWidget {
   }
 }
 
+/// Daily best 5x5 time over 14 days for the sessions passed in — the caller
+/// filters them to the selected mode. Every mode has a 5x5 table.
 class _ProgressChart extends StatelessWidget {
-  final List sessions;
+  final List<GameSession> sessions;
   final AppLocalizations l10n;
 
   const _ProgressChart({required this.sessions, required this.l10n});
@@ -365,8 +398,13 @@ class _ProgressChart extends StatelessWidget {
 
 class _BestResultsCard extends StatelessWidget {
   final Map<String, int> records;
+  final String mode;
   final AppLocalizations l10n;
-  const _BestResultsCard({required this.records, required this.l10n});
+  const _BestResultsCard({
+    required this.records,
+    required this.mode,
+    required this.l10n,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -392,8 +430,8 @@ class _BestResultsCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: AppConstants.allGridSizes.map((size) {
-              final record = records[recordKey(GameModes.classic, size)];
+            children: AppConstants.gridSizesForMode(mode).map((size) {
+              final record = records[recordKey(mode, size)];
               return _RecordChip(
                 label: '$size×$size',
                 value: record != null
@@ -453,7 +491,7 @@ class _RecordChip extends StatelessWidget {
 }
 
 class _RecentSessionsList extends StatelessWidget {
-  final List sessions;
+  final List<GameSession> sessions;
   final AppLocalizations l10n;
 
   const _RecentSessionsList({required this.sessions, required this.l10n});
@@ -496,7 +534,7 @@ class _RecentSessionsList extends StatelessWidget {
               ),
             )
           else
-            ...recent.map((s) => _SessionRow(session: s)),
+            ...recent.map((s) => _SessionRow(session: s, l10n: l10n)),
         ],
       ),
     );
@@ -504,9 +542,10 @@ class _RecentSessionsList extends StatelessWidget {
 }
 
 class _SessionRow extends StatelessWidget {
-  final dynamic session;
+  final GameSession session;
+  final AppLocalizations l10n;
 
-  const _SessionRow({required this.session});
+  const _SessionRow({required this.session, required this.l10n});
 
   @override
   Widget build(BuildContext context) {
@@ -544,27 +583,27 @@ class _SessionRow extends StatelessWidget {
               ),
             ),
           ),
-          if (session.mode == GameModes.gorbov)
+          if (gameModeBadge(l10n, session.mode) case final badge?)
             Container(
               margin: const EdgeInsets.only(left: 4),
               padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               decoration: BoxDecoration(
-                color: const Color(0xFFE17055).withValues(alpha: 0.2),
+                color: _badgeColor(session.mode).withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(4),
               ),
-              child: const Text(
-                '\u0413',
+              child: Text(
+                badge,
                 style: TextStyle(
                   fontFamily: 'Nunito',
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFFE17055),
+                  color: _badgeColor(session.mode),
                 ),
               ),
             ),
           const SizedBox(width: 12),
           Text(
-            '${session.durationSeconds}s',
+            l10n.shareSeconds(session.durationSeconds),
             style: const TextStyle(
               fontFamily: 'Nunito',
               fontSize: 14,
@@ -593,3 +632,9 @@ class _SessionRow extends StatelessWidget {
     );
   }
 }
+
+Color _badgeColor(String mode) => switch (mode) {
+      GameModes.gorbov => AppColors.gorbovRed,
+      GameModes.letters => AppColors.secondary,
+      _ => AppColors.accent,
+    };

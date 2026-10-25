@@ -81,14 +81,18 @@ Vortex — 30, Glitch — 60 (`longestStreak`, поэтому прерванны
 
 ## Детальная статистика по размеру
 
-При тапе на чип рекорда на экране прогресса открывается `GridDetailScreen` с:
+Секция «Рекорды» на экране прогресса показывает переключатель режима (`ModeFilterChips`,
+`statsModeProvider` — общий с дашбордом родителя) и чипы размеров выбранного режима
+(`gridSizesForMode`). Тап по чипу открывает `/progress/grid-detail?size=N&mode=M` —
+`GridDetailScreen` с заголовком «Режим · Таблица N×N» и:
 - Фильтры периодов: Нед | Мес | 3М | Год | Всё
 - График LineChart (fl_chart): линия daily best, scatter-точки всех сессий, пунктир рекорда
 - Карточки: лучшее время, среднее время, всего игр
 
 Доступна всем пользователям.
 
-Провайдер: `GridStatsProvider` с `TimePeriod` enum.
+Провайдер: `gridStatsProvider((mode:, gridSize:))` — семейство по паре режим/размер; сессии и
+рекорд берутся только этого режима, звёзды — `starThresholdsFor(mode, size)`.
 
 ## Модель UserProgress
 

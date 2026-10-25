@@ -92,7 +92,11 @@ final router = GoRouter(
           builder: (context, state) {
             final size =
                 int.tryParse(state.uri.queryParameters['size'] ?? '') ?? 5;
-            return GridDetailScreen(gridSize: size);
+            final mode = state.uri.queryParameters['mode'];
+            return GridDetailScreen(
+              gridSize: size,
+              mode: GameModes.all.contains(mode) ? mode! : GameModes.classic,
+            );
           },
         ),
       ],

@@ -403,6 +403,9 @@
   },
   "gameModeClassicHint": "Нажимай числа по возрастанию",
   "gameModeGorbovHint": "Чередуй: белые по возрастанию, красные по убыванию",
+  "gameModeReverseBadge": "Обр",
+  "gameModeGorbovBadge": "Горб",
+  "gameModeLettersBadge": "Букв",
   "homeDailyGoal": "Сегодня: {played} из {goal} мин",
   "@homeDailyGoal": {
     "placeholders": {

@@ -678,6 +678,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get gameModeGorbovHint => 'Alternate: white ascending, red descending';
 
   @override
+  String get gameModeReverseBadge => 'Rev';
+
+  @override
+  String get gameModeGorbovBadge => 'Gorb';
+
+  @override
+  String get gameModeLettersBadge => 'ABC';
+
+  @override
   String homeDailyGoal(int played, int goal) {
     return 'Today: $played of $goal min';
   }

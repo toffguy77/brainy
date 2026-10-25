@@ -1304,6 +1304,24 @@ abstract class AppLocalizations {
   /// **'Чередуй: белые по возрастанию, красные по убыванию'**
   String get gameModeGorbovHint;
 
+  /// No description provided for @gameModeReverseBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Обр'**
+  String get gameModeReverseBadge;
+
+  /// No description provided for @gameModeGorbovBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Горб'**
+  String get gameModeGorbovBadge;
+
+  /// No description provided for @gameModeLettersBadge.
+  ///
+  /// In ru, this message translates to:
+  /// **'Букв'**
+  String get gameModeLettersBadge;
+
   /// No description provided for @homeDailyGoal.
   ///
   /// In ru, this message translates to:

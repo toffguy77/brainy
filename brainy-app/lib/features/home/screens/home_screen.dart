@@ -11,6 +11,7 @@ import '../../parent/providers/parent_provider.dart';
 import '../../character/data/characters_data.dart';
 import '../../character/widgets/dressed_avatar.dart';
 import '../providers/training_goals_provider.dart';
+import '../../game/game_mode_text.dart';
 import '../../../constants/game_modes.dart';
 import '../../../models/session.dart';
 
@@ -231,19 +232,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   static const _modes = GameModes.all;
 
-  String _modeLabel(String mode, AppLocalizations l10n) => switch (mode) {
-    GameModes.reverse => l10n.gameModeReverse,
-    GameModes.gorbov => l10n.gameModeGorbov,
-    GameModes.letters => l10n.gameModeLetters,
-    _ => l10n.gameModeClassic,
-  };
+  String _modeLabel(String mode, AppLocalizations l10n) =>
+      gameModeLabel(l10n, mode);
 
-  String _modeHint(String mode, AppLocalizations l10n) => switch (mode) {
-    GameModes.reverse => l10n.gameModeReverseHint,
-    GameModes.gorbov => l10n.gameModeGorbovHint,
-    GameModes.letters => l10n.gameModeLettersHint,
-    _ => l10n.gameModeClassicHint,
-  };
+  String _modeHint(String mode, AppLocalizations l10n) =>
+      gameModeHint(l10n, mode);
 
   /// Four modes no longer fit a two-segment toggle at these font sizes, so the
   /// selector is a 2x2 grid of chips.

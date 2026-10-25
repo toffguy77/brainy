@@ -403,6 +403,9 @@
   },
   "gameModeClassicHint": "Tap numbers in ascending order",
   "gameModeGorbovHint": "Alternate: white ascending, red descending",
+  "gameModeReverseBadge": "Rev",
+  "gameModeGorbovBadge": "Gorb",
+  "gameModeLettersBadge": "ABC",
   "homeDailyGoal": "Today: {played} of {goal} min",
   "@homeDailyGoal": {
     "placeholders": {

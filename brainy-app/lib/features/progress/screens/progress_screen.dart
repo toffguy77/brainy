@@ -10,7 +10,7 @@ import '../../game/providers/records_provider.dart';
 import '../../game/providers/sessions_provider.dart';
 import '../../game/providers/user_progress_provider.dart';
 import '../providers/achievements_provider.dart';
-import '../../../constants/game_modes.dart';
+import '../widgets/mode_filter.dart';
 
 class ProgressScreen extends ConsumerWidget {
   const ProgressScreen({super.key});
@@ -691,6 +691,9 @@ class _RecordsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mode = ref.watch(statsModeProvider);
+    final hasRecords = AppConstants.gridSizesForMode(mode)
+        .any((size) => records.containsKey(recordKey(mode, size)));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -704,7 +707,9 @@ class _RecordsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (records.isEmpty)
+        const ModeFilterChips(),
+        const SizedBox(height: 12),
+        if (!hasRecords)
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(20),
@@ -727,12 +732,12 @@ class _RecordsSection extends StatelessWidget {
             spacing: 10,
             runSpacing: 10,
             children: [
-              for (final size in [3, 4, 5, 6, 7, 9])
+              for (final size in AppConstants.gridSizesForMode(mode))
                 _RecordChip(
                   gridSize: size,
-                  seconds: records[recordKey(GameModes.classic, size)],
-                  onTap: () =>
-                      context.push('/progress/grid-detail?size=$size'),
+                  seconds: records[recordKey(mode, size)],
+                  onTap: () => context
+                      .push('/progress/grid-detail?size=$size&mode=$mode'),
                 ),
             ],
           ),
@@ -789,7 +794,9 @@ class _RecordChip extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  hasRecord ? '${seconds}s' : '—',
+                  hasRecord
+                      ? AppLocalizations.of(context)!.shareSeconds(seconds!)
+                      : '—',
                   style: TextStyle(
                     fontFamily: 'Nunito',
                     fontSize: 13,
