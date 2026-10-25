@@ -1,29 +1,37 @@
-Brainy is a fun attention and reading speed trainer powered by Schulte tables.
+Brainy is a focus trainer built on Schulte tables — it turns three minutes a day into a habit of thinking faster.
 
-HOW IT WORKS
-Schulte tables are a proven method for developing peripheral vision, focus, and information processing speed. Numbers are scattered across a grid — the goal is to find them in order as fast as possible.
+A Schulte table is a classic neuropsychology exercise: numbers or letters are scattered across a grid and you find them in order, as fast as you can. It trains concentration, peripheral vision and visual processing speed — the skills behind faster reading, longer focus and fewer distractions.
 
-WHAT'S INSIDE
-- Tables from 3×3 to 9×9 — easy to challenging
-- Four game modes: classic, reverse, letters and Gorbov-Schulte
-- Levels and achievements system — daily motivation
-- Character collection — unlock new heroes through progress
-- Daily streaks — keep your training consistent
-- Detailed stats and progress charts
-- Parent dashboard — track progress in every mode
-- Daily goal and adaptive difficulty that grows with you
-- Collect coins and dress up your character
+FOUR MODES
+• Classic — numbers in ascending order, from 3×3 to 9×9
+• Reverse — from highest to lowest, breaks the familiar pattern
+• Letters — the alphabet instead of numbers, in English and Russian
+• Gorbov-Schulte — alternate white and red numbers, the ultimate attention-switching workout
 
-WHY BRAINY
-- Science-based: Schulte tables are used in neuropsychology
-- Game format: training feels like play
-- Short sessions: 2–5 minutes a day is enough
-- Completely free: every mode, every table size, all statistics
-- No ads and no subscriptions: nothing distracts from training
-- Works offline
+GROWS WITH YOU
+• Adaptive difficulty: when a table gets easy, Brainy suggests the next size
+• Stars for speed and personal records in every mode
+• Daily goal — choose 5, 10 or 15 minutes and close it every day
+• Day streaks and reminders at the time you choose, so you keep the rhythm
 
-Brainy helps improve focus, reading speed, and overall cognitive performance through play.
+A GAME, NOT A CHORE
+• Coins and XP for every session
+• Character collection — unlock new heroes with levels and streaks
+• Accessory shop: crowns, glasses, capes and effects for your hero
+• Achievements and a weekly league on Game Center
 
-Join our Telegram channel for news and updates: https://t.me/+O7pPZ6DJ3Vo4MDJi
+PROGRESS YOU CAN SEE
+• Charts and best results for every mode and table size
+• PIN-protected parent dashboard: stats, daily goal, table size, reminders
+• A progress card you can share
+
+HONEST AND CALM
+• Completely free: every mode, every size, all statistics
+• No ads, no subscriptions, no in-app purchases
+• Works offline and collects no analytics
+
+Three minutes of Brainy a day — and focus becomes a habit.
+
+News and updates in our Telegram channel: https://t.me/+O7pPZ6DJ3Vo4MDJi
 
 Terms of Use (EULA): https://www.apple.com/legal/internet-services/itunes/dev/stdeula/

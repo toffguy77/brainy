@@ -1,6 +1,9 @@
-- Two new game modes: reverse and letters
-- Everything is free: all modes and table sizes
-- Daily goal and adaptive difficulty
-- Accessory shop: spend coins to dress up your character
-- Stats for every game mode
-- Bug fixes and performance improvements
+Brainy 1.2 is a big one:
+
+• Four modes: classic, reverse, letters and Gorbov-Schulte
+• Daily goal — pick your minutes a day and watch your progress
+• Adaptive difficulty: Brainy tells you when you're ready for a bigger table
+• Accessory shop — spend coins on crowns, glasses, capes and effects
+• Stats for every mode; new characters unlock with levels and streaks
+• Reminders arrive on time and in your language
+• Everything free: no ads, no subscriptions, no in-app purchases
